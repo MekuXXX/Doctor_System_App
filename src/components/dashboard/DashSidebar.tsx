@@ -22,7 +22,7 @@ export default function DashSidebar({ links }: Props) {
       <SheetTrigger>
         <RxHamburgerMenu size={25} />
       </SheetTrigger>
-      <SheetContent side={"left"}>
+      <SheetContent>
         <SheetHeader>
           <SheetTitle>Logo</SheetTitle>
           <SheetDescription>Courtry</SheetDescription>

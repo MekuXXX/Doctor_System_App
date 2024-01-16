@@ -23,14 +23,14 @@ export async function UserAvatar({ image, alt }: Props) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
-        <Avatar>
+        <Avatar className="flex items-center justify-center">
           <AvatarImage
             src={image}
             alt={alt}
-            className="w-8 h-8 aspect-auto rounded-full"
+            className="w-8 h-8 aspect-auto rounded"
           />
           <AvatarFallback>
-            <Skeleton className="w-8 h-8 rounded-full" />
+            <Skeleton className="w-8 h-8 rounded" />
           </AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>

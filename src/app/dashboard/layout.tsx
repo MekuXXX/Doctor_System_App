@@ -1,6 +1,5 @@
 import DashSidebar from "@/components/dashboard/DashSidebar";
 import DashHeader from "@/components/dashboard/DashHeader";
-import DashFooter from "@/components/dashboard/DashFooter";
 import React from "react";
 
 type Props = {
@@ -50,13 +49,12 @@ export default function DashboardLayout({ children }: Props) {
   return (
     <>
       <div className="content">
-        <div className="feature fx-between gap-2">
+        <div className="feature fx-between gap-6">
           <DashSidebar links={sidebarLinks[0].links} />
           <DashHeader />
         </div>
       </div>
-      {children}
-      <DashFooter />
+      <div>{children}</div>
     </>
   );
 }
