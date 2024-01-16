@@ -85,7 +85,7 @@
     --feature: minmax(0, 5rem);
 
     display: grid;
-    padding: 1rem 0 3rem;
+    padding: 1rem 0;
     grid-template-columns:
       [full-start] var(--full)
       [feature-start] var(--feature)

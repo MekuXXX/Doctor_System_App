@@ -4,7 +4,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/global/ThemeProvider";
 import "./globals.css";
 
-const inter = Poppins({ weight: ["500", "600"], subsets: ["latin"] });
+const poppins = Poppins({ weight: ["500", "600"], subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -18,7 +18,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="auto" dir="rlt">
-      <body className={`${inter.className} h-full light:bg-[#e5e5e5]`}>
+      <body
+        className={`${poppins.className} h-full bg-[#e5e5e5] dark:bg-[#020817]`}
+      >
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

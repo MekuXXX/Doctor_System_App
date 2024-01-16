@@ -9,6 +9,10 @@ const titles = [
     from: "sessions",
     to: "الحجوزات والطلبات",
   },
+  {
+    from: "dashboard",
+    to: "الصفحة الرئيسية",
+  },
 ];
 
 export type TitlesType = typeof titles;
