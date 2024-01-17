@@ -31,7 +31,7 @@ interface DataTableProps<TData, TValue> {
   chilrendButtons?: React.ReactNode;
 }
 
-export function AllSessionsTable<TData, TValue>({
+export function DataTable<TData, TValue>({
   columns,
   data,
   chilrendButtons,
@@ -64,17 +64,17 @@ export function AllSessionsTable<TData, TValue>({
       <div className="flex items-center py-4">
         <Input
           placeholder="Filter emails..."
-          value={table.getColumn("email")?.getFilterValue() as string}
+          // value={table.getColumn("email")?.getFilterValue() as string}
           onChange={(event) =>
             table.getColumn("email")?.setFilterValue(event.target.value)
           }
-          className="max-w-sm"
+          className="max-w-sm bg-white dark:bg-dark"
         />
         <DataTableViewOptions table={table} />
         {chilrendButtons}
       </div>
-      <div className="rounded-md border">
-        <Table>
+      <div className="rounded-md border bg-white dark:bg-dark py-6 px-4">
+        <Table dir="rtl" className="text-left">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
@@ -119,7 +119,7 @@ export function AllSessionsTable<TData, TValue>({
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  No results.
+                  لا توجد نتائج
                 </TableCell>
               </TableRow>
             )}

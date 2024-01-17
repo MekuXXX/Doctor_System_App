@@ -1,4 +1,4 @@
-import { AllSessionsTable } from "@/components/dashboard/Tables/AllSessions/AllSessions";
+import { DataTable } from "@/components/dashboard/Tables/DataTable";
 import { Payment, columns } from "./data-table";
 // import { AddCopounButton } from "@/components/dashboard/Tables/ClientButtons";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -181,7 +181,7 @@ export default function CouponsPage({}: Props) {
           </TabsList>
         </div>
         <TabsContent value="sessions">
-          <AllSessionsTable
+          <DataTable
             columns={columns}
             data={data}
             chilrendButtons={

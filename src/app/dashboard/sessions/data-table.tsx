@@ -1,129 +1,139 @@
 "use client";
-import { IoMdClipboard } from "react-icons/io";
 import { Button } from "@/components/ui/button";
+import { BsThreeDots } from "react-icons/bs";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ColumnDef } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "@/components/global/DataTableColumnHeader";
-import { MdDelete } from "react-icons/md";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Badge } from "@/components/ui/badge";
-// This type is used to define the shape of our data.
-// You can use a Zod schema here if you want.
-export type Payment = {
-  id: string;
-  amount: number;
-  status: "pending" | "processing" | "success" | "failed";
-  email: string;
-};
+import { DataTableItem } from "@/components/global/DataTableItem";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
-export const columns: ColumnDef<Payment>[] = [
+export const columns: ColumnDef<any>[] = [
   {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
+    accessorKey: "#",
+    header: ({}) => (
+      <DataTableColumnHeader className=" text-black dark:text-white font-bolder text-lg">
+        #
+      </DataTableColumnHeader>
     ),
     cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
+      <DataTableItem className="text-black dark:text-white">
+        {String(row.index + 1).padStart(2, "00")}
+      </DataTableItem>
+    ),
+  },
+  {
+    accessorKey: "patient",
+    header: () => <DataTableColumnHeader>Patient</DataTableColumnHeader>,
+    cell: () => <DataTableItem>Mr. Bobby</DataTableItem>,
+  },
+  {
+    accessorKey: "Dr name",
+    header: () => <DataTableColumnHeader>Dr Name</DataTableColumnHeader>,
+    cell: () => <DataTableItem>Dr.Jackson</DataTableItem>,
+  },
+  {
+    accessorKey: "Data",
+    header: () => <DataTableColumnHeader>Data</DataTableColumnHeader>,
+    cell: () => (
+      <DataTableItem>Data</DataTableItem>
+      // <DataTableItem>
+      //   <Accordion type="single" collapsible>
+      //     <AccordionItem value="item-1">
+      //       <AccordionTrigger>Is it accessible?</AccordionTrigger>
+      //       <AccordionContent>
+      //         Yes. It adheres to the WAI-ARIA design pattern.
+      //       </AccordionContent>
+      //     </AccordionItem>
+      //   </Accordion>
+      // </DataTableItem>
     ),
   },
   {
     accessorKey: "status",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Status" />
+      <DataTableColumnHeader>Status</DataTableColumnHeader>
     ),
     cell: ({ row }) => {
-      const value = row.getValue("status");
+      const value = "success";
       return (
-        <Badge
-          className={
-            value === "pending"
-              ? "bg-orange-400"
-              : value === "success"
-                ? "bg-green-600"
-                : "bg-red-500"
-          }
+        <span
+          className="bg-green-200 text-green-800 py-1 px-2 rounded-xl text-[0.75rem]"
+          // className={
+          //   (value === "pending"
+          //     ? "bg-orange-200 text-orange-800"
+          //     : value === "success"
+          //       ? "bg-green-200 text-green-800"
+          //       : "bg-red-200 text-red-800") +
+          //   " py-1 px-2 rounded-xl text-[0.75rem]"
+          // }
         >
-          {value as string}
-        </Badge>
+          {value}
+        </span>
       );
     },
   },
   {
-    accessorKey: "email",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Email" />
-    ),
-  },
-  {
     accessorKey: "amount",
-    header: () => <div className="text-right">Amount</div>,
+    header: () => (
+      <DataTableColumnHeader className="text-right">
+        Price
+      </DataTableColumnHeader>
+    ),
     cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("amount"));
+      const amount = row.index + 35;
       const formatted = new Intl.NumberFormat("en-US", {
         style: "currency",
         currency: "USD",
       }).format(amount);
 
-      return <div className="text-right font-medium">{formatted}</div>;
+      return (
+        <DataTableItem className="text-right font-medium">
+          {formatted}
+        </DataTableItem>
+      );
     },
   },
   {
-    id: "actions",
     accessorKey: "Actions",
+    header: ({ column }) => (
+      <DataTableColumnHeader>Actions</DataTableColumnHeader>
+    ),
     cell: ({ row }) => {
-      const payment = row.original;
+      const status = row.getValue("status");
       return (
-        <div className="text-right">
+        <div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline">
+              <Button
+                variant="ghost"
+                className={
+                  "bg-green-200 hover:bg-green-200 text-green-800 hover:text-green-800"
+                  // status === "pending"
+                  //   ? "bg-orange-200 hover:bg-orange-200 hover:text-orange-800 text-orange-800"
+                  //   : status === "success"
+                  //     ? "bg-green-200 hover:bg-green-200 text-green-800 hover:text-green-800"
+                  //     : "bg-red-200 hover:bg-red-200 text-red-800 hover:text-red-800"
+                }
+              >
                 <span className="sr-only">Open menu</span>
-                <IoMdClipboard />
+                <BsThreeDots />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem
-                onClick={() => navigator.clipboard.writeText(payment.status)}
-              >
-                Copy status
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={() => navigator.clipboard.writeText(payment.email)}
-              >
-                Copy email
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() =>
-                  navigator.clipboard.writeText(`${payment.amount}`)
-                }
-              >
-                Copy amount
-              </DropdownMenuItem>
+              <DropdownMenuItem>Edit</DropdownMenuItem>
+              <DropdownMenuItem>Delete</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button variant={"destructive"} className="ml-2">
-            <MdDelete />
-          </Button>
         </div>
       );
     },
