@@ -31,15 +31,19 @@ export default function DashHeader({}: Props) {
             <Notifications />
           </div>
           <div>
-            <Button className="w-9 h-9 p-0" variant={"outline"}>
+            <Button
+              className="w-9 h-9 p-0"
+              variant={"outline"}
+              aria-label="الأعضاء"
+            >
               <PiDotsNineBold className="w-[1.2rem] h-[1.2rem]" />
             </Button>
           </div>
           <div className="flex items-center gap-2">
             <div>
-              <h3 className="text-[0.875rem] text-[#ed0b4c] tracking-wider">
+              <p className="text-[0.875rem] text-[#ed0b4c] tracking-wider">
                 David Morse
-              </h3>
+              </p>
               <p className="text-[0.625rem] -mt-1 uppercase tracking-wide">
                 Admin
               </p>

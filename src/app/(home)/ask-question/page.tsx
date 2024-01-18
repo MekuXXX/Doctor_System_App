@@ -33,7 +33,7 @@ export default function AskQuestionPage({}: Props) {
     <main className="content">
       <h1 className="text-2xl ">أسئلة طبية</h1>
       <Separator className="mt-4 mb-8" />
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-4 gap-4 feature">
         <div className="col-span-3 flex flex-col">
           <MainButton className=" justify-self-end">اسأل الان</MainButton>
           <div className="bg-[#e5e5e5] dark:bg-[#020817] mt-8 rounded-xl p-8">

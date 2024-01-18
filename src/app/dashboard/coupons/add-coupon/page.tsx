@@ -45,11 +45,13 @@ export default function AddCoupon({}: Props) {
     resolver: zodResolver(FormRangedSchema),
   });
 
-  const copounType = form.watch("couponType");
+  const { watch, resetField } = form;
+
+  const copounType = watch("couponType");
 
   useEffect(() => {
-    form.resetField("rangeDate");
-  }, [copounType]);
+    resetField("rangeDate");
+  }, [copounType, resetField]);
 
   function onSubmit(data: FormRangedSchemaType) {
     let parsed;

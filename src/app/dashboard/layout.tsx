@@ -24,22 +24,27 @@ const sidebarLinks: SideBarLinkType[] = [
       {
         id: 1,
         link: "",
-        text: "Main page",
+        text: "الصفحة الرئيسية",
       },
       {
         id: 2,
         link: "sessions",
-        text: "Sessions",
+        text: "الطلبات والحجوزات",
       },
       {
         id: 3,
-        link: "profile",
-        text: "Profile",
+        link: "coupons",
+        text: "الكوبونات",
       },
       {
         id: 4,
-        link: "coupons",
-        text: "Coupons",
+        link: "doctor-data",
+        text: "بيانات الطبيب",
+      },
+      {
+        id: 5,
+        link: "profile",
+        text: "الملف الشخصى",
       },
     ],
   },
@@ -47,7 +52,7 @@ const sidebarLinks: SideBarLinkType[] = [
 
 export default function DashboardLayout({ children }: Props) {
   return (
-    <div className="bg-[#e5e5e5] dark:bg-[#020817]">
+    <div className="bg-[#e5e5e5] dark:bg-[#020817] min-h-screen">
       <div className="content">
         <div className="feature fx-between gap-6">
           <DashSidebar links={sidebarLinks[0].links} />

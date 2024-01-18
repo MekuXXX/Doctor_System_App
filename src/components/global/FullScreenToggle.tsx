@@ -24,6 +24,7 @@ export function FullScreenToggle({}: Props) {
       variant={"outline"}
       className="w-9 h-9 p-0"
       onClick={handleFullScreen}
+      aria-label="ملىء الشاشة"
     >
       {isFullScreen ? (
         <RxExitFullScreen className="w-[1.2rem] h-[1.2rem]" />

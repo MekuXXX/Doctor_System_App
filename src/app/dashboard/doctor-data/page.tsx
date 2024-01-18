@@ -5,100 +5,77 @@ import { Button } from "@/components/ui/button";
 
 export default function Component() {
   return (
-    <div className="mx-auto max-w-sm space-y-6">
-      <div className="space-y-2 text-center">
-        <h1 className="text-3xl font-bold">Doctor Data</h1>
-        <p className="text-gray-500 dark:text-gray-400">
-          Enter your information of a doctor
-        </p>
-      </div>
-      <div className="space-y-4">
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="username">Username</Label>
-            <Input id="username" placeholder="Enter your username" required />
+    <div className="content">
+      <div className="bg-white dark:bg-dark py-8 px-6 rounded-xl">
+        <div className="space-y-2 text-center">
+          <h1 className="text-3xl font-bold">بيانات الطبيب</h1>
+        </div>
+
+        <div className="mt-8 grid gap-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="first-name">الاسم الأول</Label>
+              <Input id="first-name" required />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="last-name">الاسم الأخير</Label>
+              <Input id="last-name" required />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="username">الاسم</Label>
+              <Input id="username" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="role">التخصص</Label>
+              <Input id="role" />
+            </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="role">Role</Label>
-            <Input id="role" placeholder="Enter your role" required />
-          </div>
-        </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="first-name">First name</Label>
-            <Input
-              id="first-name"
-              placeholder="Enter your first name"
-              required
-            />
+            <Label htmlFor="email">الحساب</Label>
+            <Input id="email" required type="email" />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="last-name">Last name</Label>
-            <Input id="last-name" placeholder="Enter your last name" required />
+            <Label htmlFor="country">البلد</Label>
+            <Input id="country" required />
           </div>
+          <div className="space-y-2">
+            <Label htmlFor="gender">الجنس</Label>
+            <Input id="gender" required />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="password">كلمة المرور</Label>
+            <Input id="password" required type="password" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="brief-paragraph">نبذه</Label>
+            <Textarea className="min-h-[100px]" required />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="certificates-paragraph">الشهادات</Label>
+            <Textarea className="min-h-[100px]" required />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="article-about">المقال</Label>
+            <Textarea className="min-h-[100px]" required />
+          </div>
+          {/* <div className="space-y-2">
+            <Label htmlFor="position">Position</Label>
+            <Input id="position" placeholder="Enter your position" required />
+          </div> */}
+          <div className="space-y-2">
+            <Label htmlFor="image-upload">الصوره</Label>
+            <Input id="image-upload" required type="file" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="phone-number">رقم الهاتف</Label>
+            <Input id="phone-number" required />
+          </div>
+          <Button className="w-full" type="submit">
+            تحديث
+          </Button>
         </div>
-        <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
-          <Input id="email" placeholder="m@example.com" required type="email" />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="brief-paragraph">Brief paragraph</Label>
-          <Textarea
-            className="min-h-[100px]"
-            id="brief-paragraph"
-            placeholder="Enter your brief paragraph"
-            required
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="certificates-paragraph">Certificates paragraph</Label>
-          <Textarea
-            className="min-h-[100px]"
-            id="certificates-paragraph"
-            placeholder="Enter your certificates paragraph"
-            required
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="article-about">Article about</Label>
-          <Textarea
-            className="min-h-[100px]"
-            id="article-about"
-            placeholder="Enter your article about"
-            required
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="position">Position</Label>
-          <Input id="position" placeholder="Enter your position" required />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="image-upload">Image upload</Label>
-          <Input id="image-upload" required type="file" />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="phone-number">Phone number</Label>
-          <Input
-            id="phone-number"
-            placeholder="Enter your phone number"
-            required
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="country">Country</Label>
-          <Input id="country" placeholder="Enter your country" required />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="gender">Gender</Label>
-          <Input id="gender" placeholder="Enter your gender" required />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="password">Password</Label>
-          <Input id="password" required type="password" />
-        </div>
-        <Button className="w-full" type="submit">
-          Register
-        </Button>
       </div>
     </div>
   );

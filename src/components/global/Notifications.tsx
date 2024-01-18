@@ -37,7 +37,11 @@ export function Notifications() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant={"outline"} className="w-9 h-9 p-0">
+        <Button
+          variant={"outline"}
+          className="w-9 h-9 p-0"
+          aria-label="الإشعارات"
+        >
           <BsBellFill className="w-[1.2rem] h-[1.2rem]" />
         </Button>
       </DropdownMenuTrigger>

@@ -69,7 +69,7 @@ export default function Footer({}: Props) {
             <p className={footerHeader}>الدعم</p>
             <ul>
               {supportPages.map(({ id, link, text }) => (
-                <li>
+                <li key={id}>
                   <Link href={link}>{text}</Link>
                 </li>
               ))}

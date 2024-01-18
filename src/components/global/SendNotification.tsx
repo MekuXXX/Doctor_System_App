@@ -35,11 +35,12 @@ export function SendNotification({}: Props) {
     mode: "onBlur",
   });
 
-  const notifType = form.watch("type");
+  const { watch, resetField } = form;
+  const notifType = watch("type");
 
   useEffect(() => {
-    if (notifType === "all") form.resetField("personEmail");
-  }, [notifType]);
+    if (notifType === "all") resetField("personEmail");
+  }, [notifType, resetField]);
 
   const onSubmit = (data: SendEmNotificationSchemaType) => {
     let parsed;
