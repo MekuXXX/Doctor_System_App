@@ -61,9 +61,9 @@ export function DataTable<TData, TValue>({
 
   return (
     <div>
-      <div className="flex items-center py-4">
+      <div dir="rtl" className="flex items-center py-4">
         <Input
-          placeholder="Filter emails..."
+          placeholder="ابحث فى الحسابات..."
           // value={table.getColumn("email")?.getFilterValue() as string}
           onChange={(event) =>
             table.getColumn("email")?.setFilterValue(event.target.value)
@@ -126,7 +126,7 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-      <div className="py-4">
+      <div className="py-4" dir="rtl">
         <DataTablePagination table={table} />
       </div>
     </div>

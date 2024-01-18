@@ -1,45 +1,33 @@
 import { DataTable } from "@/components/dashboard/Tables/DataTable";
-// import { AddCopounButton } from "@/components/dashboard/Tables/ClientButtons";
 import { columns } from "./data-table";
+import { GoPlus } from "react-icons/go";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import React from "react";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 type Props = {};
 
 export default function CouponsPage({}: Props) {
   return (
     <div className="content">
-      <Tabs defaultValue="sessions">
-        <div className="w-full flex justify-center mb-6">
-          <TabsList>
-            <TabsTrigger value="sessions">Sessions</TabsTrigger>
-            <TabsTrigger value="reserved">Reserved</TabsTrigger>
-            <TabsTrigger value="finished">Finished</TabsTrigger>
-            <TabsTrigger value="canceled">Canceled</TabsTrigger>
-            <TabsTrigger value="waiting">Waiting</TabsTrigger>
-          </TabsList>
-        </div>
-        <TabsContent value="sessions">
-          <DataTable
-            columns={columns}
-            data={Array.from("1234567891".repeat(10))}
-            // chilrendButtons={
-            //   <div className="ml-2">
-            //     <AddCopounButton />
-            //     <Button variant={"outline"}>
-            //       <Link href={"/dashboard/coupons/add-coupon"}>Add coupon</Link>
-            //     </Button>
-            //   </div>
-            // }
-          />
-        </TabsContent>
-        <TabsContent value="reserved">Change your password here.</TabsContent>
-
-        <TabsContent value="finished">Change your password here.</TabsContent>
-
-        <TabsContent value="canceled">Change your password here.</TabsContent>
-        <TabsContent value="waiting">Change your password here.</TabsContent>
-      </Tabs>
+      <DataTable
+        columns={columns}
+        data={Array.from("1234567891".repeat(10))}
+        chilrendButtons={
+          <div className="ml-2">
+            <Button variant={"outline"} className="flex gap-2">
+              <GoPlus className="w-[1.2rem] h-[1.2rem]" />
+              <Link
+                href={"/dashboard/coupons/add-coupon"}
+                className="hidden md:block"
+              >
+                إضافة كوبون
+              </Link>
+            </Button>
+          </div>
+        }
+      />
     </div>
   );
 }

@@ -15,8 +15,8 @@ import { BsPerson } from "react-icons/bs";
 import Link from "next/link";
 
 type Props = {
-  image?: string;
-  alt: string;
+  image: string;
+  alt?: string;
 };
 
 export async function UserAvatar({ image, alt }: Props) {
@@ -30,7 +30,7 @@ export async function UserAvatar({ image, alt }: Props) {
             className="w-8 h-8 aspect-auto rounded"
           />
           <AvatarFallback>
-            <Skeleton className="w-8 h-8 rounded" />
+            <Skeleton className="w-8 h-8 rounded-full" />
           </AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>

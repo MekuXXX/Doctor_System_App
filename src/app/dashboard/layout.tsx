@@ -47,7 +47,7 @@ const sidebarLinks: SideBarLinkType[] = [
 
 export default function DashboardLayout({ children }: Props) {
   return (
-    <>
+    <div className="bg-[#e5e5e5] dark:bg-[#020817]">
       <div className="content">
         <div className="feature fx-between gap-6">
           <DashSidebar links={sidebarLinks[0].links} />
@@ -55,6 +55,6 @@ export default function DashboardLayout({ children }: Props) {
         </div>
       </div>
       <div>{children}</div>
-    </>
+    </div>
   );
 }

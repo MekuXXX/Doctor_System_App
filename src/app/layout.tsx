@@ -19,7 +19,7 @@ export default function RootLayout({
   return (
     <html lang="auto" dir="rlt">
       <body
-        className={`${poppins.className} h-full bg-[#e5e5e5] dark:bg-[#020817]`}
+        className={`${poppins.className} h-full flex flex-col min-h-screen`}
       >
         <ThemeProvider
           attribute="class"

@@ -25,11 +25,10 @@ export function DataTableViewOptions<TData>({
       <DropdownMenuTrigger asChild>
         <Button
           variant="outline"
-          size="sm"
-          className="ml-auto p-2 flex justify-center items-center gap-1"
+          className="mr-auto flex justify-center items-center gap-1"
         >
-          <GrFormViewHide className="h-4 w-4" />
-          <span className=" hidden md:block">View</span>
+          <GrFormViewHide className="h-[1.2rem] w-[1.2rem]" />
+          <span className=" hidden md:block">الإخفاء</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[150px]">

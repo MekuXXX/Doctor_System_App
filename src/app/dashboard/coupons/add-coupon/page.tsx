@@ -1,8 +1,6 @@
 "use client";
-import React from "react";
-import { toast } from "sonner";
+import React, { useEffect } from "react";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -22,7 +20,6 @@ import { Calendar } from "@/components/ui/calendar";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { useForm } from "react-hook-form";
-import * as z from "zod";
 
 import {
   Form,
@@ -35,87 +32,67 @@ import {
 
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
-
-const FormSchema = z.object({
-  couponType: z.enum(["permanent", "limited"]),
-  rangeDate: z
-    .object({
-      from: z
-        .date({
-          required_error: "A start date is required",
-        })
-        .min(new Date(), { message: "Current is the minimum date" })
-        .default(new Date()),
-      to: z
-        .date({
-          required_error: "A start date is required",
-        })
-        .min(new Date(), { message: "Current is the minimum date" }),
-    })
-    .optional(),
-  discountType: z.enum(["value", "percent"]),
-  discountValue: z
-    .string()
-    .regex(/^\d+$/, "Type must be a number")
-    .transform(Number)
-    .refine((n) => n > 0),
-  useTimes: z
-    .string()
-    .regex(/^\d+$/, "Type must be a number")
-    .transform(Number)
-    .refine((n) => n > 0),
-});
+import {
+  FormRangedSchema,
+  FormRangedSchemaType,
+  FormUnlimitedSchema,
+} from "@/schemas/addCoupon";
 
 type Props = {};
 
 export default function AddCoupon({}: Props) {
-  const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
+  const form = useForm<FormRangedSchemaType>({
+    resolver: zodResolver(FormRangedSchema),
   });
 
-  const { watch } = form;
-  console.log(watch("rangeDate"));
-  const copounType = watch("couponType");
+  const copounType = form.watch("couponType");
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {
-    // toast("Summit form", { description: `The date is ${data}` });
-    console.log(data);
+  useEffect(() => {
+    form.resetField("rangeDate");
+  }, [copounType]);
+
+  function onSubmit(data: FormRangedSchemaType) {
+    let parsed;
+    if (data.rangeDate === undefined)
+      parsed = FormUnlimitedSchema.safeParse(data);
+    else parsed = FormRangedSchema.safeParse(data);
+
+    console.log(parsed);
   }
 
   return (
-    <div className="content max-w-fit mx-auto border-2 rounded-xl my-8">
+    <div className="content max-w-fit mx-auto border-2 rounded-xl my-8  px-6 py-12 bg-white dark:bg-dark">
+      <h1 className="text-2xl mb-8">إضافة كوبون جديد</h1>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <FormField
             control={form.control}
             name="couponType"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Coupon type</FormLabel>
+                <FormLabel>نوع الكوبون</FormLabel>
                 <Select onValueChange={field.onChange}>
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Type" />
+                      <SelectValue />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectGroup>
-                      <SelectItem value="permanent">Permanent</SelectItem>
-                      <SelectItem value="limited">Limited</SelectItem>
-                    </SelectGroup>
+                    <SelectItem value="permanent">دائم</SelectItem>
+                    <SelectItem value="limited">محدد</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />
               </FormItem>
             )}
           />
-          {/* {copounType === "limited" && (
+          {copounType === "limited" && (
             <FormField
               control={form.control}
               name="rangeDate"
               render={({ field }) => (
                 <FormItem className="flex flex-col">
-                  <FormLabel>Coupon range</FormLabel>
+                  <FormLabel>المده الزمنية</FormLabel>
                   <FormControl>
                     <Popover>
                       <PopoverTrigger asChild>
@@ -123,11 +100,11 @@ export default function AddCoupon({}: Props) {
                           id="date"
                           variant={"outline"}
                           className={cn(
-                            "flex justify-start gap-2 font-normal",
+                            "gap-4 items-center justify-start text-left font-normal",
                             !field.value && "text-muted-foreground"
                           )}
                         >
-                          <FaCalendarAlt />
+                          <FaCalendarAlt className="mr-2 h-4 w-4" />
                           {field.value?.from ? (
                             field.value.to ? (
                               <>
@@ -138,7 +115,7 @@ export default function AddCoupon({}: Props) {
                               format(field.value.from, "LLL dd, y")
                             )
                           ) : (
-                            <span>Pick a date</span>
+                            <span>اختر التابريخ</span>
                           )}
                         </Button>
                       </PopoverTrigger>
@@ -158,23 +135,23 @@ export default function AddCoupon({}: Props) {
                 </FormItem>
               )}
             />
-        )} */}
+          )}
           <FormField
             control={form.control}
             name="discountType"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Discount type</FormLabel>
+                <FormLabel>نوع العرض</FormLabel>
                 <Select onValueChange={field.onChange}>
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Type" />
+                      <SelectValue />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
                     <SelectGroup>
-                      <SelectItem value="value">Value</SelectItem>
-                      <SelectItem value="percent">Percent</SelectItem>
+                      <SelectItem value="value">قيمة</SelectItem>
+                      <SelectItem value="percent">نسبة</SelectItem>
                     </SelectGroup>
                   </SelectContent>
                 </Select>
@@ -187,7 +164,7 @@ export default function AddCoupon({}: Props) {
             name="discountValue"
             render={({ field }) => (
               <FormItem className="flex flex-col">
-                <FormLabel>Value</FormLabel>
+                <FormLabel>القيمة أو النسبة</FormLabel>
                 <Input type="number" onChange={field.onChange} />
                 <FormMessage />
               </FormItem>
@@ -198,7 +175,7 @@ export default function AddCoupon({}: Props) {
             name="useTimes"
             render={({ field }) => (
               <FormItem className="flex flex-col">
-                <FormLabel>Number of use</FormLabel>
+                <FormLabel>عدد مرات الإستخدام</FormLabel>
                 <Input type="number" onChange={field.onChange} />
                 <FormMessage />
               </FormItem>
