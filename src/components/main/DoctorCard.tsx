@@ -112,7 +112,11 @@ export default function DoctorCard({
       </CardHeader>
       <CardContent className="flex gap-4">
         <Avatar className="mb-5">
-          <AvatarImage alt={`Dr.${name}`} src={image} />
+          <AvatarImage
+            alt={`Dr.${name}`}
+            className=" aspect-auto"
+            src={image}
+          />
         </Avatar>
         <div className="text-center">
           <div className="font-bold text-lg mb-3">{name}</div>

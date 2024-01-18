@@ -42,7 +42,7 @@ export default function Footer({}: Props) {
     <footer className="content bg-[#20273F] text-white/75 mt-auto">
       <div className="md:flex text-center md:text-start justify-center items-center gap-4 py-6">
         <div className="pb-4 md:pb-0">
-          <h3 className={footerHeader}>روابط مهمة</h3>
+          <p className={footerHeader}>روابط مهمة</p>
           <p>
             هل تواجة صعوبة عند حجز جلسة اليك اذا شرح تفصيل لطريقة التعامل مع
             المنصة من خلال قاعدة المعرفة
@@ -55,7 +55,7 @@ export default function Footer({}: Props) {
       </div>
       <div className="grid md:grid-cols-2 gap-8 justify-between mb-4 py-4">
         <div>
-          <h3 className={footerHeader}>من نحن</h3>
+          <p className={footerHeader}>من نحن</p>
           <p>
             نفسي فيرتول اخصائي نفسي اونلاين : هو موقع تابع لشركة VIRTUALPSY LTD
             مرخصة في المملكة المتحدة برقم 14803921 وتهتم بكل مايخص العلاج النفسي
@@ -66,7 +66,7 @@ export default function Footer({}: Props) {
         </div>
         <div className="grid grid-cols-2">
           <div>
-            <h3 className={footerHeader}>الدعم</h3>
+            <p className={footerHeader}>الدعم</p>
             <ul>
               {supportPages.map(({ id, link, text }) => (
                 <li>
@@ -76,7 +76,7 @@ export default function Footer({}: Props) {
             </ul>
           </div>
           <div>
-            <h3 className="text-2xl font-bold">بعض الروابط</h3>
+            <p className="text-2xl font-bold">بعض الروابط</p>
             <ul>
               <li>
                 <Link href={"/doctors"}>الأطباء</Link>
@@ -97,7 +97,7 @@ export default function Footer({}: Props) {
           <span>
             <Link
               href={"https://virtualpsy.org"}
-              className="text-main hover:text-main/55 transition"
+              className="text-[#ff6251] hover:text-main transition"
             >
               {" "}
               نفسي فيرتول{" "}
@@ -107,11 +107,14 @@ export default function Footer({}: Props) {
           {new Date().getFullYear()}
         </p>
         <div className="text-white flex gap-2">
-          <Link href={""}>
+          <Link href={"/"} aria-label="موقع فيسبوك الخاص بالصفحة">
             <FaFacebookF className="hover:text-main transition" />
           </Link>
-          <Link href={""}>
-            <FaXTwitter className="hover:text-main transition" />
+          <Link href={"/"}>
+            <FaXTwitter
+              className="hover:text-main transition"
+              aria-label="موقع تويتر الخاص بالصفحة"
+            />
           </Link>
         </div>
       </div>

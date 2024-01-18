@@ -19,9 +19,10 @@ export default function MainSearch({}: Props) {
           className="flex-grow border-none focus:ring-0"
           placeholder="بحث"
           type="text"
+          name="ابحث عن دكتور"
         />
-        <Select>
-          <SelectTrigger id="gender">
+        <Select name="gender">
+          <SelectTrigger id="gender" aria-label="جنس الدكتور">
             <SelectValue placeholder="جنس" />
           </SelectTrigger>
           <SelectContent position="popper">
@@ -33,6 +34,7 @@ export default function MainSearch({}: Props) {
           className="border-none focus:ring-0"
           placeholder="سعر"
           type="text"
+          name="سعر"
         />
       </div>
       <MainButton> ابحث</MainButton>
