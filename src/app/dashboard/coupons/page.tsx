@@ -16,15 +16,15 @@ export default function CouponsPage({}: Props) {
         data={Array.from("1234567891".repeat(10))}
         chilrendButtons={
           <div className="ml-2">
-            <Button variant={"outline"} className="flex gap-2">
-              <GoPlus className="w-[1.2rem] h-[1.2rem]" />
-              <Link
-                href={"/dashboard/coupons/add-coupon"}
-                className="hidden md:block"
-              >
+            <Link
+              href={"/dashboard/coupons/add-coupon"}
+              className="hidden md:block"
+            >
+              <Button variant={"outline"} className="flex gap-2">
+                <GoPlus className="w-[1.2rem] h-[1.2rem]" />
                 إضافة كوبون
-              </Link>
-            </Button>
+              </Button>
+            </Link>
           </div>
         }
       />

@@ -45,7 +45,9 @@ export default function Header({}: Props) {
   return (
     <header dir="rtl" className="content">
       <div className="flex justify-between items-center">
-        <Image src={Logo} alt="Logo" />
+        <Link href={"/"}>
+          <Image src={Logo} alt="Logo" />
+        </Link>
         <nav className="fixed bottom-0 left-0 py-4 px-12 w-full md:w-fit md:relative bg-white z-10 dark:bg-dark md:bg-transparent">
           <ul className="flex justify-between items-center gap-4">
             {pages.map(({ id, link, text, icon }) => (

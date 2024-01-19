@@ -37,6 +37,7 @@ import {
   FormRangedSchemaType,
   FormUnlimitedSchema,
 } from "@/schemas/addCoupon";
+import TextEditor from "@/components/global/TextEditor";
 
 type Props = {};
 

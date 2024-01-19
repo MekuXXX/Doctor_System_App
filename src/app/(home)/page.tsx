@@ -6,7 +6,7 @@ import React from "react";
 
 type Props = {};
 
-const data = [
+export const data = [
   {
     id: 1,
     discount: 25,
