@@ -15,7 +15,10 @@ import { IoMdArrowDropdown } from "react-icons/io";
 import { IoHome } from "react-icons/io5";
 import { BsFillBagPlusFill } from "react-icons/bs";
 import { GrArticle } from "react-icons/gr";
-import MainButton from "../global/MainButton";
+import MainButton from "@/components/global/MainButton";
+import { auth } from "@/auth";
+import { LogoutButton } from "@/components/auth/logout-button";
+import { LoginButton } from "@/components/auth/login-button";
 
 type Props = {};
 
@@ -41,7 +44,8 @@ const pages = [
   },
 ];
 
-export default function Header({}: Props) {
+export default async function Header({}: Props) {
+  const user = await auth();
   return (
     <header dir="rtl" className="content">
       <div className="flex justify-between items-center">
@@ -68,19 +72,27 @@ export default function Header({}: Props) {
           <MainButton>احجز الان</MainButton>
           <DropdownMenu dir="rtl">
             <DropdownMenuTrigger asChild>
-              <Button
-                className="flex gap-2 text-main hover:text-white hover:bg-main"
-                variant={"outline"}
-              >
-                <span>Mohamed Ali</span>
-                <IoMdArrowDropdown />
-              </Button>
+              {user ? (
+                <Button
+                  className="flex gap-2 text-main hover:text-white hover:bg-main"
+                  variant={"outline"}
+                >
+                  <span>{user.user?.name}</span>
+                  <IoMdArrowDropdown />
+                </Button>
+              ) : (
+                <LoginButton>
+                  <MainButton>تسجيل الدخول</MainButton>
+                </LoginButton>
+              )}
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               <DropdownMenuLabel dir="rtl">إعدادات</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem>حسابى</DropdownMenuItem>
-              <DropdownMenuItem>تسجيل الخروج</DropdownMenuItem>
+              <DropdownMenuItem>
+                <LogoutButton>تسجيل الخروج</LogoutButton>
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

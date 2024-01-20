@@ -57,8 +57,8 @@ const config = {
           foreground: "hsl(222.2 84% 4.9%)",
         },
         main: {
-          DEFAULT: "#bc6a6a",
-          foreground: "#bc6a6a",
+          DEFAULT: "var(--main)",
+          foreground: "var(--main)",
         },
       },
       borderRadius: {

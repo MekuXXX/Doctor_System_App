@@ -4,9 +4,16 @@ import FAQ from "@/components/main/FAQ";
 import MainSearch from "@/components/main/MainSearch";
 import React from "react";
 
-type Props = {};
+type Props = {
+  params: {};
+  searchParams: {
+    text?: string;
+    price?: string;
+    gender?: string;
+  };
+};
 
-export const data = [
+export let data = [
   {
     id: 1,
     discount: 25,
@@ -16,6 +23,7 @@ export const data = [
     position: "دكتوراة في العلاج النفسي",
     priceA: 926.12,
     priceB: 772.42,
+    gender: "male",
     rate: 4,
     status: true,
   },
@@ -28,6 +36,7 @@ export const data = [
     position: "مهندسة البرمجة",
     priceA: 845.5,
     priceB: 712.75,
+    gender: "female",
     rate: 4.5,
     status: false,
   },
@@ -41,6 +50,8 @@ export const data = [
     priceA: 1200.0,
     priceB: 980.5,
     rate: 3.8,
+    gender: "male",
+
     status: true,
   },
   {
@@ -52,6 +63,7 @@ export const data = [
     position: "مصممة جرافيك",
     priceA: 700.75,
     priceB: 590.5,
+    gender: "female",
     rate: 4.2,
     status: false,
   },
@@ -64,6 +76,7 @@ export const data = [
     position: "مدير موارد بشرية",
     priceA: 1500.0,
     priceB: 1325.5,
+    gender: "male",
     rate: 4.8,
     status: false,
   },
@@ -76,6 +89,7 @@ export const data = [
     position: "أستاذة في الأدب الإنجليزي",
     priceA: 1050.25,
     priceB: 920.75,
+    gender: "female",
     rate: 3.5,
     status: false,
   },
@@ -88,6 +102,7 @@ export const data = [
     position: "مدير تكنولوجيا المعلومات",
     priceA: 1350.0,
     priceB: 1125.5,
+    gender: "male",
     rate: 4.6,
     status: false,
   },
@@ -101,6 +116,7 @@ export const data = [
     priceA: 980.75,
     priceB: 820.5,
     rate: 4.0,
+    gender: "female",
     status: false,
   },
   {
@@ -112,6 +128,7 @@ export const data = [
     position: "محاسب مالي",
     priceA: 800.0,
     priceB: 670.5,
+    gender: "male",
     rate: 3.9,
     status: false,
   },
@@ -125,6 +142,7 @@ export const data = [
     priceA: 1150.25,
     priceB: 990.75,
     rate: 4.7,
+    gender: "female",
     status: false,
   },
   {
@@ -137,6 +155,7 @@ export const data = [
     priceA: 1100.0,
     priceB: 900.5,
     rate: 4.5,
+    gender: "male",
     status: false,
   },
   {
@@ -148,6 +167,8 @@ export const data = [
     position: "مهندسة الكمبيوتر",
     priceA: 950.0,
     priceB: 780.5,
+    gender: "female",
+
     rate: 4.2,
     status: false,
   },
@@ -159,6 +180,7 @@ export const data = [
     name: "نور الدين محمد",
     position: "محلل بيانات",
     priceA: 800.75,
+    gender: "male",
     priceB: 670.5,
     rate: 3.8,
     status: true,
@@ -171,6 +193,7 @@ export const data = [
     name: "لمى العلي",
     position: "مصممة أزياء",
     priceA: 720.0,
+    gender: "female",
     priceB: 600.5,
     rate: 3.5,
     status: false,
@@ -183,6 +206,7 @@ export const data = [
     name: "يوسف عبدالرحمن",
     position: "مهندس ميكانيكي",
     priceA: 1300.0,
+    gender: "male",
     priceB: 1125.5,
     rate: 4.8,
     status: true,
@@ -196,6 +220,7 @@ export const data = [
     position: "أستاذة في اللغة العربية",
     priceA: 950.25,
     priceB: 830.75,
+    gender: "female",
     rate: 3.0,
     status: true,
   },
@@ -208,12 +233,19 @@ export const data = [
     position: "مهندس كهربائي",
     priceA: 1150.0,
     priceB: 990.5,
+    gender: "female",
     rate: 4.2,
     status: false,
   },
 ];
 
-export default function page({}: Props) {
+export default async function page({ searchParams }: Props) {
+  // data = data.filter(
+  //   (p) =>
+  //     p.gender === searchParams.gender &&
+  //     p.name.includes(searchParams.text || "")
+  // );
+  await new Promise((res) => setTimeout(res, 5000));
   let availableNow: DoctorType[] = [];
   let notAvailableNow: DoctorType[] = [];
   data.forEach((doctor) =>
@@ -224,19 +256,27 @@ export default function page({}: Props) {
     <div className="content">
       <MainSearch />
       <DiscountBadge />
-      <DoctorsView
-        title="المتاحين الان"
-        description="بامكانك الحجز والتحدث فوراً"
-        data={availableNow}
-        className="feature"
-      />
-
-      <DoctorsView
-        title="الغير متاحين الان"
-        description="يمكنك الحجز من خلال الجدول الوقت الذي يناسبك"
-        data={notAvailableNow}
-        className="feature"
-      />
+      {availableNow.length !== 0 && (
+        <DoctorsView
+          title="المتاحين الان"
+          description="بامكانك الحجز والتحدث فوراً"
+          data={availableNow}
+          className="feature"
+        />
+      )}
+      {notAvailableNow.length !== 0 && (
+        <DoctorsView
+          title="الغير متاحين الان"
+          description="يمكنك الحجز من خلال الجدول الوقت الذي يناسبك"
+          data={notAvailableNow}
+          className="feature"
+        />
+      )}
+      {availableNow.length === 0 && notAvailableNow.length === 0 && (
+        <h1 className="text-xl my-8 font-extrabold text-center">
+          لا توجد نتائج
+        </h1>
+      )}
       <FAQ />
     </div>
   );

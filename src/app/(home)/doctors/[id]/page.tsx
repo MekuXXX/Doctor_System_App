@@ -109,7 +109,7 @@ export default function DoctorDataPage({ params: { id } }: Props) {
   const doctorData = data.find((d) => d.id === Number(id));
   return (
     <div className="content">
-      <div className="max-w-[800px] mx-auto grid md:grid-cols-2 gap-4">
+      <div className="feature mx-auto grid md:grid-cols-2 gap-4">
         <div className="grid gap-4 p-4 max-h-[35rem]">
           <Card className="min-w-fit px-4">
             <CardHeader>
@@ -158,7 +158,7 @@ export default function DoctorDataPage({ params: { id } }: Props) {
                   {doctorData?.position}
                 </p>
                 <p className="text-sm font-medium text-yellow-400 flex items-center min-w-fit">
-                  {doctorData?.rate} تقييم
+                  تقييم {doctorData?.rate}
                 </p>
                 <p className="text-sm text-gray-600">الروابط:</p>
                 <p className="text-lg font-semibold mt-2">الد ولة</p>

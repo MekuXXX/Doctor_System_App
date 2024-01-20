@@ -10,6 +10,7 @@ import { FaRegStar } from "react-icons/fa";
 import Link from "next/link";
 import { DoctorType } from "@/components/main/DoctorsView";
 import MainButton from "../global/MainButton";
+import StarRate from "./StarRate";
 
 type Props = DoctorType & {
   key: number;
@@ -63,7 +64,7 @@ export default function DoctorCard({
             <span className="ml-4 mt-4 text-gray-500">
               تقييم {Math.round((rate / 5) * 100)}
             </span>
-            <ul className="flex gap-1 items-center">{rateRenter}</ul>
+            <StarRate rate={rate} />
           </div>
         </div>
       </CardContent>

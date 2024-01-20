@@ -5,6 +5,7 @@
 @layer base {
   :root {
     direction: rtl;
+    --main: #bc6a6a;
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
 
@@ -78,11 +79,11 @@
 
 @layer utilities {
   .content {
-    --gap: clamp(1rem, 6vw, 3rem);
+    --gap: clamp(0.5rem, 3vw, 2rem);
     --full: minmax(var(--gap), 1fr);
     --content: min(80ch, 100% - var(--gap) * 2);
-    --breakout: minmax(0, 2rem);
-    --feature: minmax(0, 5rem);
+    --breakout: minmax(0, 1rem);
+    --feature: minmax(0, 2rem);
 
     display: grid;
     padding: 1rem 0;
@@ -116,5 +117,61 @@
 
   .fx-between {
     @apply flex justify-between;
+  }
+}
+
+.loading {
+  position: relative;
+  height: 0;
+  width: 0;
+}
+
+.loading span {
+  display: block;
+  height: 20px;
+  width: 20px;
+  background: var(--main);
+  position: absolute;
+  border-radius: 50%;
+}
+
+.loading span:nth-of-type(1) {
+  left: -40px;
+  animation: loader1Anim 1.2s linear;
+  animation-delay: 0s;
+  animation-iteration-count: infinite;
+  animation-direction: forwards;
+}
+.loading span:nth-of-type(2) {
+  left: -10px;
+  animation: loader1Anim 1.2s linear;
+  animation-delay: 0.2s;
+  animation-iteration-count: infinite;
+  animation-direction: forwards;
+}
+.loading span:nth-of-type(3) {
+  left: 20px;
+  animation: loader1Anim 1.2s linear;
+  animation-delay: 0.4s;
+  animation-iteration-count: infinite;
+  animation-direction: forwards;
+}
+
+@keyframes loader1Anim {
+  from,
+  to {
+    transform: scale3d(1.15, 0.8, 1);
+  }
+  42% {
+    transform: translateY(-45px);
+  }
+  88% {
+    transform: scale3d(1, 1, 1);
+  }
+  95% {
+    transform: scale3d(1.05, 0.85, 1);
+  }
+  98% {
+    transform: scale3d(1.15, 0.8, 1);
   }
 }
