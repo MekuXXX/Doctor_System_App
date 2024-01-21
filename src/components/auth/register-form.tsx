@@ -1,11 +1,9 @@
 "use client";
 
-import * as z from "zod";
 import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-
-import { RegisterSchema } from "@/schemas";
+import { RegisterSchema, RegisterSchemaType } from "@/schemas";
 import { Input } from "@/components/ui/input";
 import {
   Form,
@@ -20,13 +18,22 @@ import { Button } from "@/components/ui/button";
 import { FormError } from "@/components/auth/form-error";
 import { FormSuccess } from "@/components/auth/form-success";
 import { register } from "@/actions/register";
+import PhoneNumberInput from "@/components/main/PhoneNumberInput";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { isValidPhoneNumber } from "react-phone-number-input";
 
 export const RegisterForm = () => {
   const [error, setError] = useState<string | undefined>("");
   const [success, setSuccess] = useState<string | undefined>("");
   const [isPending, startTransition] = useTransition();
 
-  const form = useForm<z.infer<typeof RegisterSchema>>({
+  const form = useForm<RegisterSchemaType>({
     resolver: zodResolver(RegisterSchema),
     defaultValues: {
       email: "",
@@ -35,16 +42,25 @@ export const RegisterForm = () => {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof RegisterSchema>) => {
+  const onSubmit = async (values: RegisterSchemaType) => {
     setError("");
     setSuccess("");
-
-    startTransition(() => {
-      register(values).then((data) => {
-        setError(data.error);
-        setSuccess(data.success);
-      });
-    });
+    const parsedValue = RegisterSchema.safeParse(values);
+    if (parsedValue.success) {
+      const isPhoneValid = await isValidPhoneNumber(parsedValue.data.phone);
+      if (isPhoneValid) {
+        startTransition(() => {
+          register(parsedValue.data).then((data) => {
+            setError(data.error);
+            setSuccess(data.success);
+          });
+        });
+      } else {
+        setError("الرقم الذى أدخلة غير صحيح");
+      }
+    } else {
+      setError("حدث خطأ أثناء انشاء الحساب");
+    }
   };
 
   return (
@@ -64,11 +80,7 @@ export const RegisterForm = () => {
                 <FormItem>
                   <FormLabel>الاسم</FormLabel>
                   <FormControl>
-                    <Input
-                      {...field}
-                      disabled={isPending}
-                      placeholder="John Doe"
-                    />
+                    <Input {...field} disabled={isPending} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -81,12 +93,51 @@ export const RegisterForm = () => {
                 <FormItem>
                   <FormLabel>الحساب</FormLabel>
                   <FormControl>
-                    <Input
-                      {...field}
+                    <Input {...field} disabled={isPending} type="email" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="phone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>رقم الهاتف</FormLabel>
+                  <FormControl>
+                    <PhoneNumberInput
+                      value={field.value}
+                      onChange={field.onChange}
                       disabled={isPending}
-                      placeholder="john.doe@example.com"
-                      type="email"
                     />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="gender"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>النوع</FormLabel>
+                  <FormControl>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="male">ذكر</SelectItem>
+                        <SelectItem value="female">أنثى</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -99,12 +150,7 @@ export const RegisterForm = () => {
                 <FormItem>
                   <FormLabel>كلمة المرور</FormLabel>
                   <FormControl>
-                    <Input
-                      {...field}
-                      disabled={isPending}
-                      placeholder="******"
-                      type="password"
-                    />
+                    <Input {...field} disabled={isPending} type="password" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

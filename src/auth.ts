@@ -7,6 +7,9 @@ import authConfig from "@/auth.config";
 import { getUserById } from "@/data/user";
 import { getTwoFactorConfirmationByUserId } from "@/data/two-factor-confirmation";
 import { getAccountByUserId } from "./data/account";
+import { Session } from "inspector";
+import { JWT } from "@auth/core/jwt";
+import { ExtendedUser } from "../next-auth";
 
 export const {
   handlers: { GET, POST },
@@ -51,7 +54,8 @@ export const {
 
       return true;
     },
-    async session({ token, session }) {
+    async session(arg: any) {
+      const { session, token } = arg as { session: any; token: any }; // Error in this version of next auth
       if (token.sub && session.user) {
         session.user.id = token.sub;
       }
@@ -91,6 +95,7 @@ export const {
     },
   },
   adapter: PrismaAdapter(db),
+  trustHost: true,
   session: { strategy: "jwt" },
   ...authConfig,
 });

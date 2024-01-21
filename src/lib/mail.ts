@@ -10,9 +10,6 @@ type EmailPayload = {
 // Replace with your SMTP credentials
 
 export const sendEmail = async (data: EmailPayload) => {
-  console.log("Mail: " + process.env.SMTP_FROM_EMAIL);
-  console.log("Pass: " + process.env.SMTP_FROM_PASS);
-  console.log("Base: " + process.env.NEXT_BASE_URL);
   const smtpOptions = {
     service: "gmail",
     auth: {

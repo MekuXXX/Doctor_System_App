@@ -79,14 +79,15 @@
 
 @layer utilities {
   .content {
-    --gap: clamp(0.5rem, 3vw, 2rem);
-    --full: minmax(var(--gap), 1fr);
-    --content: min(80ch, 100% - var(--gap) * 2);
-    --breakout: minmax(0, 1rem);
-    --feature: minmax(0, 2rem);
+    --gap: clamp(0.5rem, 2vw, 0.75rem);
+    --full: minmax(var(--gap), 1rem);
+    --content: min(85vw, 100% - var(--gap) * 2);
+    --breakout: minmax(0, 0.5rem);
+    --feature: minmax(0, 1rem);
 
     display: grid;
     padding: 1rem 0;
+    place-content: center;
     grid-template-columns:
       [full-start] var(--full)
       [feature-start] var(--feature)
@@ -118,6 +119,23 @@
   .fx-between {
     @apply flex justify-between;
   }
+}
+
+.PhoneInputInput {
+  --tw-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --tw-shadow-colored: 0 1px 2px 0 var(--tw-shadow-color);
+
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  padding: 0.25rem 0.75rem;
+  border: 1px solid hsl(var(--input));
+  border-radius: calc(var(--radius) - 2px);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000),
+    var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+
+.PhoneInputCountrySelectArrow {
+  margin-inline: 0.5rem;
 }
 
 .loading {

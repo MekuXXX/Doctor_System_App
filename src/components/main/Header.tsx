@@ -70,9 +70,9 @@ export default async function Header({}: Props) {
 
         <div className="grid gap-2 items-center grid-cols-2">
           <MainButton>احجز الان</MainButton>
-          <DropdownMenu dir="rtl">
-            <DropdownMenuTrigger asChild>
-              {user ? (
+          {user ? (
+            <DropdownMenu dir="rtl">
+              <DropdownMenuTrigger asChild>
                 <Button
                   className="flex gap-2 text-main hover:text-white hover:bg-main"
                   variant={"outline"}
@@ -80,21 +80,21 @@ export default async function Header({}: Props) {
                   <span>{user.user?.name}</span>
                   <IoMdArrowDropdown />
                 </Button>
-              ) : (
-                <LoginButton>
-                  <MainButton>تسجيل الدخول</MainButton>
-                </LoginButton>
-              )}
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuLabel dir="rtl">إعدادات</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>حسابى</DropdownMenuItem>
-              <DropdownMenuItem>
-                <LogoutButton>تسجيل الخروج</LogoutButton>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuLabel dir="rtl">إعدادات</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>حسابى</DropdownMenuItem>
+                <DropdownMenuItem>
+                  <LogoutButton>تسجيل الخروج</LogoutButton>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <MainButton>
+              <LoginButton>تسجيل الدخول</LoginButton>
+            </MainButton>
+          )}
         </div>
       </div>
     </header>

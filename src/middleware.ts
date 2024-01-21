@@ -24,7 +24,9 @@ export default auth((req) => {
 
   if (isAuthRoute) {
     if (isLoggedIn) {
-      return Response.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl));
+      return Response.redirect(
+        new URL(DEFAULT_LOGIN_REDIRECT, String(nextUrl))
+      );
     }
     return null;
   }
@@ -38,7 +40,7 @@ export default auth((req) => {
     const encodedCallbackUrl = encodeURIComponent(callbackUrl);
 
     return Response.redirect(
-      new URL(`/auth/login?callbackUrl=${encodedCallbackUrl}`, nextUrl)
+      new URL(`/auth/login?callbackUrl=${encodedCallbackUrl}`, String(nextUrl))
     );
   }
 

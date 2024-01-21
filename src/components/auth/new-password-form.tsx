@@ -1,12 +1,11 @@
 "use client";
 
-import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { useState, useTransition } from "react";
 import { useSearchParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { NewPasswordSchema } from "@/schemas";
+import { NewPasswordSchema, NewPasswordSchemaType } from "@/schemas";
 import { Input } from "@/components/ui/input";
 import {
   Form,
@@ -30,14 +29,14 @@ export const NewPasswordForm = () => {
   const [success, setSuccess] = useState<string | undefined>("");
   const [isPending, startTransition] = useTransition();
 
-  const form = useForm<z.infer<typeof NewPasswordSchema>>({
+  const form = useForm<NewPasswordSchemaType>({
     resolver: zodResolver(NewPasswordSchema),
     defaultValues: {
       password: "",
     },
   });
 
-  const onSubmit = (values: z.infer<typeof NewPasswordSchema>) => {
+  const onSubmit = (values: NewPasswordSchemaType) => {
     setError("");
     setSuccess("");
 

@@ -31,7 +31,7 @@ export default function DoctorsView({
     <div className={cn("mt-4 mb-8", className)}>
       <h1 className="mt-4 text-2xl mb-4 font-extrabold">{title}</h1>
       <p className=" text-sm -mt-1 mb-8 text">{description}</p>
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-y-8 gap-x-4">
+      <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-y-8 gap-x-4">
         {data.map((doctor) => (
           <DoctorCard key={doctor.id} {...doctor} />
         ))}

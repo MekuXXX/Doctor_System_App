@@ -1,13 +1,12 @@
 "use client";
 
-import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { useState, useTransition } from "react";
 import { useSearchParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 
-import { LoginSchema } from "@/schemas/index";
+import { LoginSchema, LoginSchemaType } from "@/schemas/index";
 import { Input } from "@/components/ui/input";
 import {
   Form,
@@ -36,7 +35,7 @@ export const LoginForm = () => {
   const [success, setSuccess] = useState<string | undefined>("");
   const [isPending, startTransition] = useTransition();
 
-  const form = useForm<z.infer<typeof LoginSchema>>({
+  const form = useForm<LoginSchemaType>({
     resolver: zodResolver(LoginSchema),
     defaultValues: {
       email: "",
@@ -44,7 +43,7 @@ export const LoginForm = () => {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof LoginSchema>) => {
+  const onSubmit = (values: LoginSchemaType) => {
     setError("");
     setSuccess("");
 
