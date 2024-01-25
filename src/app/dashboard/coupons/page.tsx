@@ -1,7 +1,6 @@
 import { DataTable } from "@/components/dashboard/Tables/DataTable";
 import { columns } from "./data-table";
 import { GoPlus } from "react-icons/go";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import React from "react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";

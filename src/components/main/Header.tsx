@@ -38,7 +38,7 @@ const pages = [
   },
   {
     id: 3,
-    link: "/articles",
+    link: "https://virtualpsy.org/blog-psy",
     text: "المجلة",
     icon: <GrArticle className="w-[1.75rem] h-[1.75rem] md:hidden" />,
   },
@@ -46,6 +46,7 @@ const pages = [
 
 export default async function Header({}: Props) {
   const user = await auth();
+
   return (
     <header dir="rtl" className="content">
       <div className="flex justify-between items-center">
@@ -84,7 +85,9 @@ export default async function Header({}: Props) {
               <DropdownMenuContent>
                 <DropdownMenuLabel dir="rtl">إعدادات</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>حسابى</DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link href={"/dashboard"}>حسابى</Link>
+                </DropdownMenuItem>
                 <DropdownMenuItem>
                   <LogoutButton>تسجيل الخروج</LogoutButton>
                 </DropdownMenuItem>

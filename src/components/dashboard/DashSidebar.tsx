@@ -29,7 +29,6 @@ export default function DashSidebar({ links }: Props) {
           <SheetTitle className="mt-4">
             <Image src={Logo} alt="Logo" />
           </SheetTitle>
-          <SheetDescription className="text-right">البلد</SheetDescription>
         </SheetHeader>
         <div className="flex flex-col gap-y-2 py-6">
           {links.map(({ id, link, text }) => (

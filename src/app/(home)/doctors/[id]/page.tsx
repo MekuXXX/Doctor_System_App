@@ -15,6 +15,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import MainButton from "@/components/global/MainButton";
 import StarRate from "@/components/main/StarRate";
 import { FaWhatsapp } from "react-icons/fa";
+import SelectSessions from "@/components/main/SelectSessions";
+import SessionPakage from "@/components/main/SessionPakage";
 
 type Props = {
   params: {
@@ -110,8 +112,8 @@ export default function DoctorDataPage({ params: { id } }: Props) {
   return (
     <div className="content">
       <div className="feature mx-auto grid md:grid-cols-2 gap-4">
-        <div className="grid gap-4 p-4 max-h-[35rem]">
-          <Card className="min-w-fit px-4">
+        <div className="grid gap-4 p-4 ">
+          <Card className="min-w-fit px-4 max-h-[15rem]">
             <CardHeader>
               <CardTitle className="text-lg font-semibold">
                 {doctorData?.name}
@@ -183,12 +185,12 @@ export default function DoctorDataPage({ params: { id } }: Props) {
               </Button>
             </div>
           </div>
-          <div>
-            <Calendar
-              className="rounded-md mx-auto border border-dark dark:border-white w-fit"
-              mode="single"
-            />
+          <div className="space-y-2">
+            <SessionPakage image={doctorData?.image || ""} />
+
+            <SessionPakage image={doctorData?.image || ""} />
           </div>
+          <SelectSessions />
         </div>
 
         <div className="p-4">

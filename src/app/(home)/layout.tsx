@@ -6,7 +6,7 @@ type Props = {
   children: React.ReactNode;
 };
 
-export default function layout({ children }: Props) {
+export default async function layout({ children }: Props) {
   return (
     <>
       <Header />

@@ -37,6 +37,7 @@ import {
   FormRangedSchemaType,
   FormUnlimitedSchema,
 } from "@/schemas/addCoupon";
+import TextEditor from "@/components/global/TextEditor";
 
 type Props = {};
 
@@ -167,7 +168,11 @@ export default function AddCoupon({}: Props) {
             render={({ field }) => (
               <FormItem className="flex flex-col">
                 <FormLabel>القيمة أو النسبة</FormLabel>
-                <Input type="number" onChange={field.onChange} />
+                <TextEditor
+                  value={field.value as unknown as string}
+                  onChange={field.onChange}
+                />
+                {/* <Input type="number" onChange={field.onChange} /> */}
                 <FormMessage />
               </FormItem>
             )}

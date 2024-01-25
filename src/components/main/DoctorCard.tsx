@@ -48,7 +48,7 @@ export default function DoctorCard({
           </Badge>
         )}
         {discount && (
-          <div className="bg-[#e74c3c] text-white text-lg font-semibold py-2 px-4 rounded-lg absolute left-[50%] -top-10 translate-x-[-50%]">
+          <div className="bg-[#e74c3c] min-w-fit text-white text-lg font-semibold py-2 px-4 rounded-lg absolute left-[50%] -top-10 translate-x-[-50%]">
             خصم %{discount}
           </div>
         )}

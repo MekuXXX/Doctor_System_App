@@ -245,7 +245,6 @@ export default async function page({ searchParams }: Props) {
   //     p.gender === searchParams.gender &&
   //     p.name.includes(searchParams.text || "")
   // );
-  await new Promise((res) => setTimeout(res, 5000));
   let availableNow: DoctorType[] = [];
   let notAvailableNow: DoctorType[] = [];
   data.forEach((doctor) =>
@@ -273,9 +272,7 @@ export default async function page({ searchParams }: Props) {
         />
       )}
       {availableNow.length === 0 && notAvailableNow.length === 0 && (
-        <h1 className="text-xl my-8 font-extrabold text-center">
-          لا توجد نتائج
-        </h1>
+        <p className="text-xl my-8 font-extrabold text-center">لا توجد نتائج</p>
       )}
       <FAQ />
     </div>

@@ -13,6 +13,10 @@ const titles = [
     from: "dashboard",
     to: "الصفحة الرئيسية",
   },
+  {
+    from: "masters",
+    to: "التخصصات",
+  },
 ];
 
 export type TitlesType = typeof titles;

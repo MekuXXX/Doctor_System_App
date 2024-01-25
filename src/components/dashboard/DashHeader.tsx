@@ -10,15 +10,24 @@ import { ModeToggle } from "@/components/global/ModeToggle";
 import { FullScreenToggle } from "@/components/global/FullScreenToggle";
 import { Button } from "@/components/ui/button";
 import { Notifications } from "@/components/global/Notifications";
+import { useUserDataStore } from "@/store/user-data";
+import { ExtendedUser } from "../../../next-auth";
 
-type Props = {};
+type Props = {
+  user?: ExtendedUser;
+};
 
-export default function DashHeader({}: Props) {
+export default function DashHeader({ user }: Props) {
+  const { userData, status } = useUserDataStore();
+
   return (
     <header className="fx-between grow items-center py-2">
-      <Suspense fallback={<DashHeaderTitleFallback />}>
-        <DashHeaderTitle />
-      </Suspense>
+      <div className="flex gap-4 items-center">
+        <Suspense fallback={<DashHeaderTitleFallback />}>
+          <DashHeaderTitle />
+        </Suspense>
+        {status && <p className=" text-sm">{userData?.geoplugin_timezone}</p>}
+      </div>
       <div className="flex gap-4 items-center">
         <div className="flex gap-4 items-center justify-center">
           <div>
@@ -42,10 +51,10 @@ export default function DashHeader({}: Props) {
           <div className="flex items-center gap-2">
             <div>
               <p className="text-[0.875rem] text-[#ed0b4c] tracking-wider">
-                David Morse
+                {user?.name}
               </p>
               <p className="text-[0.625rem] -mt-1 uppercase tracking-wide">
-                Admin
+                {user?.role}
               </p>
             </div>
             <UserAvatar

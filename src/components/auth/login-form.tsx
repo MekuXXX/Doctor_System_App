@@ -64,7 +64,7 @@ export const LoginForm = () => {
             setShowTwoFactor(true);
           }
         })
-        .catch(() => setError("Something went wrong"));
+        .catch(() => setError("حدث خطأ برجاء إعادة المحاولة"));
     });
   };
 
@@ -86,11 +86,7 @@ export const LoginForm = () => {
                   <FormItem>
                     <FormLabel>Two Factor Code</FormLabel>
                     <FormControl>
-                      <Input
-                        {...field}
-                        disabled={isPending}
-                        placeholder="123456"
-                      />
+                      <Input {...field} disabled={isPending} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -106,12 +102,7 @@ export const LoginForm = () => {
                     <FormItem>
                       <FormLabel>الحساب</FormLabel>
                       <FormControl>
-                        <Input
-                          {...field}
-                          disabled={isPending}
-                          placeholder="john.doe@example.com"
-                          type="email"
-                        />
+                        <Input {...field} disabled={isPending} type="email" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -127,7 +118,6 @@ export const LoginForm = () => {
                         <Input
                           {...field}
                           disabled={isPending}
-                          placeholder="******"
                           type="password"
                         />
                       </FormControl>
