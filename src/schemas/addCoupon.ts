@@ -1,35 +1,39 @@
 import * as z from "zod";
 
-export const FormRangedSchema = z.object({
-  couponType: z.enum(["permanent", "limited"]),
-  rangeDate: z
-    .object({
-      from: z
-        .date({
+export const addCouponSchema = z
+  .object({
+    couponType: z.enum(["PERMANENT", "LIMITED"]),
+    rangeDate: z
+      .object({
+        from: z.date({
           required_error: "A start date is required",
-        })
-        .default(new Date()),
-      to: z.date({
-        required_error: "A start date is required",
+        }),
+        to: z.date({
+          required_error: "A start date is required",
+        }),
+      })
+      .default({
+        from: new Date(),
+        to: new Date(),
       }),
-    })
-    .optional(),
-  discountType: z.enum(["value", "percent"]),
-  discountValue: z
-    .string()
-    .regex(/^\d+$/, "Type must be a number")
-    .transform(Number)
-    .refine((n) => n > 0 && n < 100)
-    .or(z.number().min(0).max(100)),
-  useTimes: z
-    .string()
-    .regex(/^\d+$/, "Type must be a number")
-    .transform(Number)
-    .refine((n) => n > 0)
-    .or(z.number().min(1)),
-});
+    discountType: z.enum(["VALUE", "PERCENT"]),
+    discountValue: z
+      .string()
+      .regex(/^\d+$/, { message: "يجب أن يكون المدخل رقم" }),
+    useTimes: z.string().regex(/^(?:\d+|unlimited)$/, {
+      message: "القيمية الذى أدخلتها غير صحيحه",
+    }),
+  })
+  .refine(
+    (data) => {
+      if (data.discountType === "PERCENT") {
+        return (
+          Number(data.discountValue) <= 100 && Number(data.discountValue) > 0
+        );
+      }
+      return true;
+    },
+    { message: "يجب أن تكون النسبة أكبر من الصفر وأضغر أو تساوى 100" }
+  );
 
-export const FormUnlimitedSchema = FormRangedSchema.omit({ rangeDate: true });
-
-export type FormRangedSchemaType = z.infer<typeof FormRangedSchema>;
-export type FormUnlimitedSchemaType = z.infer<typeof FormUnlimitedSchema>;
+export type AddCouponSchemaType = z.infer<typeof addCouponSchema>;

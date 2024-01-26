@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { startTransition, useState, useTransition } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import {
@@ -13,9 +13,19 @@ import {
 import { Button } from "@/components/ui/button";
 import { AddMasterSchemaType, addMasterSchema } from "@/schemas/addMaster";
 import { Input } from "@/components/ui/input";
+import { addMaster } from "@/actions/master";
+import { FormError } from "../auth/form-error";
+import { FormSuccess } from "../auth/form-success";
+import { useRouter } from "next/navigation";
+
 type Props = {};
 
 export default function ViewMasters({}: Props) {
+  const [error, setError] = useState<string | undefined>("");
+  const [success, setSuccess] = useState<string | undefined>("");
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+
   const form = useForm<AddMasterSchemaType>({
     resolver: zodResolver(addMasterSchema),
     defaultValues: {
@@ -24,10 +34,30 @@ export default function ViewMasters({}: Props) {
     },
   });
 
-  const onSubmit = (values: AddMasterSchemaType) => {};
+  const onSubmit = async (values: AddMasterSchemaType) => {
+    setSuccess("");
+    setError("");
+    const parsedValues = addMasterSchema.parse(values);
+
+    startTransition(async () => {
+      try {
+        const res = await addMaster(parsedValues);
+        if (res.error) {
+          form.reset();
+          setError(res.error);
+        } else if (res.success) {
+          form.reset();
+          setSuccess(res.success);
+          router.refresh();
+        }
+      } catch {
+        setError("حدث خطأ أثناء انشاء النتخصص");
+      }
+    });
+  };
 
   return (
-    <div>
+    <div className="bg-white dark:bg-dark py-12 px-6 rounded-xl mt-4 border">
       <h3 className="text-xl font-bold mb-6">أضف تخصص جديد</h3>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -58,7 +88,11 @@ export default function ViewMasters({}: Props) {
               </FormItem>
             )}
           />
-          <Button type="submit">أضف تخصص جديد</Button>
+          <FormError message={error} />
+          <FormSuccess message={success} />
+          <Button type="submit" disabled={isPending}>
+            أضف تخصص جديد
+          </Button>
         </form>
       </Form>
     </div>

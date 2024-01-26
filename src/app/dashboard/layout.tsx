@@ -39,8 +39,8 @@ const sidebarLinks: SideBarLinkType[] = [
       },
       {
         id: 4,
-        link: "doctor-data",
-        text: "بيانات الطبيب",
+        link: "members",
+        text: "الأعضاء",
       },
       {
         id: 5,

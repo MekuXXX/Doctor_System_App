@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/global/ThemeProvider";
-import "./globals.css";
 import { getUserData } from "@/actions/set-user-data";
 import SetUserData from "@/components/main/SetUserData";
-
+import { TanstackQueryProvider } from "@/components/global/TanstackQueryProvider";
+import "./globals.css";
 const poppins = Poppins({ weight: ["500", "600"], subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -24,16 +24,18 @@ export default async function RootLayout({
       <body
         className={`${poppins.className} h-full flex flex-col min-h-screen`}
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <SetUserData data={data} />
-          {children}
-          <Toaster />
-        </ThemeProvider>
+        <TanstackQueryProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <SetUserData data={data} />
+            {children}
+            <Toaster richColors position="top-right" />
+          </ThemeProvider>
+        </TanstackQueryProvider>
       </body>
     </html>
   );

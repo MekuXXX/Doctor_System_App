@@ -10,12 +10,11 @@ import {
 import { ColumnDef } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "@/components/global/DataTableColumnHeader";
 import { DataTableItem } from "@/components/global/DataTableItem";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+import { FaClipboard } from "react-icons/fa";
+import { MdDelete } from "react-icons/md";
+import { removeCoupon } from "@/actions/coupon";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export const columns: ColumnDef<any>[] = [
   {
@@ -32,109 +31,74 @@ export const columns: ColumnDef<any>[] = [
     ),
   },
   {
-    accessorKey: "patient",
-    header: () => <DataTableColumnHeader>Patient</DataTableColumnHeader>,
-    cell: () => <DataTableItem>Mr. Bobby</DataTableItem>,
+    accessorKey: "coupon",
+    header: () => <DataTableColumnHeader>رمز الكوبون</DataTableColumnHeader>,
+    cell: ({ row }) => <DataTableItem>{row.getValue("coupon")}</DataTableItem>,
   },
   {
-    accessorKey: "Dr name",
-    header: () => <DataTableColumnHeader>Dr Name</DataTableColumnHeader>,
-    cell: () => <DataTableItem>Dr.Jackson</DataTableItem>,
+    accessorKey: "type",
+    header: () => <DataTableColumnHeader>مدة الكوبون</DataTableColumnHeader>,
+    cell: ({ row }) => <DataTableItem>{row.getValue("type")}</DataTableItem>,
   },
   {
-    accessorKey: "Data",
-    header: () => <DataTableColumnHeader>Data</DataTableColumnHeader>,
-    cell: () => (
-      <DataTableItem>Data</DataTableItem>
-      // <DataTableItem>
-      //   <Accordion type="single" collapsible>
-      //     <AccordionItem value="item-1">
-      //       <AccordionTrigger>Is it accessible?</AccordionTrigger>
-      //       <AccordionContent>
-      //         Yes. It adheres to the WAI-ARIA design pattern.
-      //       </AccordionContent>
-      //     </AccordionItem>
-      //   </Accordion>
-      // </DataTableItem>
+    accessorKey: "discount",
+    header: () => <DataTableColumnHeader>الخصم</DataTableColumnHeader>,
+    cell: ({ row }) => (
+      <DataTableItem>{row.getValue("discount")}</DataTableItem>
     ),
   },
   {
-    accessorKey: "status",
+    accessorKey: "useTimes",
     header: ({ column }) => (
-      <DataTableColumnHeader>Status</DataTableColumnHeader>
+      <DataTableColumnHeader>الاستخدامات</DataTableColumnHeader>
     ),
-    cell: ({ row }) => {
-      const value = "success";
-      return (
-        <span
-          className="bg-green-200 text-green-800 py-1 px-2 rounded-xl text-[0.75rem]"
-          // className={
-          //   (value === "pending"
-          //     ? "bg-orange-200 text-orange-800"
-          //     : value === "success"
-          //       ? "bg-green-200 text-green-800"
-          //       : "bg-red-200 text-red-800") +
-          //   " py-1 px-2 rounded-xl text-[0.75rem]"
-          // }
-        >
-          {value}
-        </span>
-      );
-    },
-  },
-  {
-    accessorKey: "amount",
-    header: () => (
-      <DataTableColumnHeader className="text-right">
-        Price
-      </DataTableColumnHeader>
+    cell: ({ row }) => (
+      <DataTableItem>{row.getValue("useTimes")}</DataTableItem>
     ),
-    cell: ({ row }) => {
-      const amount = row.index + 35;
-      const formatted = new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-      }).format(amount);
-
-      return (
-        <DataTableItem className="text-right font-medium">
-          {formatted}
-        </DataTableItem>
-      );
-    },
   },
   {
     accessorKey: "Actions",
-    header: ({ column }) => (
-      <DataTableColumnHeader>Actions</DataTableColumnHeader>
-    ),
+    header: () => <DataTableColumnHeader>تعديلات</DataTableColumnHeader>,
     cell: ({ row }) => {
-      const status = row.getValue("status");
+      const router = useRouter();
+      const id = row.original.id;
+      const handleDelete = async () => {
+        const res = await removeCoupon(id as string);
+        if (res.success) {
+          toast.success(res.success);
+        } else {
+          toast.error(res.error);
+        }
+        router.refresh();
+      };
+
       return (
-        <div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                className={
-                  "bg-green-200 hover:bg-green-200 text-green-800 hover:text-green-800"
-                  // status === "pending"
-                  //   ? "bg-orange-200 hover:bg-orange-200 hover:text-orange-800 text-orange-800"
-                  //   : status === "success"
-                  //     ? "bg-green-200 hover:bg-green-200 text-green-800 hover:text-green-800"
-                  //     : "bg-red-200 hover:bg-red-200 text-red-800 hover:text-red-800"
-                }
-              >
-                <span className="sr-only">Open menu</span>
-                <BsThreeDots />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem>Edit</DropdownMenuItem>
-              <DropdownMenuItem>Delete</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+        <DropdownMenu dir="rtl">
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost">
+              <BsThreeDots />
+              <span className="sr-only">Open menu</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem
+              className="flex gap-2 items-center"
+              onClick={() =>
+                navigator.clipboard.writeText(row.getValue("coupon"))
+              }
+            >
+              <FaClipboard className="h-[1.2rem] w-[1.2rem]" />
+              <span>نسخ الكوبون</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className="flex gap-2 items-center"
+              onClick={handleDelete}
+            >
+              <MdDelete className="h-[1.2rem] w-[1.2rem]" />
+              <span>حذف الكوبون</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       );
     },
   },

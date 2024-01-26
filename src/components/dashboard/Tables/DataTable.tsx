@@ -24,22 +24,46 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { DataTablePagination } from "@/components/global/DataTablePagination";
 import { DataTableViewOptions } from "@/components/global/DataTableViewOptions";
+import { useQuery } from "@tanstack/react-query";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  searchIn?: string;
+  keys: any[];
+  queryFn: () => TData[];
+  queryFnParams?: [];
   chilrendButtons?: React.ReactNode;
 }
 
 export function DataTable<TData, TValue>({
   columns,
-  data,
+  data: initialData,
+  searchIn,
+  keys,
+  queryFn,
+  queryFnParams,
   chilrendButtons,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
+
+  const { data } = useQuery({
+    initialData,
+    queryKey: keys,
+    queryFn: async () => {
+      let data;
+      if (queryFnParams !== undefined) {
+        data = await queryFn(...queryFnParams);
+      } else {
+        data = await queryFn();
+      }
+      return data || [];
+    },
+    refetchInterval: 3000,
+  });
 
   const table = useReactTable({
     data,
@@ -63,10 +87,10 @@ export function DataTable<TData, TValue>({
     <div>
       <div dir="rtl" className="flex items-center py-4">
         <Input
-          placeholder="ابحث فى الحسابات..."
+          placeholder="ابحث فى..."
           // value={table.getColumn("email")?.getFilterValue() as string}
           onChange={(event) =>
-            table.getColumn("email")?.setFilterValue(event.target.value)
+            table.getColumn(searchIn || "")?.setFilterValue(event.target.value)
           }
           className="max-w-sm bg-white dark:bg-dark"
         />

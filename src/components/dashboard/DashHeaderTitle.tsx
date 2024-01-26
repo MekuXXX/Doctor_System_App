@@ -17,6 +17,18 @@ const titles = [
     from: "masters",
     to: "التخصصات",
   },
+  {
+    from: "coupons",
+    to: "الكوبونات",
+  },
+  {
+    from: "add coupon",
+    to: "اضافة كوبون",
+  },
+  {
+    from: "members",
+    to: "الأعضاء",
+  },
 ];
 
 export type TitlesType = typeof titles;

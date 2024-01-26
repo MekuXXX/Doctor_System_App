@@ -20,10 +20,10 @@ export default function Sessions({}: Props) {
           </TabsList>
         </div>
         <TabsContent value="sessions">
-          <DataTable
+          {/* <DataTable
             columns={columns}
             data={Array.from("1234567891".repeat(10))}
-          />
+          /> */}
         </TabsContent>
         <TabsContent value="reserved">Change your password here.</TabsContent>
 
