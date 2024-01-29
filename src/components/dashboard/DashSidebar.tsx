@@ -27,7 +27,9 @@ export default function DashSidebar({ links }: Props) {
       <SheetContent>
         <SheetHeader>
           <SheetTitle className="mt-4">
-            <Image src={Logo} alt="Logo" />
+            <Link href={"/"}>
+              <Image src={Logo} alt="Logo" />
+            </Link>
           </SheetTitle>
         </SheetHeader>
         <div className="flex flex-col gap-y-2 py-6">

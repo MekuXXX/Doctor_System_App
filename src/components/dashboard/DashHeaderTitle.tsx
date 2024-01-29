@@ -29,6 +29,14 @@ const titles = [
     from: "members",
     to: "الأعضاء",
   },
+  {
+    from: "rates",
+    to: "التقييمات",
+  },
+  {
+    from: "add rate",
+    to: "اضافة تقييمات",
+  },
 ];
 
 export type TitlesType = typeof titles;

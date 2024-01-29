@@ -33,7 +33,7 @@ const sessionsTimes = [
 
 export default function SelectSessions() {
   return (
-    <div className="flex items-start gap-1 justify-center">
+    <div className="flex items-start gap-2 justify-center md:justify-start">
       <SelectSessionCol times={sessionsTimes} />
 
       <SelectSessionCol times={sessionsTimes} />

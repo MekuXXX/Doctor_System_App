@@ -9,14 +9,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Calendar } from "@/components/ui/calendar";
 import Image from "next/image";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import MainButton from "@/components/global/MainButton";
 import StarRate from "@/components/main/StarRate";
 import { FaWhatsapp } from "react-icons/fa";
 import SelectSessions from "@/components/main/SelectSessions";
-import SessionPakage from "@/components/main/SessionPakage";
+import SessionPackage from "@/components/main/SessionPakage";
+import ChangeTimezone from "@/components/main/ChangeTimezone";
 
 type Props = {
   params: {
@@ -111,8 +111,8 @@ export default function DoctorDataPage({ params: { id } }: Props) {
   const doctorData = data.find((d) => d.id === Number(id));
   return (
     <div className="content">
-      <div className="feature mx-auto grid md:grid-cols-2 gap-4">
-        <div className="grid gap-4 p-4 ">
+      <div className="feature mx-auto grid md:grid-cols-2 gap-4 items-start">
+        <div className="grid gap-8 p-4 ">
           <Card className="min-w-fit px-4 max-h-[15rem]">
             <CardHeader>
               <CardTitle className="text-lg font-semibold">
@@ -170,6 +170,15 @@ export default function DoctorDataPage({ params: { id } }: Props) {
               </div>
             </CardContent>
           </Card> */}
+          <div className="space-y-2">
+            <SessionPackage
+              image={doctorData?.image || ""}
+              time="نصف"
+              price="989.99"
+            />
+
+            <SessionPackage image={doctorData?.image || ""} price="1249.99" />
+          </div>
           <div>
             <h2 className="text-2xl font-bold text-main my-3">
               المواعيد المتاحه
@@ -185,11 +194,7 @@ export default function DoctorDataPage({ params: { id } }: Props) {
               </Button>
             </div>
           </div>
-          <div className="space-y-2">
-            <SessionPakage image={doctorData?.image || ""} />
-
-            <SessionPakage image={doctorData?.image || ""} />
-          </div>
+          <ChangeTimezone />
           <SelectSessions />
         </div>
 

@@ -5,50 +5,41 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { db } from "@/lib/db";
+import { Rate } from "@prisma/client";
 
 type Props = {};
 
 const getData = async () => {
   "use server";
-  const data = await db.coupon.findMany();
-  const refinedData = data.map((curr) => {
-    let discount;
-    if (curr.discountType === "PERCENT") {
-      discount = curr.discountValue + "%";
-    } else {
-      discount = curr.discountValue + "$";
-    }
+  const data = await db.rate.findMany({ include: { doctor: true } });
+  const refinedData = data.map((rate) => {
     return {
-      coupon: curr.coupon,
-      type:
-        curr.type === "PERMANENT"
-          ? "دائم"
-          : curr.from?.getTime() + " " + curr.to?.getDate(),
-      useTimes: curr.useTimes === "unlimited" ? "غير محدود" : curr.useTimes,
-      id: curr.id,
-      discount,
+      id: rate.id,
+      doctor: rate.doctor.name,
+      patient: rate.patientName,
+      rate: rate.rateValue,
+      message: rate.message,
     };
-  }, []);
+  });
   return refinedData;
 };
 
 export default async function CouponsPage({}: Props) {
   const data = await getData();
-
   return (
     <div className="content">
       <DataTable
         columns={columns}
         data={data}
-        keys={["coupons"]}
+        keys={["rates"]}
         queryFn={getData as any}
-        searchIn="coupon"
+        searchIn="doctor"
         childrenButtons={
           <div className="ml-2">
-            <Link href={"/dashboard/coupons/add-coupon"}>
+            <Link href={"/dashboard/rates/add-rate"}>
               <Button variant={"outline"} className="flex gap-2">
                 <GoPlus className="w-[1.2rem] h-[1.2rem]" />
-                <span className="hidden md:block">إضافة كوبون</span>
+                <span className="hidden md:block">إضافة تقييم</span>
               </Button>
             </Link>
           </div>

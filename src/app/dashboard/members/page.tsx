@@ -53,7 +53,7 @@ export default async function MembersPage({ searchParams }: Props) {
         keys={["users", String(role) || ""]}
         queryFn={getData as any}
         queryFnParams={[role] as any}
-        chilrendButtons={
+        childrenButtons={
           role === "DOCTOR" && (
             <Link href={"/dashboard/members/add-doctor"}>
               <Button variant={"outline"}>

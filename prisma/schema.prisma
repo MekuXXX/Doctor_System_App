@@ -32,6 +32,7 @@ model User {
   twoFactorConfirmation TwoFactorConfirmation?
   masterId              String?
   master                Master?                @relation(fields: [masterId], references: [id], onDelete: Cascade)
+  Rate                  Rate[]
 }
 
 model Account {
@@ -117,4 +118,13 @@ model Coupon {
   from          DateTime?
   to            DateTime?
   useTimes      String
+}
+
+model Rate {
+  id          String @id @default(cuid())
+  doctorId    String
+  doctor      User   @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  message     String
+  rateValue   Int
+  patientName String
 }

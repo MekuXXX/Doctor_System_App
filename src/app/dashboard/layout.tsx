@@ -52,6 +52,11 @@ const sidebarLinks: SideBarLinkType[] = [
         link: "masters",
         text: "التخصصات",
       },
+      {
+        id: 7,
+        link: "rates",
+        text: "التقييمات",
+      },
     ],
   },
 ];

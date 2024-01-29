@@ -1,6 +1,5 @@
 import * as z from "zod";
 import { UserRole } from "@prisma/client";
-import { isValidPhoneNumber } from "react-phone-number-input";
 
 export const SettingsSchema = z
   .object({

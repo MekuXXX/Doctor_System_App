@@ -33,7 +33,7 @@ interface DataTableProps<TData, TValue> {
   keys: any[];
   queryFn: () => TData[];
   queryFnParams?: [];
-  chilrendButtons?: React.ReactNode;
+  childrenButtons?: React.ReactNode;
 }
 
 export function DataTable<TData, TValue>({
@@ -43,7 +43,7 @@ export function DataTable<TData, TValue>({
   keys,
   queryFn,
   queryFnParams,
-  chilrendButtons,
+  childrenButtons,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -95,7 +95,7 @@ export function DataTable<TData, TValue>({
           className="max-w-sm bg-white dark:bg-dark"
         />
         <DataTableViewOptions table={table} />
-        {chilrendButtons}
+        {childrenButtons}
       </div>
       <div className="rounded-md border bg-white dark:bg-dark py-6 px-4">
         <Table dir="rtl" className="text-left">

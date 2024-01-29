@@ -15,6 +15,7 @@ export const getMembers = async (role?: UserRole) => {
     } else {
       data = await db.user.findMany();
     }
+
     return { success: "تم الحصول على الأعضاء بنجاح", data };
   } catch {
     return { error: "خطأ أثناء الحصول على الأعضاء" };
