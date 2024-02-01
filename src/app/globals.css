@@ -193,3 +193,7 @@
     transform: scale3d(1.15, 0.8, 1);
   }
 }
+
+.ql-editor,
+.ql-blank {
+}

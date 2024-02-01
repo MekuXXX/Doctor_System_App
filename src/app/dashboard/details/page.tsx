@@ -7,7 +7,7 @@ import { db } from "@/lib/db";
 type Props = {};
 export const revalidate = 1;
 
-export default async function MastersPage({}: Props) {
+export default async function DetailsPage({}: Props) {
   const getData = async () => {
     "use server";
     const data = await db.master.findMany();
@@ -16,18 +16,14 @@ export default async function MastersPage({}: Props) {
   const data = await getData();
   return (
     <div className="content">
-      <h1>التخصصات</h1>
-      <div className="grid lg:grid-cols-2 gap-4 items-start">
-        <AddMaster />
-        <DataTable
-          searchIn="name"
-          keys={["masters"]}
-          queryFn={getData as any}
-          data={data}
-          columns={columns}
-        />
-        {/* <ViewMasters /> */}
-      </div>
+      <h1>الأطباء</h1>
+      <DataTable
+        searchIn="name"
+        keys={["masters"]}
+        queryFn={getData as any}
+        data={data}
+        columns={columns}
+      />
     </div>
   );
 }

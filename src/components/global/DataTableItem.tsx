@@ -8,6 +8,6 @@ type Props = {
 
 export function DataTableItem({ className, children }: Props) {
   return (
-    <p className={cn("text-[#c3c4c9] font-thin", className)}>{children}</p>
+    <div className={cn("text-[#c3c4c9] font-thin", className)}>{children}</div>
   );
 }

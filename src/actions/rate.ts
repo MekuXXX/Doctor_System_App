@@ -1,10 +1,13 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { AddRateSchemaType } from "@/schemas/rate";
+import { AddRateSchemaType, addRateSchema } from "@/schemas/rate";
 import { Rate } from "@prisma/client";
 
 export const addRate = async (data: AddRateSchemaType) => {
+  const parsedData = addRateSchema.safeParse(data);
+
+  if (!parsedData.success) return { error: "البيانات الذى أدخلتها غير صحيحة" };
   try {
     await db.rate.create({
       data: {

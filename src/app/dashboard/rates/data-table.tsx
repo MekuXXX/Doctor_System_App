@@ -41,7 +41,6 @@ export const columns: ColumnDef<any>[] = [
     accessorKey: "rate",
     header: () => <DataTableColumnHeader>التقييم</DataTableColumnHeader>,
     cell: ({ row }) => {
-      console.log(row.original);
       return <DataTableItem>{row.original.rate}</DataTableItem>;
     },
   },

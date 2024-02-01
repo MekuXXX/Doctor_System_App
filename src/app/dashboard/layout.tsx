@@ -44,8 +44,8 @@ const sidebarLinks: SideBarLinkType[] = [
       },
       {
         id: 5,
-        link: "profile",
-        text: "الملف الشخصى",
+        link: "details",
+        text: "بيانات الأطباء",
       },
       {
         id: 6,

@@ -9,7 +9,7 @@ export const reset = async (values: ResetSchemaType) => {
   const validatedFields = ResetSchema.safeParse(values);
 
   if (!validatedFields.success) {
-    return { error: "Invalid emaiL!" };
+    return { error: "الحساب الذى أدخلتة غير صحيح" };
   }
 
   const { email } = validatedFields.data;
@@ -17,7 +17,7 @@ export const reset = async (values: ResetSchemaType) => {
   const existingUser = await getUserByEmail(email);
 
   if (!existingUser) {
-    return { error: "Email not found!" };
+    return { error: "الحساب الذى أدخلتة غير موجود" };
   }
 
   const passwordResetToken = await generatePasswordResetToken(email);
@@ -26,5 +26,5 @@ export const reset = async (values: ResetSchemaType) => {
     passwordResetToken.token
   );
 
-  return { success: "Reset email sent!" };
+  return { success: "تم ارسال رابط اعادة التعيين" };
 };

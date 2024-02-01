@@ -11,11 +11,10 @@ type Props = {
 };
 
 export default function SetUserData({ data, doctors }: Props) {
-  const { setUserData, setStatus } = useUserDataStore();
+  const { setUserData, setStatus: setUserStatus } = useUserDataStore();
   const { setDoctorData } = useDoctorData();
-
   useEffect(() => {
-    setStatus(data.success);
+    setUserData(data.success);
     setUserData(data.data);
     setDoctorData(doctors);
   }, []);

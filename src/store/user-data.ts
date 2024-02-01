@@ -10,7 +10,7 @@ export interface UserDataStoreType {
 
 export const useUserDataStore = create<UserDataStoreType>((set) => ({
   userData: undefined,
-  status: true,
+  status: false,
   setUserData: (data) =>
     set((state) => {
       return { ...state, userData: data };

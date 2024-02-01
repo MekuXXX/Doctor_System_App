@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import dynamic from "next/dynamic";
 import "react-quill/dist/quill.snow.css"; // Import Quill styles
 
@@ -23,6 +23,7 @@ export default function TextEditor({ value, onChange }: Props) {
       ],
       ["link", "image", "video"],
       ["clean"],
+      [{ direction: "rtl" }], // this is rtl support
     ],
     clipboard: {
       // toggle to add extra line breaks when pasting HTML:
@@ -45,6 +46,7 @@ export default function TextEditor({ value, onChange }: Props) {
     "list",
     "bullet",
     "indent",
+    "video",
     "link",
     "image",
     "color",

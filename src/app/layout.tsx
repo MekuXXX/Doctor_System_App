@@ -7,6 +7,7 @@ import SetUserData from "@/components/main/SetUserData";
 import { TanstackQueryProvider } from "@/components/global/TanstackQueryProvider";
 import "./globals.css";
 import { getMembers } from "@/actions/member";
+import { getCountries } from "@/actions/set-country";
 const poppins = Poppins({ weight: ["500", "600"], subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -22,7 +23,6 @@ const getDoctors = async () => {
       name: doctor.name,
       gender: doctor.gender,
       image: doctor.image,
-      masterId: doctor.masterId,
     };
   });
   return filtered;
@@ -34,7 +34,6 @@ export type FilteredDoctors =
       name: string | null;
       gender: string | null;
       image: string | null;
-      masterId: string | null;
     }[]
   | undefined;
 
@@ -44,6 +43,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const data = await getUserData();
+  const countries = await getCountries();
   const doctors = await getDoctors();
 
   return (

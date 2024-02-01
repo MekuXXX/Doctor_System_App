@@ -13,7 +13,6 @@ export function FullScreenToggle({}: Props) {
       window.document.documentElement.requestFullscreen();
       setIsFullScreen(true);
     } else {
-      console.log("Done");
       window.document.exitFullscreen();
       setIsFullScreen(false);
     }

@@ -5,7 +5,6 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { db } from "@/lib/db";
-import { Rate } from "@prisma/client";
 
 type Props = {};
 
@@ -15,7 +14,6 @@ const getData = async () => {
   const refinedData = data.map((rate) => {
     return {
       id: rate.id,
-      doctor: rate.doctor.name,
       patient: rate.patientName,
       rate: rate.rateValue,
       message: rate.message,

@@ -8,7 +8,7 @@ type Props = {
   };
 };
 
-export default async function AddCouponPage({ searchParams }: Props) {
+export default async function AddRatePage({ searchParams }: Props) {
   const { id } = searchParams;
   if (!id) redirect("/dashboard/rates");
   const data = await db.rate.findUnique({ where: { id } });
@@ -16,7 +16,7 @@ export default async function AddCouponPage({ searchParams }: Props) {
 
   return (
     <div className="content max-w-fit mx-auto border-2 rounded-xl my-8  px-6 py-12 bg-white dark:bg-dark">
-      <h1 className="text-2xl mb-8">تعديل تقييم جديد</h1>
+      <h1 className="text-2xl mb-8">تعديل تقييم</h1>
       <AddRate propsData={data!} />
     </div>
   );

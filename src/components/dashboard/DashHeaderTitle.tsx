@@ -30,12 +30,20 @@ const titles = [
     to: "الأعضاء",
   },
   {
+    from: "edit doctor",
+    to: "تعديل الطبيب",
+  },
+  {
     from: "rates",
     to: "التقييمات",
   },
   {
     from: "add rate",
     to: "اضافة تقييمات",
+  },
+  {
+    from: "details",
+    to: "بيانات الأطباء",
   },
 ];
 
