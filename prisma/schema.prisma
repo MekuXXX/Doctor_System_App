@@ -41,18 +41,19 @@ enum DoctorRank {
 }
 
 model DoctorData {
-  id          String     @id
-  breif       String?
-  certificate String?
-  article     String?
-  country     String?
-  doctorId    String     @unique
-  isActive    Boolean    @default(false)
-  doctorRank  DoctorRank @default(BRONSE)
-  doctor      User       @relation(fields: [doctorId], references: [id], onDelete: Cascade)
-  masterId    String?
-  master      Master?    @relation(fields: [masterId], references: [id], onDelete: Cascade)
-  Rate        Rate[]
+  id             String     @id
+  breif          String?
+  certificate    String?
+  article        String?
+  country        String?
+  doctorId       String     @unique
+  isActive       Boolean    @default(false)
+  doctorRank     DoctorRank @default(BRONSE)
+  doctor         User       @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  doctorDiscount Int        @default(0)
+  masterId       String?
+  master         Master?    @relation(fields: [masterId], references: [id], onDelete: Cascade)
+  Rate           Rate[]
 }
 
 model Account {

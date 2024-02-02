@@ -12,6 +12,11 @@ import bcrypt from "bcryptjs";
 import { cwd } from "process";
 import { generateVerificationToken } from "@/lib/tokens";
 import { sendVerificationEmail } from "@/lib/mail";
+import {
+  DoctorDetailsSchemaType,
+  doctorDetailsSchema,
+} from "@/schemas/doctorDetails";
+import { error } from "console";
 
 export const addDoctor = async (data: AddDoctorSchemaType) => {
   let image, path;
@@ -124,5 +129,29 @@ export const editDoctor = async (
       await unlink(path);
     }
     return { error: "حدث خطأ أثناء تعديل حساب الطبيب" };
+  }
+};
+
+export const editDoctorDetails = async (
+  id: string,
+  data: DoctorDetailsSchemaType
+) => {
+  const parsedData = await doctorDetailsSchema.safeParse(data);
+  if (!parsedData.success) return { error: "خطأ فى البيانات المدخلة" };
+  try {
+    await db.user.update({
+      where: { id },
+      data: {
+        DoctorData: {
+          update: {
+            doctorRank: parsedData.data.doctorRank,
+            doctorDiscount: Number(parsedData.data.doctorDiscount),
+          },
+        },
+      },
+    });
+    return { success: "تم تعديل بيانات الطبيب بنجاح" };
+  } catch {
+    return { error: "حدث خطأ أثناء تعديل بيانات الطبيب" };
   }
 };
