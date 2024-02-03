@@ -28,6 +28,7 @@ model User {
   password              String?
   role                  UserRole               @default(USER)
   accounts              Account[]
+  sessions              Sessions[]
   isTwoFactorEnabled    Boolean                @default(false)
   twoFactorConfirmation TwoFactorConfirmation?
   DoctorData            DoctorData?
@@ -41,19 +42,62 @@ enum DoctorRank {
 }
 
 model DoctorData {
-  id             String     @id
+  id             String          @id
   breif          String?
   certificate    String?
   article        String?
   country        String?
-  doctorId       String     @unique
-  isActive       Boolean    @default(false)
-  doctorRank     DoctorRank @default(BRONSE)
-  doctor         User       @relation(fields: [doctorId], references: [id], onDelete: Cascade)
-  doctorDiscount Int        @default(0)
+  doctorRank     DoctorRank      @default(BRONSE)
+  doctorDiscount Int             @default(0)
   masterId       String?
-  master         Master?    @relation(fields: [masterId], references: [id], onDelete: Cascade)
+  master         Master?         @relation(fields: [masterId], references: [id], onDelete: Cascade)
+  doctorId       String          @unique
+  doctor         User            @relation(fields: [doctorId], references: [id], onDelete: Cascade)
   Rate           Rate[]
+  money          DoctorMoney?
+  doctorActive   DoctorActive?
+  doctorSessions DoctorSessions?
+}
+
+model DoctorMoney {
+  id       String     @id @default(uuid())
+  pending  Float      @default(0.00)
+  ready    Float      @default(0.00)
+  doctorId String     @unique
+  doctor   DoctorData @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+}
+
+model DoctorActive {
+  id       String     @id @default(uuid())
+  isActive Boolean    @default(false)
+  from     String     @default("00:00")
+  to       String     @default("00:00")
+  doctorId String     @unique
+  doctor   DoctorData @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+}
+
+enum Session_Time {
+  HALF
+  HOUR
+}
+
+model DoctorSessions {
+  id           String     @id @default(uuid())
+  halfSessions Float      @default(0.00)
+  hourSessions Float      @default(0.00)
+  twoSessions  Float      @default(0.00)
+  fourSessions Float      @default(0.00)
+  doctorId     String     @unique
+  doctor       DoctorData @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+}
+
+model Sessions {
+  id     String       @id @default(uuid())
+  price  String
+  time   Session_Time
+  link   String
+  userId String
+  user   User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Account {

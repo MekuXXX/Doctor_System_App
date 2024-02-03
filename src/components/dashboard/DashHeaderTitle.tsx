@@ -45,6 +45,14 @@ const titles = [
     from: "details",
     to: "بيانات الأطباء",
   },
+  {
+    from: "online settings",
+    to: "اعدادات الأونلاين",
+  },
+  {
+    from: "dr dashboard",
+    to: "الصفحة الرئيسية",
+  },
 ];
 
 export type TitlesType = typeof titles;

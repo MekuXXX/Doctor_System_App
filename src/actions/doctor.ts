@@ -60,11 +60,12 @@ export const addDoctor = async (data: AddDoctorSchemaType) => {
             country: parsedData.data.country,
             breif: parsedData.data.brief,
             masterId: parsedData.data.master,
+            doctorSessions: { create: {} },
+            doctorActive: { create: {} },
           },
         },
       },
     });
-    console.log("-------- Done");
     const verificationToken = await generateVerificationToken(data.email);
     await sendVerificationEmail(
       verificationToken.email,
@@ -72,7 +73,6 @@ export const addDoctor = async (data: AddDoctorSchemaType) => {
     );
     return { success: "تم ارسال رسالة تأكيد للحساب" };
   } catch (err) {
-    console.log(err);
     if (image !== "/images/default.jpg" && path) {
       await unlink(path);
     }

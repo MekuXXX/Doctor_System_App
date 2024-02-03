@@ -8,17 +8,17 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { RxHamburgerMenu } from "react-icons/rx";
-import { LinkType, SideBarLinkType } from "@/app/dashboard/layout";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Logo from "#/logo1.png";
 import Image from "next/image";
+import { SideBarLinkType } from "@/global";
 
 type Props = {
-  links: LinkType[];
+  routes: SideBarLinkType;
 };
 
-export default function DashSidebar({ links }: Props) {
+export default function DashSidebar({ routes }: Props) {
   return (
     <Sheet>
       <SheetTrigger>
@@ -33,10 +33,10 @@ export default function DashSidebar({ links }: Props) {
           </SheetTitle>
         </SheetHeader>
         <div className="flex flex-col gap-y-2 py-6">
-          {links.map(({ id, link, text }) => (
+          {routes.links.map(({ id, link, text }) => (
             <Button key={id} variant={"ghost"} className="justify-start">
               <Link
-                href={`/dashboard/${link}`}
+                href={`/${routes.base}/${link}`}
                 className="capitalize block w-full text-right"
               >
                 {text}
