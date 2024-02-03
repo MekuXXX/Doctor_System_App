@@ -38,6 +38,7 @@ import { FormSuccess } from "@/components/auth/form-success";
 import { addCoupon } from "@/actions/coupon";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { ADMIN_DASHBOARD } from "@/lib/constants";
 
 type Props = {};
 
@@ -68,7 +69,7 @@ export default function AddCoupon({}: Props) {
         } else if (res.success) {
           toast.success(res.success);
           router.refresh();
-          router.push("/dashboard/coupons");
+          router.push(`/${ADMIN_DASHBOARD}/coupons`);
         }
       } catch {
         setError("حدث خطأ أثناء انشاء النتخصص");

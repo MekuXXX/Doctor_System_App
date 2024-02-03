@@ -2,9 +2,9 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "@/components/global/DataTableColumnHeader";
 import { DataTableItem } from "@/components/global/DataTableItem";
-import { cn } from "@/lib/utils";
 import React from "react";
 import { StatusBadge } from "@/components/main/StatusBadge";
+import { formatDate } from "@/lib/date";
 
 export const columns: ColumnDef<any>[] = [
   {
@@ -29,14 +29,7 @@ export const columns: ColumnDef<any>[] = [
     accessorKey: "date",
     header: () => <DataTableColumnHeader>التاريخ</DataTableColumnHeader>,
     cell: ({ row }) => (
-      <DataTableItem>
-        {row.original.date.toLocaleDateString("en-us", {
-          weekday: "long",
-          year: "numeric",
-          month: "short",
-          day: "numeric",
-        })}
-      </DataTableItem>
+      <DataTableItem>{formatDate(row.original.date)}</DataTableItem>
     ),
   },
   {

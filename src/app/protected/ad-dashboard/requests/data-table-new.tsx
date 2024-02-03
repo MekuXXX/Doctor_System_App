@@ -10,11 +10,12 @@ import {
 import { ColumnDef } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "@/components/global/DataTableColumnHeader";
 import { DataTableItem } from "@/components/global/DataTableItem";
-import { FaClipboard } from "react-icons/fa";
-import { MdDelete } from "react-icons/md";
-import { removeCoupon } from "@/actions/coupon";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { formatDate } from "@/lib/date";
+import { AiOutlineCheck } from "react-icons/ai";
+import { updateMoneyRequest } from "@/actions/money";
+import { MdCancel } from "react-icons/md";
 
 export const columns: ColumnDef<any>[] = [
   {
@@ -31,30 +32,29 @@ export const columns: ColumnDef<any>[] = [
     ),
   },
   {
-    accessorKey: "coupon",
-    header: () => <DataTableColumnHeader>رمز الكوبون</DataTableColumnHeader>,
-    cell: ({ row }) => <DataTableItem>{row.getValue("coupon")}</DataTableItem>,
-  },
-  {
-    accessorKey: "type",
-    header: () => <DataTableColumnHeader>مدة الكوبون</DataTableColumnHeader>,
-    cell: ({ row }) => <DataTableItem>{row.getValue("type")}</DataTableItem>,
-  },
-  {
-    accessorKey: "discount",
-    header: () => <DataTableColumnHeader>الخصم</DataTableColumnHeader>,
+    accessorKey: "name",
+    header: () => <DataTableColumnHeader>الاسم</DataTableColumnHeader>,
     cell: ({ row }) => (
-      <DataTableItem>{row.getValue("discount")}</DataTableItem>
+      <DataTableItem>{row.original.doctor.doctor.name}</DataTableItem>
     ),
   },
   {
-    accessorKey: "useTimes",
-    header: ({ column }) => (
-      <DataTableColumnHeader>الاستخدامات</DataTableColumnHeader>
+    accessorKey: "date",
+    header: () => (
+      <DataTableColumnHeader className="text-center">
+        التاريح
+      </DataTableColumnHeader>
     ),
     cell: ({ row }) => (
-      <DataTableItem>{row.getValue("useTimes")}</DataTableItem>
+      <DataTableItem className="text-center">
+        {formatDate(row.original.date)}
+      </DataTableItem>
     ),
+  },
+  {
+    accessorKey: "Money",
+    header: () => <DataTableColumnHeader>المبلغ</DataTableColumnHeader>,
+    cell: ({ row }) => <DataTableItem>{row.original.money}$</DataTableItem>,
   },
   {
     accessorKey: "Actions",
@@ -62,8 +62,18 @@ export const columns: ColumnDef<any>[] = [
     cell: ({ row }) => {
       const router = useRouter();
       const id = row.original.id;
-      const handleDelete = async () => {
-        const res = await removeCoupon(id as string);
+      const handleDone = async () => {
+        const res = await updateMoneyRequest(id, "DONE");
+        if (res.success) {
+          toast.success(res.success);
+        } else {
+          toast.error(res.error);
+        }
+        router.refresh();
+      };
+
+      const handleCancelled = async () => {
+        const res = await updateMoneyRequest(id, "CANCELLED");
         if (res.success) {
           toast.success(res.success);
         } else {
@@ -83,19 +93,17 @@ export const columns: ColumnDef<any>[] = [
           <DropdownMenuContent>
             <DropdownMenuItem
               className="flex gap-2 items-center"
-              onClick={() =>
-                navigator.clipboard.writeText(row.getValue("coupon"))
-              }
+              onClick={handleCancelled}
             >
-              <FaClipboard className="h-[1.2rem] w-[1.2rem]" />
-              <span>نسخ الكوبون</span>
+              <MdCancel className="h-[1.2rem] w-[1.2rem]" />
+              <span>الغاء التحويل</span>
             </DropdownMenuItem>
             <DropdownMenuItem
               className="flex gap-2 items-center"
-              onClick={handleDelete}
+              onClick={handleDone}
             >
-              <MdDelete className="h-[1.2rem] w-[1.2rem]" />
-              <span>حذف الكوبون</span>
+              <AiOutlineCheck className="h-[1.2rem] w-[1.2rem]" />
+              <span>تم التحويل</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

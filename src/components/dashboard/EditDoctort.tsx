@@ -40,6 +40,7 @@ import Image from "next/image";
 import { CountrySelectInput } from "../global/CountrySelectInput";
 import { reset } from "@/actions/reset";
 import { FormSuccess } from "../auth/form-success";
+import { ADMIN_DASHBOARD } from "@/lib/constants";
 
 type Props = {
   masters: Master[];
@@ -88,7 +89,7 @@ export default function EditDoctor({ masters, data, id }: Props) {
             form.reset();
             toast.success(res.success);
             router.refresh();
-            router.push("/dashboard/members?role=DOCTOR");
+            router.push(`/${ADMIN_DASHBOARD}/members?role=DOCTOR`);
           }
         }
       } catch {

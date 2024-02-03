@@ -10,12 +10,14 @@ import {
 import { ColumnDef } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "@/components/global/DataTableColumnHeader";
 import { DataTableItem } from "@/components/global/DataTableItem";
-import { FaClipboard } from "react-icons/fa";
+import { FaClipboard, FaPen } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import { removeCoupon } from "@/actions/coupon";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { formatDate } from "@/lib/date";
+import { removeRate } from "@/actions/rate";
+import Link from "next/link";
+import StarRate from "@/components/main/StarRate";
 
 export const columns: ColumnDef<any>[] = [
   {
@@ -32,54 +34,39 @@ export const columns: ColumnDef<any>[] = [
     ),
   },
   {
-    accessorKey: "coupon",
-    header: () => <DataTableColumnHeader>رمز الكوبون</DataTableColumnHeader>,
-    cell: ({ row }) => <DataTableItem>{row.getValue("coupon")}</DataTableItem>,
+    accessorKey: "doctor",
+    header: () => <DataTableColumnHeader>الطبيب</DataTableColumnHeader>,
+    cell: ({ row }) => (
+      <DataTableItem>{row.original.doctor.doctor.name}</DataTableItem>
+    ),
   },
   {
-    accessorKey: "type",
+    accessorKey: "rate",
     header: () => (
       <DataTableColumnHeader className="text-center">
-        مدة الكوبون
+        التقييم
       </DataTableColumnHeader>
     ),
     cell: ({ row }) => {
-      let time;
-      if (row.original.type === "LIMITED") time = "دائم";
-      else {
-        time = (
-          <>
-            {formatDate(row.original.from)}
-            <br />
-            {formatDate(row.original.to)}
-          </>
-        );
-      }
-      return <DataTableItem className="text-center">{time}</DataTableItem>;
+      return (
+        <DataTableItem>
+          <StarRate className=" justify-center" rate={row.original.rateValue} />
+        </DataTableItem>
+      );
     },
   },
   {
-    accessorKey: "discount",
-    header: () => <DataTableColumnHeader>الخصم</DataTableColumnHeader>,
-    cell: ({ row }) => {
-      let value;
-      if (row.original.discountType === "VALUE")
-        value = row.original.discountValue + "$";
-      else value = row.original.discountValue + "%";
-      return <DataTableItem>{value}</DataTableItem>;
-    },
-  },
-  {
-    accessorKey: "useTimes",
-    header: ({ column }) => (
-      <DataTableColumnHeader>الاستخدامات</DataTableColumnHeader>
-    ),
+    accessorKey: "message",
+    header: () => <DataTableColumnHeader>الرسالة</DataTableColumnHeader>,
     cell: ({ row }) => (
-      <DataTableItem>
-        {row.original.type === "unlimited"
-          ? "غير محدود"
-          : row.original.useTimes}
-      </DataTableItem>
+      <DataTableItem className="">{row.original.message}</DataTableItem>
+    ),
+  },
+  {
+    accessorKey: "patient",
+    header: () => <DataTableColumnHeader>المقييم</DataTableColumnHeader>,
+    cell: ({ row }) => (
+      <DataTableItem>{row.original.patientName}</DataTableItem>
     ),
   },
   {
@@ -89,7 +76,7 @@ export const columns: ColumnDef<any>[] = [
       const router = useRouter();
       const id = row.original.id;
       const handleDelete = async () => {
-        const res = await removeCoupon(id as string);
+        const res = await removeRate(id as string);
         if (res.success) {
           toast.success(res.success);
         } else {
@@ -107,21 +94,18 @@ export const columns: ColumnDef<any>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuItem
-              className="flex gap-2 items-center"
-              onClick={() =>
-                navigator.clipboard.writeText(row.getValue("coupon"))
-              }
-            >
-              <FaClipboard className="h-[1.2rem] w-[1.2rem]" />
-              <span>نسخ الكوبون</span>
-            </DropdownMenuItem>
+            <a href={"/dashboard/rates/edit-rate?id=" + id}>
+              <DropdownMenuItem className="flex gap-2 items-center">
+                <FaPen className="h-[1.2rem] w-[1.2rem]" />
+                <span>تعديل التقييم</span>
+              </DropdownMenuItem>
+            </a>
             <DropdownMenuItem
               className="flex gap-2 items-center"
               onClick={handleDelete}
             >
               <MdDelete className="h-[1.2rem] w-[1.2rem]" />
-              <span>حذف الكوبون</span>
+              <span>حذف التقييم</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

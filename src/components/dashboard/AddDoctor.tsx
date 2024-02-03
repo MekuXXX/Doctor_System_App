@@ -35,6 +35,7 @@ import { toast } from "sonner";
 import { addDoctor } from "@/actions/doctor";
 import Image from "next/image";
 import { CountrySelectInput } from "../global/CountrySelectInput";
+import { ADMIN_DASHBOARD } from "@/lib/constants";
 
 type Props = {
   masters: Master[];
@@ -83,7 +84,7 @@ export default function AddDoctor({ masters }: Props) {
             form.reset();
             toast.success(res.success);
             router.refresh();
-            router.push("/dashboard/members?role=DOCTOR");
+            router.push(`/${ADMIN_DASHBOARD}/members?role=DOCTOR`);
           }
         }
       } catch {

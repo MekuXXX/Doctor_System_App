@@ -1,4 +1,3 @@
-import AddMaster from "@/components/dashboard/AddMaster";
 import { DataTable } from "@/components/dashboard/Tables/DataTable";
 import React from "react";
 import { columns } from "./data-table";

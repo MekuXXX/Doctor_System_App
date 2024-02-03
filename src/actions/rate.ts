@@ -4,21 +4,37 @@ import { db } from "@/lib/db";
 import { AddRateSchemaType, addRateSchema } from "@/schemas/rate";
 import { Rate } from "@prisma/client";
 
+export const getRatesDoctors = async () => {
+  try {
+    const data = await db.user.findMany({
+      where: { role: "DOCTOR" },
+      select: { name: true, DoctorData: { select: { id: true } } },
+    });
+    return { success: "نجح الحصول على بيانات الأطباء لاضافة التقييم", data };
+  } catch {
+    return { error: "حدث خطأ حين الوصول للأطباء", data: [] };
+  }
+};
+
 export const addRate = async (data: AddRateSchemaType) => {
   const parsedData = addRateSchema.safeParse(data);
 
   if (!parsedData.success) return { error: "البيانات الذى أدخلتها غير صحيحة" };
   try {
-    await db.rate.create({
+    await db.doctorData.update({
+      where: { id: parsedData.data.doctorId },
       data: {
-        patientName: data.patientName,
-        doctorId: data.doctorId,
-        message: data.message,
-        rateValue: Number(data.rate),
+        Rate: {
+          create: {
+            message: parsedData.data.message,
+            patientName: parsedData.data.patientName,
+            rateValue: Number(parsedData.data.rate),
+          },
+        },
       },
     });
     return { success: "تم اضافة التقييم بنجاح" };
-  } catch {
+  } catch (err) {
     return { error: "حدث خطأ أثناء اضافة التقييم" };
   }
 };
@@ -26,11 +42,10 @@ export const addRate = async (data: AddRateSchemaType) => {
 export const editRate = async (data: Rate) => {
   try {
     const rate = await db.rate.findUnique({ where: { id: data.id } });
-
     if (!rate) return { error: "خطأ التقييم الذى أدخلته غير موجود" };
     await db.rate.update({ where: { id: data.id }, data });
     return { success: "تم تعديل التقييم بنجاح" };
-  } catch {
+  } catch (err) {
     return { error: "حدث خطأ أثنا تعديل التقييم" };
   }
 };

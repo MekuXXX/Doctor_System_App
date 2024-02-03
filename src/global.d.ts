@@ -5,6 +5,6 @@ export type LinkType = {
 };
 
 export type SideBarLinkType = {
-  base: "dashboard" | "dr-dashboard" | "protect/ad-dashboard";
+  base: "dashboard" | "dr-dashboard" | "protected/ad-dashboard";
   links: LinkType[];
 };

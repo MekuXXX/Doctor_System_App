@@ -1,4 +1,5 @@
 import EditDoctor from "@/components/dashboard/EditDoctort";
+import { ADMIN_DASHBOARD } from "@/lib/constants";
 import { db } from "@/lib/db";
 import { redirect } from "next/navigation";
 import React from "react";
@@ -10,12 +11,12 @@ type Props = {
 };
 export default async function AddDoctorPage({ searchParams }: Props) {
   const { id } = searchParams;
-  if (!id) redirect("/dashboard/rates");
+  if (!id) redirect(`/${ADMIN_DASHBOARD}/rates`);
   const data = await db.user.findUnique({
     where: { id },
     include: { DoctorData: true },
   });
-  if (!data) redirect("/dashboard/rates");
+  if (!data) redirect(`/${ADMIN_DASHBOARD}/rates`);
   const masters = await db.master.findMany();
   return (
     <div className="content place-content-center">

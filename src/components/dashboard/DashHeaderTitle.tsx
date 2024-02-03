@@ -1,7 +1,8 @@
-"use clint";
+"use client";
 import { usePathname } from "next/navigation";
 import React from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useUserDataStore } from "@/store/user-data";
 
 type Props = {};
 const titles = [
@@ -57,29 +58,39 @@ const titles = [
     from: "money",
     to: "الرصيد",
   },
+  {
+    from: "requests",
+    to: "طلبات السحب",
+  },
 ];
 
 export type TitlesType = typeof titles;
 
 export function DashHeaderTitle({}: Props) {
   const path = usePathname().split("/").slice(1);
+  const { userData } = useUserDataStore();
   let pageHeader = path[path.length - 1];
   if (pageHeader.includes("-")) pageHeader = pageHeader.split("-").join(" ");
 
   pageHeader = getArTitle(titles, pageHeader);
 
-  return <h1 className="capitalize font-medium text-2xl">{pageHeader}</h1>;
+  return (
+    <div className="md:flex items-center gap-4">
+      <h1 className="capitalize font-medium text-2xl">{pageHeader}</h1>
+      <p className="hidden md:block">({userData?.geoplugin_timezone})</p>
+    </div>
+  );
 }
 
 export function DashHeaderTitleFallback() {
   return <Skeleton className="w-32 h-6" />;
 }
 
-const getArTitle = (titles: TitlesType, enTitle: string) => {
+const getArTitle = (titles: TitlesType, engTitle: string) => {
   let result;
   for (let lang of titles) {
-    if (lang.from === enTitle) result = lang.to;
+    if (lang.from === engTitle) result = lang.to;
   }
 
-  return result ? result : enTitle;
+  return result ? result : engTitle;
 };

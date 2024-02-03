@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import React from "react";
 import { columns } from "./data-table";
 import { DataTable } from "@/components/dashboard/Tables/DataTable";
-import { getDoctorRequests } from "@/actions/doctor-money";
+import { getDoctorRequests } from "@/actions/money";
 
 type Props = {};
 

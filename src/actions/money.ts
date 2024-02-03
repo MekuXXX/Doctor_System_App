@@ -2,6 +2,7 @@
 
 import { db } from "@/lib/db";
 import { RequestMoneySchemaType, requestMoneySchema } from "@/schemas/money";
+import { Money_Request_Status } from "@prisma/client";
 
 export const getDoctorMoney = async (email: string) => {
   try {
@@ -89,5 +90,17 @@ export const getDoctorRequests = async (email: string) => {
     return { success: "نجح الحصول على بيانات طلبات سحب الطبيب", data };
   } catch {
     return { error: "حدث خطأ أثناء الحسول على بيانات طلبات السحب", data: [] };
+  }
+};
+
+export const updateMoneyRequest = async (
+  id: string,
+  status: Money_Request_Status
+) => {
+  try {
+    await db.moneyRequest.update({ where: { id }, data: { status } });
+    return { success: "تم تحديث الطلب بنجاح" };
+  } catch {
+    return { error: "حدث خطأ أثناء تحديث الطلب" };
   }
 };

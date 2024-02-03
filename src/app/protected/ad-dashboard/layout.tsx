@@ -3,13 +3,14 @@ import DashHeader from "@/components/dashboard/DashHeader";
 import React from "react";
 import { auth } from "@/auth";
 import { SideBarLinkType } from "@/global";
+import { ADMIN_DASHBOARD } from "@/lib/constants";
 
 type Props = {
   children: React.ReactNode;
 };
 
 const sidebarLinks: SideBarLinkType = {
-  base: "protect/ad-dashboard",
+  base: ADMIN_DASHBOARD,
   links: [
     {
       id: 1,
@@ -45,6 +46,11 @@ const sidebarLinks: SideBarLinkType = {
       id: 7,
       link: "rates",
       text: "التقييمات",
+    },
+    {
+      id: 8,
+      link: "requests",
+      text: "طلبات السحب",
     },
   ],
 };

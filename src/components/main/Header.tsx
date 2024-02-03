@@ -19,6 +19,7 @@ import MainButton from "@/components/global/MainButton";
 import { auth } from "@/auth";
 import { LogoutButton } from "@/components/auth/logout-button";
 import { LoginButton } from "@/components/auth/login-button";
+import { ADMIN_DASHBOARD, DOCTOR_DASHBOARD } from "@/lib/constants";
 
 type Props = {};
 
@@ -46,7 +47,12 @@ const pages = [
 
 export default async function Header({}: Props) {
   const user = await auth();
-
+  const dashboard =
+    user?.user.role === "USER"
+      ? "/dashboard"
+      : user?.user.role === "ADMIN"
+        ? `/${ADMIN_DASHBOARD}`
+        : `/${DOCTOR_DASHBOARD}`;
   return (
     <header dir="rtl" className="content">
       <div className="flex justify-between items-center">
@@ -86,7 +92,7 @@ export default async function Header({}: Props) {
                 <DropdownMenuLabel dir="rtl">إعدادات</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
-                  <Link href={"/dashboard"}>حسابى</Link>
+                  <Link href={dashboard}>حسابى</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                   <LogoutButton>تسجيل الخروج</LogoutButton>

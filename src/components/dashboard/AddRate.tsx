@@ -27,11 +27,11 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { addRateSchema, AddRateSchemaType } from "@/schemas/rate";
 import { Textarea } from "@/components/ui/textarea";
-import { FaStar } from "react-icons/fa6";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useDoctorData } from "@/store/doctors";
-import { addRate, editRate } from "@/actions/rate";
+import { addRate, editRate, getRatesDoctors } from "@/actions/rate";
 import { Rate } from "@prisma/client";
+import { useQuery } from "@tanstack/react-query";
+import { ADMIN_DASHBOARD } from "@/lib/constants";
 type Props = {
   propsData?: Rate;
 };
@@ -40,7 +40,16 @@ export function AddRate({ propsData }: Props) {
   const [error, setError] = useState("");
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
-  const { doctors } = useDoctorData();
+  const refetchInterval = process.env.NEXT_PUBLIC_REFETCH_INTERVAL || 5000;
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["doctors", "add", "edit"],
+    queryFn: async () => {
+      const data = await getRatesDoctors();
+      if (data.error) throw new Error(data.error);
+      return data.data;
+    },
+    refetchInterval: Number(refetchInterval),
+  });
   const form = useForm<AddRateSchemaType>({
     resolver: zodResolver(addRateSchema),
     defaultValues: {
@@ -74,13 +83,17 @@ export function AddRate({ propsData }: Props) {
         } else if (res.success) {
           toast.success(res.success);
           router.refresh();
-          router.push("/dashboard/rates");
+          router.push(`/${ADMIN_DASHBOARD}/rates`);
         }
       } catch {
         setError("حدث خطأ أثناء انشاء النتخصص");
       }
     });
   }
+  console.log(data);
+  // TODO: add loading spinner and error messages
+  if (isLoading) return <h1>Loading...</h1>;
+  if (isError) return <h1>Error</h1>;
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -110,8 +123,11 @@ export function AddRate({ propsData }: Props) {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {doctors?.map((doctor) => (
-                    <SelectItem value={doctor.id} key={doctor.id}>
+                  {data?.map((doctor) => (
+                    <SelectItem
+                      value={doctor.DoctorData?.id!}
+                      key={doctor.DoctorData?.id}
+                    >
                       {doctor.name}
                     </SelectItem>
                   ))}

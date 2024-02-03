@@ -7,6 +7,7 @@ import { db } from "@/lib/db";
 import { FaPlus } from "react-icons/fa6";
 import { UserRole } from "@prisma/client";
 import { getMembers } from "@/actions/member";
+import { ADMIN_DASHBOARD } from "@/lib/constants";
 
 type Props = {
   searchParams: {
@@ -27,21 +28,21 @@ export default async function MembersPage({ searchParams }: Props) {
     <div className="content">
       <div>
         <Link
-          href={"/dashboard/members"}
+          href={`/${ADMIN_DASHBOARD}/members`}
           className={role === undefined ? " font-extrabold" : ""}
         >
           <Button variant={"link"}>الكل</Button>
         </Link>
 
         <Link
-          href={"/dashboard/members?role=USER"}
+          href={`/${ADMIN_DASHBOARD}/members?role=USER`}
           className={role === "USER" ? " font-extrabold" : ""}
         >
           <Button variant={"link"}>المستخدمين</Button>
         </Link>
 
         <Link
-          href={"/dashboard/members?role=DOCTOR"}
+          href={`/${ADMIN_DASHBOARD}/members?role=DOCTOR`}
           className={role === "DOCTOR" ? " font-extrabold" : ""}
         >
           <Button variant={"link"}>الأطباء</Button>
@@ -55,7 +56,7 @@ export default async function MembersPage({ searchParams }: Props) {
         queryFnParams={[role] as any}
         childrenButtons={
           role === "DOCTOR" && (
-            <Link href={"/dashboard/members/add-doctor"}>
+            <Link href={`/${ADMIN_DASHBOARD}/members/add-doctor`}>
               <Button variant={"outline"}>
                 <FaPlus />
                 <span className="hidden lg:block">إضافة طبيب</span>

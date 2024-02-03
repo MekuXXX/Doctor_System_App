@@ -11,25 +11,7 @@ type Props = {};
 const getData = async () => {
   "use server";
   const data = await db.coupon.findMany();
-  const refinedData = data.map((curr) => {
-    let discount;
-    if (curr.discountType === "PERCENT") {
-      discount = curr.discountValue + "%";
-    } else {
-      discount = curr.discountValue + "$";
-    }
-    return {
-      coupon: curr.coupon,
-      type:
-        curr.type === "PERMANENT"
-          ? "دائم"
-          : curr.from?.getTime() + " " + curr.to?.getDate(),
-      useTimes: curr.useTimes === "unlimited" ? "غير محدود" : curr.useTimes,
-      id: curr.id,
-      discount,
-    };
-  }, []);
-  return refinedData;
+  return data;
 };
 
 export default async function CouponsPage({}: Props) {

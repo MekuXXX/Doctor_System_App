@@ -1,5 +1,5 @@
 "use client";
-import { getDoctorMoney, makeMoneyRequest } from "@/actions/doctor-money";
+import { getDoctorMoney, makeMoneyRequest } from "@/actions/money";
 import { useQuery } from "@tanstack/react-query";
 import React, { useState, useTransition } from "react";
 import MoneyCard from "@/components/dashboard/MoneyCard";

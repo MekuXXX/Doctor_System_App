@@ -11,20 +11,23 @@ export default async function OnlineSettingsPage({}: Props) {
   const user = await auth();
   const getData = async () => {
     "use server";
-
-    const data = await db.user.findUnique({
-      where: { email: user?.user.email!, role: "DOCTOR" },
-      select: {
-        email: true,
-        DoctorData: {
-          select: {
-            doctorSessions: true,
-            doctorActive: true,
+    try {
+      const data = await db.user.findUnique({
+        where: { email: user?.user.email!, role: "DOCTOR" },
+        select: {
+          email: true,
+          DoctorData: {
+            select: {
+              doctorSessions: true,
+              doctorActive: true,
+            },
           },
         },
-      },
-    });
-    return data;
+      });
+      return data;
+    } catch {
+      return [];
+    }
   };
   const data = await getData();
   if (!data) redirect("/");

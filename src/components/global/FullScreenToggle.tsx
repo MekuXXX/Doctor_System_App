@@ -1,3 +1,4 @@
+"use client";
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { RxEnterFullScreen, RxExitFullScreen } from "react-icons/rx";
@@ -6,7 +7,6 @@ type Props = {};
 
 export function FullScreenToggle({}: Props) {
   const [isFullScreen, setIsFullScreen] = useState<boolean>();
-  // let isFullScreen = false;
 
   const handleFullScreen = async () => {
     if (!isFullScreen) {
