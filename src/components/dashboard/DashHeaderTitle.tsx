@@ -53,6 +53,10 @@ const titles = [
     from: "dr dashboard",
     to: "الصفحة الرئيسية",
   },
+  {
+    from: "money",
+    to: "الرصيد",
+  },
 ];
 
 export type TitlesType = typeof titles;

@@ -44,7 +44,6 @@ export const saveOnlineSettings = async (
     });
     return { success: "تم حفط الاعدادات بنجاح" };
   } catch (err) {
-    console.log(err);
     return { error: "حدث خطأ أثناء حفظ الاعدادات" };
   }
 };

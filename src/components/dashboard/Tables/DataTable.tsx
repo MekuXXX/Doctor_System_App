@@ -49,8 +49,9 @@ export function DataTable<TData, TValue>({
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
+  const refetchInterval = process.env.NEXT_PUBLIC_REFETCH_INTERVAL || 5000;
 
-  const { data } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     initialData,
     queryKey: keys,
     queryFn: async () => {
@@ -62,8 +63,10 @@ export function DataTable<TData, TValue>({
       }
       return data || [];
     },
-    refetchInterval: 3000,
+    refetchInterval: Number(refetchInterval),
   });
+
+  // TODO: add loading spinner and error messages
 
   const table = useReactTable({
     data,
@@ -83,6 +86,8 @@ export function DataTable<TData, TValue>({
     },
   });
 
+  if (isLoading) return <h1>Loading..</h1>;
+  if (isError) return <h1>Error</h1>;
   return (
     <div>
       <div dir="rtl" className="flex items-center py-4">

@@ -55,8 +55,24 @@ model DoctorData {
   doctor         User            @relation(fields: [doctorId], references: [id], onDelete: Cascade)
   Rate           Rate[]
   money          DoctorMoney?
+  moneyRequests  MoneyRequest[]
   doctorActive   DoctorActive?
   doctorSessions DoctorSessions?
+}
+
+enum Money_Request_Status {
+  DONE
+  WATING
+  CANCELLED
+}
+
+model MoneyRequest {
+  id       String               @id @default(uuid())
+  money    Float
+  status   Money_Request_Status @default(WATING)
+  date     DateTime
+  doctorId String
+  doctor   DoctorData           @relation(fields: [doctorId], references: [id], onDelete: Cascade)
 }
 
 model DoctorMoney {

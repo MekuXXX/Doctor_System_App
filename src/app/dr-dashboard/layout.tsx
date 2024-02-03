@@ -28,6 +28,11 @@ const sidebarLinks: SideBarLinkType = {
     },
     {
       id: 4,
+      link: "money",
+      text: "الرصيد",
+    },
+    {
+      id: 5,
       link: "online-settings",
       text: "اعدادات الأونلاين",
     },

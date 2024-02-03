@@ -17,11 +17,11 @@ import {
   onlineSettingSchema,
 } from "@/schemas/online-settions";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { FormSuccess } from "../auth/form-success";
-import { FormError } from "../auth/form-error";
+import { FormSuccess } from "@/components/auth/form-success";
+import { FormError } from "@/components/auth/form-error";
 import { saveOnlineSettings } from "@/actions/online-settings";
-import { useRouter } from "next/navigation";
 import { DoctorActive, DoctorData, DoctorSessions, User } from "@prisma/client";
+import { useQuery } from "@tanstack/react-query";
 
 type Props = {
   user: User & {
@@ -30,23 +30,33 @@ type Props = {
       doctorActive: DoctorActive;
     };
   };
+  getData: () => any;
 };
 
-export default function DashDoctorOnlineSettings({ user }: Props) {
+export default function DashDoctorOnlineSettings({ user, getData }: Props) {
   const [checked, setChecked] = useState(user.DoctorData.doctorActive.isActive);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [isPending, startTransition] = useTransition();
-  const router = useRouter();
+  const refetchInterval = process.env.NEXT_PUBLIC_REFETCH_INTERVAL || 5000;
+  const { isError, isLoading, data } = useQuery({
+    initialData: user,
+    queryKey: ["online-settings"],
+    queryFn: async () => {
+      const data = await getData();
+      return data;
+    },
+    refetchInterval: Number(refetchInterval),
+  });
   const form = useForm<OnlineSettingSchemaType>({
     resolver: zodResolver(onlineSettingSchema),
     defaultValues: {
       from: user.DoctorData.doctorActive.from,
       to: user.DoctorData.doctorActive.to,
-      halfSession: String(user.DoctorData.doctorSessions.halfSessions),
-      hourSession: String(user.DoctorData.doctorSessions.hourSessions),
-      twoSessions: String(user.DoctorData.doctorSessions.twoSessions),
-      fourSessions: String(user.DoctorData.doctorSessions.fourSessions),
+      halfSession: String(data.DoctorData.doctorSessions.halfSessions),
+      hourSession: String(data.DoctorData.doctorSessions.hourSessions),
+      twoSessions: String(data.DoctorData.doctorSessions.twoSessions),
+      fourSessions: String(data.DoctorData.doctorSessions.fourSessions),
     },
   });
 
@@ -75,6 +85,10 @@ export default function DashDoctorOnlineSettings({ user }: Props) {
       }
     });
   };
+
+  // TODO: add loading spinner and error messages
+  if (isLoading) return <h1>Loading..</h1>;
+  if (isError) return <h1>Error..</h1>;
 
   return (
     <div className="bg-white dark:bg-dark py-12 px-8 rounded-xl">

@@ -62,6 +62,7 @@ export const addDoctor = async (data: AddDoctorSchemaType) => {
             masterId: parsedData.data.master,
             doctorSessions: { create: {} },
             doctorActive: { create: {} },
+            money: { create: {} },
           },
         },
       },

@@ -5,7 +5,7 @@ import MainButton from "@/components/global/MainButton";
 
 type Props = {};
 
-export default function NotFoundPage() {
+export default function ErrorPage() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900 text-center px-4 sm:px-6 lg:px-8">
       <h1 className="text-6xl font-extrabold text-gray-900 dark:text-gray-100 my-8">
