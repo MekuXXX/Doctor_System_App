@@ -1,7 +1,15 @@
 "use server";
 import { db } from "@/lib/db";
 import { AddMasterSchemaType, addMasterSchema } from "@/schemas/addMaster";
-import { revalidatePath } from "next/cache";
+
+export const getMasters = async () => {
+  try {
+    const masters = await db.master.findMany();
+    return { success: "نجح الحصول على التخصصات", data: masters };
+  } catch {
+    return { error: "حدث خطأ أثناء الحصول على التخصصات" };
+  }
+};
 
 export const addMaster = async (data: AddMasterSchemaType) => {
   const parsedData = addMasterSchema.safeParse(data);

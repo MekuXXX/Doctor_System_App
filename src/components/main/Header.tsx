@@ -19,7 +19,7 @@ import MainButton from "@/components/global/MainButton";
 import { auth } from "@/auth";
 import { LogoutButton } from "@/components/auth/logout-button";
 import { LoginButton } from "@/components/auth/login-button";
-import { ADMIN_DASHBOARD, DOCTOR_DASHBOARD } from "@/lib/constants";
+import { ADMIN_DASHBOARD, DOCTOR_DASHBOARD, USER_DASHBOARD } from "@/routes";
 
 type Props = {};
 
@@ -49,10 +49,10 @@ export default async function Header({}: Props) {
   const user = await auth();
   const dashboard =
     user?.user.role === "USER"
-      ? "/dashboard"
+      ? USER_DASHBOARD
       : user?.user.role === "ADMIN"
-        ? `/${ADMIN_DASHBOARD}`
-        : `/${DOCTOR_DASHBOARD}`;
+        ? ADMIN_DASHBOARD
+        : DOCTOR_DASHBOARD;
   return (
     <header dir="rtl" className="content">
       <div className="flex justify-between items-center">

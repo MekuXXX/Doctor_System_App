@@ -53,7 +53,7 @@ export default async function CouponsPage({}: Props) {
           <DataTable
             columns={newColumns}
             data={newData}
-            keys={["money", "requests", "new"]}
+            keys={["requests", "new"]}
             queryFn={getNewRequests as any}
             searchIn="name"
           />
@@ -62,7 +62,7 @@ export default async function CouponsPage({}: Props) {
           <DataTable
             columns={prevColumns}
             data={prevData}
-            keys={["money", "requests", "prev"]}
+            keys={["requests", "prev"]}
             queryFn={getPrevRequests as any}
             searchIn="name"
           />

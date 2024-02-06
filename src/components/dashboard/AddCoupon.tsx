@@ -34,15 +34,17 @@ import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { addCouponSchema, AddCouponSchemaType } from "@/schemas/addCoupon";
 import { FormError } from "@/components/auth/form-error";
-import { FormSuccess } from "@/components/auth/form-success";
-import { addCoupon } from "@/actions/coupon";
+import { addCoupon, addDoctorCoupon } from "@/actions/coupon";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { ADMIN_DASHBOARD } from "@/lib/constants";
+import { ADMIN_DASHBOARD, DOCTOR_DASHBOARD } from "@/routes";
+import { ExtendedUser } from "../../../next-auth";
 
-type Props = {};
+type Props = {
+  user?: ExtendedUser;
+};
 
-export default function AddCoupon({}: Props) {
+export default function AddCoupon({ user }: Props) {
   const [error, setError] = useState("");
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
@@ -63,13 +65,22 @@ export default function AddCoupon({}: Props) {
     setError("");
     startTransition(async () => {
       try {
-        const res = await addCoupon(data);
-        if (res.error) {
-          setError(res.error);
-        } else if (res.success) {
-          toast.success(res.success);
-          router.refresh();
-          router.push(`/${ADMIN_DASHBOARD}/coupons`);
+        const parsedData = addCouponSchema.safeParse(data);
+        if (!parsedData.success) setError("خطأ فى بيانات الكوبون المدخلة");
+        else {
+          let res;
+          if (user) {
+            res = await addDoctorCoupon(user.email!, parsedData.data);
+          } else {
+            res = await addCoupon(parsedData.data);
+          }
+          if (res.error) {
+            setError(res.error);
+          } else if (res.success) {
+            toast.success(res.success);
+            router.refresh();
+            router.push(`${user ? DOCTOR_DASHBOARD : ADMIN_DASHBOARD}/coupons`);
+          }
         }
       } catch {
         setError("حدث خطأ أثناء انشاء النتخصص");
@@ -198,7 +209,7 @@ export default function AddCoupon({}: Props) {
         <FormError message={error} />
         <div className=" text-center">
           <Button type="submit" disabled={isPending}>
-            Submit
+            اضافة الكوبون
           </Button>
         </div>
       </form>

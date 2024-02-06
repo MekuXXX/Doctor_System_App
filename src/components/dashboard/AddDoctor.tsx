@@ -16,36 +16,54 @@ import {
   addDoctorSchema,
 } from "@/schemas/doctor";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Input } from "../ui/input";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../ui/select";
-import { Textarea } from "../ui/textarea";
-import { Button } from "../ui/button";
-import TextEditor from "../global/TextEditor";
-import PhoneNumberInput from "../main/PhoneNumberInput";
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import TextEditor from "@/components/global/TextEditor";
+import PhoneNumberInput from "@/components/main/PhoneNumberInput";
 import { Master } from "@prisma/client";
-import { FormError } from "../auth/form-error";
+import { FormError } from "@/components/auth/form-error";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { addDoctor } from "@/actions/doctor";
 import Image from "next/image";
-import { CountrySelectInput } from "../global/CountrySelectInput";
-import { ADMIN_DASHBOARD } from "@/lib/constants";
+import { CountrySelectInput } from "@/components/global/CountrySelectInput";
+import { ADMIN_DASHBOARD } from "@/routes";
+import { DEFAULT_IMG } from "@/lib/constants";
+import { getMasters } from "@/actions/master";
+import { useQuery } from "@tanstack/react-query";
 
 type Props = {
   masters: Master[];
 };
 
-export default function AddDoctor({ masters }: Props) {
+export default function AddDoctor({ masters: mastersProps }: Props) {
   const [imageUrl, setImageUrl] = useState("");
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string>();
+  const refetchInterval = process.env.NEXT_PUBLIC_REFETCH_INTERVAL || 5000;
   const router = useRouter();
+  const {
+    data: masters,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["masters"],
+    queryFn: async () => {
+      const masters = await getMasters();
+      if (masters.error) throw new Error(masters.error);
+      return masters.data;
+    },
+    refetchInterval: Number(refetchInterval),
+    initialData: mastersProps,
+  });
 
   const form = useForm<AddDoctorSchemaType>({
     resolver: zodResolver(addDoctorSchema),
@@ -54,14 +72,14 @@ export default function AddDoctor({ masters }: Props) {
       lastName: "",
       username: "",
       email: "",
-      gender: "male",
+      gender: "" as "MALE",
       brief: "",
       certificate: "",
       article: "",
       phone: "",
       country: "",
       master: "",
-      image: "/images/default.jpg",
+      image: DEFAULT_IMG,
       password: "",
     },
   });
@@ -76,7 +94,7 @@ export default function AddDoctor({ masters }: Props) {
           const formData = new FormData();
           formData.append("image", parsedData.data.image);
           parsedData.data.image = formData;
-
+          console.log(parsedData);
           let res = await addDoctor(parsedData.data);
           if (res.error) {
             setError(res.error);
@@ -84,7 +102,7 @@ export default function AddDoctor({ masters }: Props) {
             form.reset();
             toast.success(res.success);
             router.refresh();
-            router.push(`/${ADMIN_DASHBOARD}/members?role=DOCTOR`);
+            router.push(`${ADMIN_DASHBOARD}/members?role=DOCTOR`);
           }
         }
       } catch {
@@ -92,6 +110,10 @@ export default function AddDoctor({ masters }: Props) {
       }
     });
   };
+
+  // TODO: add loading spinner and error messages to masters select
+  if (isLoading) return <h1>Loading...</h1>;
+  if (isError) return <h1>Error</h1>;
 
   return (
     <div>
@@ -105,7 +127,7 @@ export default function AddDoctor({ masters }: Props) {
                 <FormLabel htmlFor="profile-picture-input">
                   <div className="w-24 h-24 relative rounded-full overflow-clip cursor-pointer mx-auto">
                     <Image
-                      src={imageUrl || "/images/default.jpg"}
+                      src={imageUrl || DEFAULT_IMG}
                       alt="avatar image"
                       fill
                       sizes={"6rem"}
@@ -204,8 +226,8 @@ export default function AddDoctor({ masters }: Props) {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent position="popper">
-                      <SelectItem value="male">ذكر</SelectItem>
-                      <SelectItem value="female">أنثى</SelectItem>
+                      <SelectItem value="MALE">ذكر</SelectItem>
+                      <SelectItem value="FEMALE">أنثى</SelectItem>
                     </SelectContent>
                   </Select>
                 </FormControl>
@@ -311,7 +333,6 @@ export default function AddDoctor({ masters }: Props) {
                     onChange={field.onChange}
                     value={field.value}
                   />
-                  {/* <Input {...field} /> */}
                 </FormControl>
                 <FormMessage />
               </FormItem>

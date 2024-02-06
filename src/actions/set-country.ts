@@ -1,16 +1,18 @@
 "use server";
 
+export type Translation = {
+  [key: string]: {
+    official: string;
+    common: string;
+  };
+};
+
 export type Country = {
   name: {
     common: string;
     official: string;
-    nativeName: {
-      cat: {
-        official: string;
-        common: string;
-      };
-    };
   };
+  translations: Translation;
 };
 
 export async function getCountries() {

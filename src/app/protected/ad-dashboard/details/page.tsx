@@ -47,7 +47,7 @@ export default async function DetailsPage({}: Props) {
     <div className="content">
       <DataTable
         searchIn="name"
-        keys={["masters"]}
+        keys={["doctors", "details"]}
         queryFn={getData as any}
         data={data}
         columns={columns}

@@ -1,2 +1,1 @@
-export const ADMIN_DASHBOARD = "protected/ad-dashboard";
-export const DOCTOR_DASHBOARD = "dr-dashboard";
+export const DEFAULT_IMG = "/images/default.jpg";

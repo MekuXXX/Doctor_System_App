@@ -32,7 +32,6 @@ export async function getUserData() {
     const data: UserDataType = await res.json();
     return { success: true, data };
   } catch (err) {
-    console.log(err);
     return { success: false };
   }
 }

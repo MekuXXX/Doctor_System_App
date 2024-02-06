@@ -26,7 +26,6 @@ export default async function MastersPage({}: Props) {
           data={data}
           columns={columns}
         />
-        {/* <ViewMasters /> */}
       </div>
     </div>
   );

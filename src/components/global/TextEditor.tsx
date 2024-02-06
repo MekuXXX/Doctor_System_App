@@ -59,7 +59,7 @@ export default function TextEditor({ value, onChange }: Props) {
       onChange={onChange}
       modules={quillModules}
       formats={quillFormats}
-      className="w-full h-full mt-10 bg-white dark:bg-dark rounded-xl"
+      className="w-full h-full mt-10 bg-white dark:bg-dark rounded-xl text-black"
       style={{ direction: "ltr" }}
     />
   );

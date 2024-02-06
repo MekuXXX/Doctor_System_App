@@ -1,5 +1,4 @@
 import React from "react";
-import { data } from "../../page";
 import { Button } from "@/components/ui/button";
 import { AvatarImage, AvatarFallback, Avatar } from "@/components/ui/avatar";
 import {
@@ -17,6 +16,9 @@ import { FaWhatsapp } from "react-icons/fa";
 import SelectSessions from "@/components/main/SelectSessions";
 import SessionPackage from "@/components/main/SessionPakage";
 import ChangeTimezone from "@/components/main/ChangeTimezone";
+import { db } from "@/lib/db";
+import { redirect } from "next/navigation";
+import { calculateRate } from "@/lib/rate";
 
 type Props = {
   params: {
@@ -24,91 +26,34 @@ type Props = {
   };
 };
 
-const rateData = [
-  {
-    id: 1,
-    rate: 4,
-    name: "أحمد محمد",
-    image:
-      "https://img.freepik.com/free-psd/3d-illustration-person-with-sunglasses_23-2149436188.jpg?t=st=1705664275~exp=1705664875~hmac=b3a35b96e9e8f0e130eece7ba715f15f7a6ce0838a9b25603569777afe5bf008",
-    text: "ممتاز جدا",
-  },
-  {
-    id: 2,
-    rate: 3,
-    name: "فاطمة علي",
-    image:
-      "https://img.freepik.com/free-psd/3d-illustration-person-with-sunglasses_23-2149436188.jpg?t=st=1705664275~exp=1705664875~hmac=b3a35b96e9e8f0e130eece7ba715f15f7a6ce0838a9b25603569777afe5bf008",
-    text: "رائعة",
-  },
-  {
-    id: 3,
-    rate: 5,
-    name: "محمد حسين",
-    image:
-      "https://img.freepik.com/free-psd/3d-illustration-person-with-sunglasses_23-2149436188.jpg?t=st=1705664275~exp=1705664875~hmac=b3a35b96e9e8f0e130eece7ba715f15f7a6ce0838a9b25603569777afe5bf008",
-    text: "ممتازة جدا",
-  },
-  {
-    id: 4,
-    rate: 4.5,
-    name: "سارة العبد",
-    image:
-      "https://img.freepik.com/free-psd/3d-illustration-person-with-sunglasses_23-2149436188.jpg?t=st=1705664275~exp=1705664875~hmac=b3a35b96e9e8f0e130eece7ba715f15f7a6ce0838a9b25603569777afe5bf008",
-    text: "رائعة جدا",
-  },
-  {
-    id: 5,
-    rate: 3.5,
-    name: "علي الحسين",
-    image:
-      "https://img.freepik.com/free-psd/3d-illustration-person-with-sunglasses_23-2149436188.jpg?t=st=1705664275~exp=1705664875~hmac=b3a35b96e9e8f0e130eece7ba715f15f7a6ce0838a9b25603569777afe5bf008",
-    text: "جيدة جدا",
-  },
-  {
-    id: 6,
-    rate: 4,
-    name: "ليلى محمد",
-    image:
-      "https://img.freepik.com/free-psd/3d-illustration-person-with-sunglasses_23-2149436188.jpg?t=st=1705664275~exp=1705664875~hmac=b3a35b96e9e8f0e130eece7ba715f15f7a6ce0838a9b25603569777afe5bf008",
-    text: "ممتازة",
-  },
-  {
-    id: 7,
-    rate: 2.5,
-    name: "حسن عبدالله",
-    image:
-      "https://img.freepik.com/free-psd/3d-illustration-person-with-sunglasses_23-2149436188.jpg?t=st=1705664275~exp=1705664875~hmac=b3a35b96e9e8f0e130eece7ba715f15f7a6ce0838a9b25603569777afe5bf008",
-    text: "مقبولة",
-  },
-  {
-    id: 8,
-    rate: 4.8,
-    name: "نورا السعيد",
-    image:
-      "https://img.freepik.com/free-psd/3d-illustration-person-with-sunglasses_23-2149436188.jpg?t=st=1705664275~exp=1705664875~hmac=b3a35b96e9e8f0e130eece7ba715f15f7a6ce0838a9b25603569777afe5bf008",
-    text: "رائعة جدا",
-  },
-  {
-    id: 9,
-    rate: 3.2,
-    name: "مصطفى خليل",
-    image:
-      "https://img.freepik.com/free-psd/3d-illustration-person-with-sunglasses_23-2149436188.jpg?t=st=1705664275~exp=1705664875~hmac=b3a35b96e9e8f0e130eece7ba715f15f7a6ce0838a9b25603569777afe5bf008",
-    text: "جيدة",
-  },
-  {
-    id: 10,
-    rate: 4.5,
-    name: "ريما صالح",
-    image:
-      "https://img.freepik.com/free-psd/3d-illustration-person-with-sunglasses_23-2149436188.jpg?t=st=1705664275~exp=1705664875~hmac=b3a35b96e9e8f0e130eece7ba715f15f7a6ce0838a9b25603569777afe5bf008",
-    text: "رائعة جدا",
-  },
-];
+export default async function DoctorDataPage({ params: { id } }: Props) {
+  if (!id) redirect("/");
+  const doctor = await db.doctorData.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      article: true,
+      breif: true,
+      country: true,
+      doctorActive: {
+        select: { isActive: true, from: true, to: true },
+      },
+      master: { select: { name: true } },
+      Rate: true,
+      doctorRank: true,
+      certificate: true,
+      doctor: {
+        select: {
+          id: true,
+          name: true,
+          image: true,
+        },
+      },
+    },
+  });
+  if (!doctor) redirect("/");
+  const rate = calculateRate(doctor.Rate);
 
-export default function DoctorDataPage({ params: { id } }: Props) {
-  const doctorData = data.find((d) => d.id === Number(id));
   return (
     <div className="content">
       <div className="feature mx-auto grid md:grid-cols-2 gap-4 items-start">
@@ -116,29 +61,29 @@ export default function DoctorDataPage({ params: { id } }: Props) {
           <Card className="min-w-fit px-4 max-h-[15rem]">
             <CardHeader>
               <CardTitle className="text-lg font-semibold">
-                {doctorData?.name}
+                {doctor?.doctor?.name}
               </CardTitle>
             </CardHeader>
             <CardContent className="flex items-center gap-4">
               <div className="w-[100px] relative">
                 <Image
-                  src={doctorData?.image || ""}
-                  alt={`Dr.${doctorData?.name}`}
+                  src={doctor.doctor?.image}
+                  alt={`Dr.${doctor.doctor?.name}`}
                   width={100}
                   height={200}
                   objectFit="cover"
                 />
               </div>
               <div className="flex flex-col gap-3">
-                <p className="text-sm text-gray-600">{doctorData?.position}</p>
+                <p className="text-sm text-gray-600">{doctor.master?.name}</p>
                 <p className="text-sm font-medium text-yellow-400 flex items-center">
-                  تقييم {doctorData?.rate}
+                  تقييم {rate}
                 </p>
                 <p className="text-sm text-gray-600">الروابط:</p>
               </div>
             </CardContent>
             <CardFooter className="text-right">
-              <p className="text-sm text-gray-600">المملكة العربية السعودية</p>
+              <p className="text-sm text-gray-600">{doctor.country}</p>
             </CardFooter>
           </Card>
 
@@ -172,12 +117,12 @@ export default function DoctorDataPage({ params: { id } }: Props) {
           </Card> */}
           <div className="space-y-2">
             <SessionPackage
-              image={doctorData?.image || ""}
+              image={doctor.doctor?.image || ""}
               time="نصف"
               price="989.99"
             />
 
-            <SessionPackage image={doctorData?.image || ""} price="1249.99" />
+            {/* <SessionPackage image={doctorData?.image || ""} price="1249.99" /> */}
           </div>
           <div>
             <h2 className="text-2xl font-bold text-main my-3">
@@ -209,49 +154,38 @@ export default function DoctorDataPage({ params: { id } }: Props) {
               <MainButton className="mx-auto w-full">احجز موعد الان</MainButton>
             </div>
             <TabsContent value="rate" className="grid gap-2">
-              {rateData.map(({ id, image, name, rate, text }) => (
+              {doctor.Rate.map(({ id, message, patientName, rateValue }) => (
                 <div
                   key={id}
                   className="border border-gray-200 rounded-lg p-4 dark:border-gray-800"
                 >
-                  <div className="flex items-start gap-4">
-                    <Avatar className="w-10 h-10 border">
-                      <AvatarImage alt="user image" src={image} />
-                      <AvatarFallback>AC</AvatarFallback>
-                    </Avatar>
-                    <div className="grid gap-1">
-                      <div className="font-semibold">{name}</div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400">
-                        داقائق فائته 5
-                      </div>
+                  <div className="flex items-center gap-4">
+                    <div className="relative w-12 h-12 overflow-clip rounded-full">
+                      <Image
+                        src={"/images/default.jpg"}
+                        alt={"المقيم " + patientName}
+                        fill
+                      />
                     </div>
+                    <p className="font-semibold h-fit">{patientName}</p>
                   </div>
-                  <div className="mt-2 text-sm">{text}</div>
-                  <StarRate rate={rate} />
+                  <div className="mt-2 text-sm">{message}</div>
+                  <StarRate rate={rateValue} />
                 </div>
               ))}
             </TabsContent>
             <TabsContent value="details">
               <h3 className=" text-main text-xl my-4 font-bold">حول المعالج</h3>
-              <p>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                Necessitatibus, nostrum!
-              </p>
+              <div dangerouslySetInnerHTML={{ __html: doctor.breif }} />
               <h3 className=" text-main text-xl my-4 font-bold">
                 الشهادات العلمية
               </h3>
-              <p>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                Necessitatibus, nostrum!
-              </p>
+              <p>{doctor.certificate}</p>
             </TabsContent>
             <TabsContent value="article">
               <h3 className="text-xl font-bold text-main my-2">المقال</h3>
-              <p>
-                Lorem ipsum, dolor sit amet consectetur adipisicing elit.
-                Perspiciatis reprehenderit eveniet nam doloribus fuga numquam
-                molestias, laborum voluptatum doloremque enim.
-              </p>
+
+              <div dangerouslySetInnerHTML={{ __html: doctor.article }} />
             </TabsContent>
           </Tabs>
         </div>

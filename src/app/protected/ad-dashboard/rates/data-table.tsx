@@ -18,6 +18,7 @@ import { toast } from "sonner";
 import { removeRate } from "@/actions/rate";
 import Link from "next/link";
 import StarRate from "@/components/main/StarRate";
+import { ADMIN_DASHBOARD } from "@/routes";
 
 export const columns: ColumnDef<any>[] = [
   {
@@ -94,7 +95,7 @@ export const columns: ColumnDef<any>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <a href={"/dashboard/rates/edit-rate?id=" + id}>
+            <a href={`${ADMIN_DASHBOARD}/rates/edit-rate?id=${id}`}>
               <DropdownMenuItem className="flex gap-2 items-center">
                 <FaPen className="h-[1.2rem] w-[1.2rem]" />
                 <span>تعديل التقييم</span>

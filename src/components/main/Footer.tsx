@@ -40,7 +40,7 @@ const footerHeader = "text-2xl font-bold mb-2";
 export default function Footer({}: Props) {
   return (
     <footer className="content bg-[#20273F] text-white/75 mt-auto">
-      <div className="md:flex text-center md:text-start justify-center items-center gap-4 py-6">
+      <div className="md:flex text-center md:text-start justify-between items-center gap-4 py-6">
         <div className="pb-4 md:pb-0">
           <p className={footerHeader}>روابط مهمة</p>
           <p>
@@ -64,7 +64,7 @@ export default function Footer({}: Props) {
             للعيادة وانتضار المواعيد لفتره كبيره
           </p>
         </div>
-        <div className="grid grid-cols-2">
+        <div className="grid grid-cols-2 justify-between">
           <div>
             <p className={footerHeader}>الدعم</p>
             <ul>

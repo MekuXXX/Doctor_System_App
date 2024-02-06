@@ -1,8 +1,5 @@
 import React from "react";
-import PhoneInput, {
-  formatPhoneNumber,
-  isValidPhoneNumber,
-} from "react-phone-number-input";
+import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 
 type Props = {

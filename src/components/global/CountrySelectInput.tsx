@@ -16,20 +16,12 @@ type Props = {
   className?: string;
 };
 
-export type Country = {
-  name: {
-    common: string;
-    official: string;
-    nativeName: {
-      cat: {
-        official: string;
-        common: string;
-      };
-    };
-  };
-};
 export function CountrySelectInput({ value, onChange, className }: Props) {
-  const { data: countries } = useCountries();
+  const { data: countries, isError, isLoading } = useCountries();
+
+  // TODO: add loading spinner and error message
+  if (isLoading) return <h1>Loading...</h1>;
+  if (isError) return <h1>Error</h1>;
 
   return (
     <Select onValueChange={onChange} value={value}>
@@ -38,7 +30,10 @@ export function CountrySelectInput({ value, onChange, className }: Props) {
       </SelectTrigger>
       <SelectContent>
         {countries?.map((country) => (
-          <SelectItem value={country.name.common} key={country.name.common}>
+          <SelectItem
+            value={country.translations.ara.official}
+            key={country.name.common}
+          >
             {country.name.common}
           </SelectItem>
         ))}

@@ -67,7 +67,7 @@ export const RegisterSchema = z.object({
     message: "Email is required",
   }),
   phone: z.string().min(1, { message: "يجب ادخال هذا الحقل" }),
-  gender: z.enum(["male", "female"]),
+  gender: z.enum(["MALE", "FEMALE"]),
   password: z.string().min(6, {
     message: "Minimum 6 characters required",
   }),

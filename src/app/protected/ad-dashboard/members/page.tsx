@@ -3,11 +3,10 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import React from "react";
 import { columns } from "./data-table";
-import { db } from "@/lib/db";
 import { FaPlus } from "react-icons/fa6";
 import { UserRole } from "@prisma/client";
 import { getMembers } from "@/actions/member";
-import { ADMIN_DASHBOARD } from "@/lib/constants";
+import { ADMIN_DASHBOARD } from "@/routes";
 
 type Props = {
   searchParams: {
@@ -28,21 +27,21 @@ export default async function MembersPage({ searchParams }: Props) {
     <div className="content">
       <div>
         <Link
-          href={`/${ADMIN_DASHBOARD}/members`}
+          href={`${ADMIN_DASHBOARD}/members`}
           className={role === undefined ? " font-extrabold" : ""}
         >
           <Button variant={"link"}>الكل</Button>
         </Link>
 
         <Link
-          href={`/${ADMIN_DASHBOARD}/members?role=USER`}
+          href={`${ADMIN_DASHBOARD}/members?role=USER`}
           className={role === "USER" ? " font-extrabold" : ""}
         >
           <Button variant={"link"}>المستخدمين</Button>
         </Link>
 
         <Link
-          href={`/${ADMIN_DASHBOARD}/members?role=DOCTOR`}
+          href={`${ADMIN_DASHBOARD}/members?role=DOCTOR`}
           className={role === "DOCTOR" ? " font-extrabold" : ""}
         >
           <Button variant={"link"}>الأطباء</Button>
@@ -51,12 +50,12 @@ export default async function MembersPage({ searchParams }: Props) {
       <DataTable
         columns={columns}
         data={data || []}
-        keys={["users", String(role) || ""]}
+        keys={["members", String(role) || "all"]}
         queryFn={getData as any}
         queryFnParams={[role] as any}
         childrenButtons={
           role === "DOCTOR" && (
-            <Link href={`/${ADMIN_DASHBOARD}/members/add-doctor`}>
+            <Link href={`${ADMIN_DASHBOARD}/members/add-doctor`}>
               <Button variant={"outline"}>
                 <FaPlus />
                 <span className="hidden lg:block">إضافة طبيب</span>

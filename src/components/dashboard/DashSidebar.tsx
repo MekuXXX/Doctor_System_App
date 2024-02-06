@@ -36,7 +36,7 @@ export default function DashSidebar({ routes }: Props) {
           {routes.links.map(({ id, link, text }) => (
             <Button key={id} variant={"ghost"} className="justify-start">
               <Link
-                href={`/${routes.base}/${link}`}
+                href={`${routes.base}/${link}`}
                 className="capitalize block w-full text-right"
               >
                 {text}

@@ -1,5 +1,5 @@
 import { AddRate } from "@/components/dashboard/AddRate";
-import { ADMIN_DASHBOARD } from "@/lib/constants";
+import { ADMIN_DASHBOARD } from "@/routes";
 import { db } from "@/lib/db";
 import { redirect } from "next/navigation";
 
@@ -11,9 +11,9 @@ type Props = {
 
 export default async function AddRatePage({ searchParams }: Props) {
   const { id } = searchParams;
-  if (!id) redirect(`/${ADMIN_DASHBOARD}/rates`);
+  if (!id) redirect(`${ADMIN_DASHBOARD}/rates`);
   const data = await db.rate.findUnique({ where: { id } });
-  if (!data) redirect(`/${ADMIN_DASHBOARD}/rates`);
+  if (!data) redirect(`${ADMIN_DASHBOARD}/rates`);
 
   return (
     <div className="content max-w-fit mx-auto border-2 rounded-xl my-8  px-6 py-12 bg-white dark:bg-dark">

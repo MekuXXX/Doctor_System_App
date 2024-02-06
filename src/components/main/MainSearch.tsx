@@ -110,8 +110,8 @@ export default function MainSearch({}: Props) {
                       <SelectValue placeholder="جنس" />
                     </SelectTrigger>
                     <SelectContent position="popper">
-                      <SelectItem value="male">ذكر</SelectItem>
-                      <SelectItem value="female">أنثى</SelectItem>
+                      <SelectItem value="MALE">ذكر</SelectItem>
+                      <SelectItem value="FEMALE">أنثى</SelectItem>
                     </SelectContent>
                   </Select>
                 </FormControl>

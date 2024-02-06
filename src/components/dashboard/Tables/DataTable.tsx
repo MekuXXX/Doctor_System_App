@@ -100,7 +100,7 @@ export function DataTable<TData, TValue>({
           className="max-w-sm bg-white dark:bg-dark"
         />
         <DataTableViewOptions table={table} />
-        {childrenButtons}
+        <div className=" mx-2">{childrenButtons}</div>
       </div>
       <div className="rounded-md border bg-white dark:bg-dark py-6 px-4">
         <Table dir="rtl" className="text-left">

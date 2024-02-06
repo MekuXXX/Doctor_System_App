@@ -35,3 +35,21 @@ export const apiAuthPrefix = "/api/auth";
  * @type {string}
  */
 export const DEFAULT_LOGIN_REDIRECT = "/";
+
+/**
+ * The base url for admin dashboard
+ * @type {string}
+ */
+export const ADMIN_DASHBOARD = "/protected/ad-dashboard";
+
+/**
+ * The base url for doctor url
+ * @type {string}
+ */
+export const DOCTOR_DASHBOARD = "/dr-dashboard";
+
+/**
+ * The base url for doctor url
+ * @type {string}
+ */
+export const USER_DASHBOARD = "/dashboard";

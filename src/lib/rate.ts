@@ -1,7 +1,5 @@
-import { Rate } from "@prisma/client";
-
 export const calculateRate = (rates: { rateValue: number }[]) => {
-  if (!rates.length) return 0;
+  if (!rates || rates.length === 0) return 1;
 
   let numberRates = 0;
   const rate = rates.reduce((acc, curr) => {

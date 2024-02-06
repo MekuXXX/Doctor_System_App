@@ -31,7 +31,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { addRate, editRate, getRatesDoctors } from "@/actions/rate";
 import { Rate } from "@prisma/client";
 import { useQuery } from "@tanstack/react-query";
-import { ADMIN_DASHBOARD } from "@/lib/constants";
+import { ADMIN_DASHBOARD } from "@/routes";
 type Props = {
   propsData?: Rate;
 };
@@ -83,14 +83,13 @@ export function AddRate({ propsData }: Props) {
         } else if (res.success) {
           toast.success(res.success);
           router.refresh();
-          router.push(`/${ADMIN_DASHBOARD}/rates`);
+          router.push(`${ADMIN_DASHBOARD}/rates`);
         }
       } catch {
         setError("حدث خطأ أثناء انشاء النتخصص");
       }
     });
   }
-  console.log(data);
   // TODO: add loading spinner and error messages
   if (isLoading) return <h1>Loading...</h1>;
   if (isError) return <h1>Error</h1>;

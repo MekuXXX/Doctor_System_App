@@ -24,12 +24,12 @@ enum USER_GENDER {
 
 model User {
   id                    String                 @id @default(cuid())
-  name                  String?
-  email                 String?                @unique
+  name                  String
+  email                 String                 @unique
   emailVerified         DateTime?
   phone                 String?
   gender                USER_GENDER            @default(MALE)
-  image                 String?
+  image                 String                 @default("/images/default.jpg")
   password              String?
   role                  UserRole               @default(USER)
   accounts              Account[]
@@ -48,10 +48,10 @@ enum DoctorRank {
 
 model DoctorData {
   id             String          @id
-  breif          String?
-  certificate    String?
-  article        String?
-  country        String?
+  breif          String
+  certificate    String
+  article        String
+  country        String
   doctorRank     DoctorRank      @default(BRONSE)
   doctorDiscount Int             @default(0)
   masterId       String?
@@ -59,8 +59,9 @@ model DoctorData {
   doctorId       String          @unique
   doctor         User            @relation(fields: [doctorId], references: [id], onDelete: Cascade)
   Rate           Rate[]
-  money          DoctorMoney?
   moneyRequests  MoneyRequest[]
+  coupons        Coupon[]
+  money          DoctorMoney?
   doctorActive   DoctorActive?
   doctorSessions DoctorSessions?
 }
@@ -204,6 +205,8 @@ model Coupon {
   from          DateTime?
   to            DateTime?
   useTimes      String
+  doctorId      String?
+  doctor        DoctorData?  @relation(fields: [doctorId], references: [id], onDelete: Cascade)
 }
 
 model Rate {

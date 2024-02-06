@@ -1,5 +1,6 @@
 "use server";
 
+import { DEFAULT_IMG } from "@/lib/constants";
 import { db } from "@/lib/db";
 import { UserRole } from "@prisma/client";
 import { unlink } from "fs/promises";
@@ -42,7 +43,7 @@ export const getMembers = async (role?: UserRole) => {
 export const removeMember = async (id: string) => {
   try {
     const res = await db.user.delete({ where: { id } });
-    if (res.image !== "/images/default.jpg")
+    if (res.image !== DEFAULT_IMG)
       unlink(join(cwd(), "public", res.image as string));
     return { success: "تم الحذف بنجاح" };
   } catch {

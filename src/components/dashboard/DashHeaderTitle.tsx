@@ -7,12 +7,16 @@ import { useUserDataStore } from "@/store/user-data";
 type Props = {};
 const titles = [
   {
-    from: "sessions",
-    to: "الحجوزات والطلبات",
+    from: ["ad dashboard", "dr dashboard", "dashboard"],
+    to: "الصفحة الرئيسية",
   },
   {
-    from: "dashboard",
-    to: "الصفحة الرئيسية",
+    from: "add doctor",
+    to: "اضافة طبيب",
+  },
+  {
+    from: "sessions",
+    to: "الحجوزات والطلبات",
   },
   {
     from: "masters",
@@ -35,6 +39,10 @@ const titles = [
     to: "تعديل الطبيب",
   },
   {
+    from: "edit user",
+    to: "تعديل المستخدم",
+  },
+  {
     from: "rates",
     to: "التقييمات",
   },
@@ -51,16 +59,16 @@ const titles = [
     to: "اعدادات الأونلاين",
   },
   {
-    from: "dr dashboard",
-    to: "الصفحة الرئيسية",
-  },
-  {
     from: "money",
     to: "الرصيد",
   },
   {
     from: "requests",
     to: "طلبات السحب",
+  },
+  {
+    from: "account",
+    to: "حسابك",
   },
 ];
 
@@ -89,7 +97,10 @@ export function DashHeaderTitleFallback() {
 const getArTitle = (titles: TitlesType, engTitle: string) => {
   let result;
   for (let lang of titles) {
-    if (lang.from === engTitle) result = lang.to;
+    if (Array.isArray(lang.from)) {
+      for (let childLang of lang.from)
+        if (childLang === engTitle) result = lang.to;
+    } else if (lang.from === engTitle) result = lang.to;
   }
 
   return result ? result : engTitle;

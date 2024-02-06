@@ -16,6 +16,8 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import Image from "next/image";
 import { removeMember } from "@/actions/member";
+import { ADMIN_DASHBOARD } from "@/routes";
+import Link from "next/link";
 
 export const columns: ColumnDef<any>[] = [
   {
@@ -98,12 +100,14 @@ export const columns: ColumnDef<any>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <a href={"/dashboard/members/edit-doctor?id=" + id}>
+            <Link
+              href={`${ADMIN_DASHBOARD}/members/${row.getValue("role") === "DOCTOR" ? "edit-doctor" : "edit-user"}?id=${id}`}
+            >
               <DropdownMenuItem className="flex gap-2 items-center">
                 <FaPen className="h-[1.2rem] w-[1.2rem]" />
                 <span>تعديل</span>
               </DropdownMenuItem>
-            </a>
+            </Link>
             <DropdownMenuItem
               className="flex gap-2 items-center"
               onClick={handleDelete}

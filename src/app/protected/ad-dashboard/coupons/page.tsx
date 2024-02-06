@@ -5,7 +5,7 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { db } from "@/lib/db";
-import { ADMIN_DASHBOARD } from "@/lib/constants";
+import { ADMIN_DASHBOARD } from "@/routes";
 
 type Props = {};
 
@@ -28,7 +28,7 @@ export default async function CouponsPage({}: Props) {
         searchIn="coupon"
         childrenButtons={
           <div className="ml-2">
-            <Link href={`/${ADMIN_DASHBOARD}/coupons/add-coupon`}>
+            <Link href={`${ADMIN_DASHBOARD}/coupons/add-coupon`}>
               <Button variant={"outline"} className="flex gap-2">
                 <GoPlus className="w-[1.2rem] h-[1.2rem]" />
                 <span className="hidden md:block">إضافة كوبون</span>

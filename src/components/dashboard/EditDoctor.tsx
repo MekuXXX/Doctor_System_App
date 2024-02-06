@@ -31,43 +31,80 @@ import { Textarea } from "../ui/textarea";
 import { Button } from "../ui/button";
 import TextEditor from "../global/TextEditor";
 import PhoneNumberInput from "../main/PhoneNumberInput";
-import { DoctorData, Master, User } from "@prisma/client";
+import { DoctorData, Master, User, UserRole } from "@prisma/client";
 import { FormError } from "../auth/form-error";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { editDoctor } from "@/actions/doctor";
+import { editDoctor, getDoctorByEmail } from "@/actions/doctor";
 import Image from "next/image";
 import { CountrySelectInput } from "../global/CountrySelectInput";
 import { reset } from "@/actions/reset";
 import { FormSuccess } from "../auth/form-success";
-import { ADMIN_DASHBOARD } from "@/lib/constants";
+import { ADMIN_DASHBOARD } from "@/routes";
+import { useQuery } from "@tanstack/react-query";
+import { getMasters } from "@/actions/master";
 
 type Props = {
-  masters: Master[];
-  id: string;
-  data: User & {
+  email: string;
+  mastersProps: Master[];
+  data?: User & {
     DoctorData: DoctorData;
   };
+  role: UserRole;
 };
 
-export default function EditDoctor({ masters, data, id }: Props) {
-  const [imageUrl, setImageUrl] = useState(data.image as string);
+export default function EditDoctor({
+  email,
+  mastersProps,
+  data: initialData,
+  role,
+}: Props) {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string>();
   const [success, setSuccess] = useState<string>();
+  const refetchInterval = process.env.NEXT_PUBLIC_REFETCH_INTERVAL || 5000;
+  const {
+    data: masters,
+    isLoading: isMasterLoading,
+    isError: isMasterError,
+  } = useQuery({
+    queryKey: ["masters"],
+    queryFn: async () => {
+      const masters = await getMasters();
+      if (masters.error) throw new Error(masters.error);
+      return masters.data;
+    },
+    initialData: mastersProps,
+    refetchInterval: Number(refetchInterval),
+  });
+  const {
+    data,
+    isError: isDoctorError,
+    isLoading: isDoctorLoading,
+  } = useQuery({
+    queryKey: ["doctor", email],
+    queryFn: async () => {
+      const doctor = await getDoctorByEmail(email);
+      if (doctor.error) throw new Error(doctor.error);
+      return doctor.data;
+    },
+    initialData: initialData,
+    refetchInterval: Number(refetchInterval),
+  });
+  const [imageUrl, setImageUrl] = useState(data?.image as string);
   const router = useRouter();
   const form = useForm<EditDoctorSchemaType>({
     resolver: zodResolver(editDoctorSchema),
     defaultValues: {
-      name: data.name!,
-      email: data.email!,
-      gender: data.gender as "male",
-      brief: data.DoctorData.breif!,
-      certificate: data.DoctorData.certificate!,
-      article: data.DoctorData.article!,
-      phone: data.phone!,
-      country: data.DoctorData.country!,
-      master: data.DoctorData.masterId!,
+      name: data?.name!,
+      email: data?.email!,
+      gender: data?.gender as "MALE",
+      brief: data?.DoctorData?.breif!,
+      certificate: data?.DoctorData?.certificate!,
+      article: data?.DoctorData?.article!,
+      phone: data?.phone!,
+      country: data?.DoctorData?.country!,
+      master: data?.DoctorData?.masterId!,
       image: imageUrl,
     },
   });
@@ -82,14 +119,20 @@ export default function EditDoctor({ masters, data, id }: Props) {
           const formData = new FormData();
           formData.append("image", parsedData.data.image);
           parsedData.data.image = formData;
-          let res = await editDoctor(id, data.image as string, parsedData.data);
+          let res = await editDoctor(
+            email,
+            initialData?.image as string,
+            parsedData.data
+          );
           if (res.error) {
             setError(res.error);
           } else if (res.success) {
-            form.reset();
             toast.success(res.success);
-            router.refresh();
-            router.push(`/${ADMIN_DASHBOARD}/members?role=DOCTOR`);
+            if (role === "ADMIN") {
+              console.log("Done");
+              router.refresh();
+              router.push(`${ADMIN_DASHBOARD}/members`);
+            }
           }
         }
       } catch {
@@ -103,7 +146,7 @@ export default function EditDoctor({ masters, data, id }: Props) {
     setSuccess("");
     startTransition(async () => {
       try {
-        const res = await reset({ email: data.email as string });
+        const res = await reset({ email: data?.email as string });
         if (res.error) setError(res.error);
         else setSuccess(res.success);
         console.log(res);
@@ -112,6 +155,11 @@ export default function EditDoctor({ masters, data, id }: Props) {
       }
     });
   };
+
+  // TODO: add loading spinner and error messages to masters select
+  if (isMasterLoading || isDoctorLoading) return <h1>Loading...</h1>;
+  if (isMasterError || isDoctorError) return <h1>Error</h1>;
+
   return (
     <div>
       <Form {...form}>
@@ -198,8 +246,8 @@ export default function EditDoctor({ masters, data, id }: Props) {
                       <SelectValue defaultValue={field.value} />
                     </SelectTrigger>
                     <SelectContent position="popper">
-                      <SelectItem value="male">ذكر</SelectItem>
-                      <SelectItem value="female">أنثى</SelectItem>
+                      <SelectItem value="MALE">ذكر</SelectItem>
+                      <SelectItem value="FEMALE">أنثى</SelectItem>
                     </SelectContent>
                   </Select>
                 </FormControl>

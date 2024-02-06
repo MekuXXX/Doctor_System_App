@@ -3,8 +3,10 @@ import { db } from "@/lib/db";
 import {
   AddDoctorSchemaType,
   EditDoctorSchemaType,
+  EditUserSchemaType,
   addDoctorSchema,
   editDoctorSchema,
+  editUserSchema,
 } from "@/schemas/doctor";
 import { writeFile, unlink } from "fs/promises";
 import { join } from "path";
@@ -16,7 +18,96 @@ import {
   DoctorDetailsSchemaType,
   doctorDetailsSchema,
 } from "@/schemas/doctorDetails";
-import { error } from "console";
+import { DEFAULT_IMG } from "@/lib/constants";
+
+export const getDoctors = async () => {
+  try {
+    const doctors = await db.user.findMany({
+      where: { role: "DOCTOR" },
+      select: {
+        id: true,
+        name: true,
+        image: true,
+        DoctorData: {
+          select: {
+            id: true,
+            article: true,
+            breif: true,
+            country: true,
+            doctorActive: {
+              select: { isActive: true, from: true, to: true },
+            },
+            master: { select: { name: true } },
+            Rate: true,
+            doctorRank: true,
+            certificate: true,
+          },
+        },
+      },
+    });
+    if (!doctors)
+      return { error: "البيانات الذى أدخلتها غير صحيحه للحصول على الأطباء" };
+    return { success: "نجح الحصول على الأطباء", data: doctors };
+  } catch {
+    return { error: "حدث خطأ أثناء الوصول لبيانات الأطباء" };
+  }
+};
+
+export const getDoctorById = async (id: string) => {
+  try {
+    const doctor = await db.user.findUnique({
+      where: { id, role: "DOCTOR" },
+      include: { DoctorData: true },
+    });
+    if (!doctor)
+      return { error: "البيانات الذى أدخلتها غير صحيحه للحصول على الطبيب" };
+    return { success: "نجح الحصول على الطبيب", data: doctor };
+  } catch {
+    return { error: "حدث خطأ أثناء الوصول لبيانات الطبيب" };
+  }
+};
+
+export const getDoctorByEmail = async (email: string) => {
+  try {
+    const doctor = await db.user.findUnique({
+      where: { email, role: "DOCTOR" },
+      include: { DoctorData: true },
+    });
+    if (!doctor)
+      return { error: "البيانات الذى أدخلتها غير صحيحه للحصول على الطبيب" };
+    return { success: "نجح الحصول على الطبيب", data: doctor };
+  } catch {
+    return { error: "حدث خطأ أثناء الوصول لبيانات الطبيب" };
+  }
+};
+
+export const getUserById = async (id: string) => {
+  try {
+    const doctor = await db.user.findUnique({
+      where: { id, role: "USER" },
+      include: { DoctorData: true },
+    });
+    if (!doctor)
+      return { error: "البيانات الذى أدخلتها غير صحيحه للحصول على المستخدم" };
+    return { success: "نجح الحصول على المستخدم", data: doctor };
+  } catch {
+    return { error: "حدث خطأ أثناء الوصول لبيانات المستخدم" };
+  }
+};
+
+export const getUserByEmail = async (email: string) => {
+  try {
+    const doctor = await db.user.findUnique({
+      where: { email, role: "USER" },
+      include: { DoctorData: true },
+    });
+    if (!doctor)
+      return { error: "البيانات الذى أدخلتها غير صحيحه للحصول على المستخدم" };
+    return { success: "نجح الحصول على المستخدم", data: doctor };
+  } catch {
+    return { error: "حدث خطأ أثناء الوصول لبيانات المستخدم" };
+  }
+};
 
 export const addDoctor = async (data: AddDoctorSchemaType) => {
   let image, path;
@@ -30,7 +121,7 @@ export const addDoctor = async (data: AddDoctorSchemaType) => {
     if (user) return { error: "الحساب الذى أدخلتة موجود مسبقا" };
 
     if (typeof parsedData.data.image === "string") {
-      image = "/images/default.jpg";
+      image = DEFAULT_IMG;
     } else {
       const file = parsedData.data.image;
       const bytes = await file.arrayBuffer();
@@ -74,7 +165,7 @@ export const addDoctor = async (data: AddDoctorSchemaType) => {
     );
     return { success: "تم ارسال رسالة تأكيد للحساب" };
   } catch (err) {
-    if (image !== "/images/default.jpg" && path) {
+    if (image !== DEFAULT_IMG && path) {
       await unlink(path);
     }
     return { error: "حدث خطأ أثناء انشاء حساب الطبيب" };
@@ -82,7 +173,7 @@ export const addDoctor = async (data: AddDoctorSchemaType) => {
 };
 
 export const editDoctor = async (
-  id: string,
+  email: string,
   lastImage: string,
   data: EditDoctorSchemaType
 ) => {
@@ -94,9 +185,11 @@ export const editDoctor = async (
     if (typeof parsedData.data.image === "string") {
       image = parsedData.data.image;
     } else {
-      const prevImage = cwd() + "/public" + lastImage;
-      console.log(prevImage);
-      await unlink(prevImage);
+      if (DEFAULT_IMG !== lastImage) {
+        const prevImage = cwd() + "/public" + lastImage;
+        console.log(DEFAULT_IMG);
+        await unlink(prevImage);
+      }
       const file = parsedData.data.image;
       const bytes = await file.arrayBuffer();
       const buffer = Buffer.from(bytes);
@@ -105,15 +198,14 @@ export const editDoctor = async (
       await writeFile(path, buffer);
     }
     await db.user.update({
-      where: { id },
+      where: { email },
       data: {
-        name: data.name.trim(),
+        name: parsedData.data.name.trim(),
         email: parsedData.data.email,
         gender: parsedData.data.gender,
         phone: parsedData.data.phone,
         role: "DOCTOR",
         image: image,
-        emailVerified: new Date(),
         DoctorData: {
           update: {
             article: parsedData.data.article,
@@ -124,12 +216,56 @@ export const editDoctor = async (
         },
       },
     });
-    return { success: "تم تعديل حساب الطبيب بنجاح" };
+    return { success: "تم تعديل الحساب بنجاح" };
   } catch {
-    if (image !== "/images/default.jpg" && path) {
+    if (image !== DEFAULT_IMG && path) {
       await unlink(path);
     }
-    return { error: "حدث خطأ أثناء تعديل حساب الطبيب" };
+    return { error: "حدث خطأ أثناء تعديل الحساب" };
+  }
+};
+
+export const editUser = async (
+  id: string,
+  lastImage: string,
+  data: EditUserSchemaType
+) => {
+  let image, path;
+  try {
+    data.image = data.image.get("image") as unknown as File;
+    const parsedData = editUserSchema.safeParse(data);
+    if (!parsedData.success) return { error: "خطأ فى البيانات المدخلة" };
+    if (typeof parsedData.data.image === "string") {
+      image = parsedData.data.image;
+    } else {
+      if (DEFAULT_IMG !== lastImage) {
+        const prevImage = cwd() + "/public" + lastImage;
+        console.log(DEFAULT_IMG);
+        await unlink(prevImage);
+      }
+      const file = parsedData.data.image;
+      const bytes = await file.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+      image = join("/images/", `${Date.now()}-${file.name}`);
+      path = join(cwd(), "public", image);
+      await writeFile(path, buffer);
+    }
+    await db.user.update({
+      where: { id },
+      data: {
+        name: parsedData.data.name.trim(),
+        email: parsedData.data.email,
+        gender: parsedData.data.gender,
+        phone: parsedData.data.phone,
+        image: image,
+      },
+    });
+    return { success: "تم تعديل حساب المستخدم بنجاح" };
+  } catch {
+    if (image !== DEFAULT_IMG && path) {
+      await unlink(path);
+    }
+    return { error: "حدث خطأ أثناء تعديل حساب المستخدم" };
   }
 };
 

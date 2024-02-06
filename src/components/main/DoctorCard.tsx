@@ -5,39 +5,26 @@ import {
   CardFooter,
   Card,
 } from "@/components/ui/card";
-import { AvatarImage, Avatar } from "@/components/ui/avatar";
-import { FaRegStar } from "react-icons/fa";
 import Link from "next/link";
-import { DoctorType } from "@/components/main/DoctorsView";
 import MainButton from "../global/MainButton";
 import StarRate from "./StarRate";
+import { RenderedDoctorData } from "@/components/main/DoctorsView";
+import { calculateRate } from "@/lib/rate";
+import Image from "next/image";
 
-type Props = DoctorType & {
-  key: number;
+type Props = {
+  doctor: RenderedDoctorData;
 };
-export default function DoctorCard({
-  discount,
-  status,
-  name,
-  image,
-  position,
-  rate,
-  priceA,
-  priceB,
-  id,
-}: Props) {
-  const rateRenter = Array.from("12345").map((_, i) => {
-    return (
-      <li key={i}>
-        <FaRegStar
-          className={i + 1 <= rate ? " fill-yellow-500 text-yellow-500" : ""}
-        />
-      </li>
-    );
-  });
+
+export default function DoctorCard({ doctor }: Props) {
+  const rate = calculateRate(doctor.DoctorData?.Rate);
+  const status = true;
+  const discount = 20;
+  const priceA = 50;
+  const priceB = 20;
 
   return (
-    <Card className="bg-white rounded-lg border shadow-md p-4 min-w-[15rem]">
+    <Card className="bg-white dark:bg-dark rounded-lg border shadow-md p-4 min-w-[15rem]">
       <CardHeader className="flex justify-between items-start relative">
         {status && (
           <Badge
@@ -54,12 +41,19 @@ export default function DoctorCard({
         )}
       </CardHeader>
       <CardContent className="flex flex-col items-center">
-        <Avatar className="mb-5">
-          <AvatarImage alt={`Dr.${name}`} src={image} />
-        </Avatar>
+        <div className="relative w-24 h-24 overflow-clip rounded-full">
+          <Image
+            src={doctor.image}
+            alt={"دكتور " + doctor.name}
+            fill
+            className=" object-cover w-full h-full"
+          />
+        </div>
         <div className="text-center">
-          <div className="font-bold text-lg mb-3">{name}</div>
-          <div className="text-sm text-gray-500 mb-3">{position}</div>
+          <div className="font-bold text-lg mb-3">{doctor.name}</div>
+          <div className="text-sm text-gray-500 mb-3">
+            {doctor.DoctorData?.master?.name}
+          </div>
           <div className="flex items-center mt-1">
             <span className="ml-4 mt-4 text-gray-500">
               تقييم {Math.round((rate / 5) * 100)}
@@ -70,7 +64,7 @@ export default function DoctorCard({
       </CardContent>
       <CardFooter className="flex flex-col items-center mt-4">
         <MainButton className="mx-auto mb-4 text-lg">
-          <Link href={`/doctors/${id}`}>حجز موعد</Link>
+          <Link href={`/doctors/${doctor.DoctorData?.id}`}>حجز موعد</Link>
         </MainButton>
         <div className="flex items-center justify-between w-full">
           <div className="text-lg font-bold">{priceB} EGP</div>

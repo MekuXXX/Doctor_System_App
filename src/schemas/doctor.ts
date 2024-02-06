@@ -1,3 +1,4 @@
+import { DEFAULT_IMG } from "@/lib/constants";
 import * as z from "zod";
 export const MAX_IMAGE_SIZE = 2000000;
 export const ACCEPTED_IMAGE_TYPES = [
@@ -14,7 +15,7 @@ export const addDoctorSchema = z.object({
   email: z.string().email({ message: "يجب ادخال حساب الطبيب" }),
   image: z
     .string()
-    .refine((n) => n === "/images/default.jpg")
+    .refine((n) => n === DEFAULT_IMG)
     .or(
       z
         .any()
@@ -33,7 +34,7 @@ export const addDoctorSchema = z.object({
   article: z.string(),
   phone: z.string().min(1, { message: "يجب ادخال هذا الحقل" }),
   country: z.string().min(1, { message: "يجب اختيار بلد الطبيب" }),
-  gender: z.enum(["male", "female"]),
+  gender: z.enum(["MALE", "FEMALE"]),
   password: z.string().min(6, { message: "يجب ادخال كلمة مرور الطبييب" }),
 });
 
@@ -42,7 +43,7 @@ export const editDoctorSchema = z.object({
   email: z.string().email({ message: "يجب ادخال حساب الطبيب" }),
   image: z
     .string()
-    .refine((n) => n.includes("/images"))
+    .refine((n) => n.includes("/images/"))
     .or(
       z
         .any()
@@ -61,8 +62,29 @@ export const editDoctorSchema = z.object({
   article: z.string(),
   phone: z.string().min(1, { message: "يجب ادخال هذا الحقل" }),
   country: z.string().min(1, { message: "يجب اختيار بلد الطبيب" }),
-  gender: z.enum(["male", "female"]),
+  gender: z.enum(["MALE", "FEMALE"]),
+});
+
+export const editUserSchema = z.object({
+  name: z.string().min(1, { message: "يجب ادخال اسم الطبيب" }),
+  email: z.string().email({ message: "يجب ادخال حساب الطبيب" }),
+  gender: z.enum(["MALE", "FEMALE"]),
+  phone: z.string().min(1, { message: "يجب ادخال هذا الحقل" }),
+  image: z
+    .string()
+    .refine((n) => n.includes("/images/"))
+    .or(
+      z
+        .any()
+        .refine((file) => {
+          return ACCEPTED_IMAGE_TYPES.includes(file.type);
+        }, "الصورة يجب أن تكون من نوع (jpeg, jpg, png, webp)")
+        .refine((file) => {
+          return file?.size <= MAX_IMAGE_SIZE;
+        }, `أقصى حد للصوره هو 2 ميغا`)
+    ),
 });
 
 export type AddDoctorSchemaType = z.infer<typeof addDoctorSchema>;
 export type EditDoctorSchemaType = z.infer<typeof editDoctorSchema>;
+export type EditUserSchemaType = z.infer<typeof editUserSchema>;

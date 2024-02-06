@@ -3,13 +3,15 @@ import DashHeader from "@/components/dashboard/DashHeader";
 import React from "react";
 import { auth } from "@/auth";
 import { SideBarLinkType } from "@/global";
+import { redirect } from "next/navigation";
+import { DOCTOR_DASHBOARD } from "@/routes";
 
 type Props = {
   children: React.ReactNode;
 };
 
 const sidebarLinks: SideBarLinkType = {
-  base: "dr-dashboard",
+  base: DOCTOR_DASHBOARD,
   links: [
     {
       id: 1,
@@ -36,17 +38,23 @@ const sidebarLinks: SideBarLinkType = {
       link: "online-settings",
       text: "اعدادات الأونلاين",
     },
+    {
+      id: 6,
+      link: "account",
+      text: "حسابك",
+    },
   ],
 };
 
 export default async function DashboardLayout({ children }: Props) {
   const userData = await auth();
+  if (!userData || userData.user.role !== "DOCTOR") redirect("/");
   return (
     <div className="bg-[#e5e5e5] dark:bg-[#020817] min-h-screen">
       <div className="content">
         <div className="feature fx-between gap-6">
           <DashSidebar routes={sidebarLinks} />
-          <DashHeader user={userData?.user} />
+          <DashHeader />
         </div>
       </div>
       <div>{children}</div>
