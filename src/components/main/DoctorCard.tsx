@@ -11,14 +11,15 @@ import StarRate from "./StarRate";
 import { RenderedDoctorData } from "@/components/main/DoctorsView";
 import { calculateRate } from "@/lib/rate";
 import Image from "next/image";
+import CurrencyConvert from "../global/CurrencyConvert";
 
 type Props = {
   doctor: RenderedDoctorData;
+  isActive?: boolean;
 };
 
-export default function DoctorCard({ doctor }: Props) {
+export default function DoctorCard({ doctor, isActive }: Props) {
   const rate = calculateRate(doctor.DoctorData?.Rate);
-  const status = true;
   const discount = 20;
   const priceA = 50;
   const priceB = 20;
@@ -26,7 +27,7 @@ export default function DoctorCard({ doctor }: Props) {
   return (
     <Card className="bg-white dark:bg-dark rounded-lg border shadow-md p-4 min-w-[15rem]">
       <CardHeader className="flex justify-between items-start relative">
-        {status && (
+        {isActive && (
           <Badge
             className="bg-[#a2eec0] text-[#217a56] absolute left-4 top-4 pr-4 rounded-full  before:content-[''] before:absolute before:w-2 before:h-2 before:rounded-full before:right-1 before:bg-[#217a56]"
             variant="secondary"
@@ -40,7 +41,7 @@ export default function DoctorCard({ doctor }: Props) {
           </div>
         )}
       </CardHeader>
-      <CardContent className="flex flex-col items-center">
+      <CardContent className="flex flex-col items-center gap-2">
         <div className="relative w-24 h-24 overflow-clip rounded-full">
           <Image
             src={doctor.image}
@@ -50,16 +51,11 @@ export default function DoctorCard({ doctor }: Props) {
           />
         </div>
         <div className="text-center">
-          <div className="font-bold text-lg mb-3">{doctor.name}</div>
-          <div className="text-sm text-gray-500 mb-3">
+          <p className="font-bold text-lg mb-3">{doctor.name}</p>
+          <p className="text-sm text-gray-500 mb-3">
             {doctor.DoctorData?.master?.name}
-          </div>
-          <div className="flex items-center mt-1">
-            <span className="ml-4 mt-4 text-gray-500">
-              تقييم {Math.round((rate / 5) * 100)}
-            </span>
-            <StarRate rate={rate} />
-          </div>
+          </p>
+          <StarRate rate={rate} />
         </div>
       </CardContent>
       <CardFooter className="flex flex-col items-center mt-4">
@@ -67,8 +63,12 @@ export default function DoctorCard({ doctor }: Props) {
           <Link href={`/doctors/${doctor.DoctorData?.id}`}>حجز موعد</Link>
         </MainButton>
         <div className="flex items-center justify-between w-full">
-          <div className="text-lg font-bold">{priceB} EGP</div>
-          <div className="text-sm text-gray-500 line-through">{priceA} EGP</div>
+          <div className="text-lg font-bold">
+            <CurrencyConvert currency={priceB} />
+          </div>
+          <div className="text-sm text-gray-500 line-through">
+            <CurrencyConvert currency={priceA} />
+          </div>
         </div>
       </CardFooter>
     </Card>

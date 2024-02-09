@@ -17,10 +17,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  SendAllNotificationSchemaType,
-  SendEmNotificationSchemaType,
-  sendAllNotificationSchema,
-  sendEmNotificationSchema,
+  SendNotificationSchemaType,
+  sendNotificationSchema,
 } from "@/schemas/sendNotification";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
@@ -30,8 +28,8 @@ import { toast } from "sonner";
 type Props = {};
 
 export function SendNotification({}: Props) {
-  const form = useForm<SendEmNotificationSchemaType>({
-    resolver: zodResolver(sendEmNotificationSchema),
+  const form = useForm<SendNotificationSchemaType>({
+    resolver: zodResolver(sendNotificationSchema),
     mode: "onBlur",
   });
 
@@ -42,35 +40,19 @@ export function SendNotification({}: Props) {
     if (notifType === "all") resetField("personEmail");
   }, [notifType, resetField]);
 
-  const onSubmit = (data: SendEmNotificationSchemaType) => {
-    let parsed;
-    if (data.type === "person") {
-      parsed = sendEmNotificationSchema.parse(data);
-      toast("أرسل لشخص واحد", {
-        description: "الرسالة: " + parsed.message,
-        action: {
-          label: "Undo",
-          onClick: () => console.log("Undo"),
-        },
-        style: {
-          display: "flex",
-          justifyContent: "space-between",
-        },
-      });
-    } else {
-      parsed = sendAllNotificationSchema.parse(data);
-      toast("أرسل لكل الأشخاص", {
-        description: "الرساله: " + parsed.message,
-        action: {
-          label: "الرجوع",
-          onClick: () => console.log("Undo"),
-        },
-        style: {
-          display: "flex",
-          justifyContent: "space-between",
-        },
-      });
-    }
+  const onSubmit = (data: SendNotificationSchemaType) => {
+    const parsedData = sendNotificationSchema.safeParse(data);
+    toast("أرسل لشخص واحد", {
+      // description: "الرسالة: " + parsedData.data.message,
+      action: {
+        label: "Undo",
+        onClick: () => console.log("Undo"),
+      },
+      style: {
+        display: "flex",
+        justifyContent: "space-between",
+      },
+    });
   };
   return (
     <div className="border p-4 rounded-xl bg-white dark:bg-inherit h-full">
@@ -82,7 +64,7 @@ export function SendNotification({}: Props) {
             name="type"
             render={({ field }) => (
               <FormItem>
-                <FormLabel />
+                <FormLabel>نوع الاشعار</FormLabel>
                 <FormControl>
                   <Select
                     dir="rtl"
@@ -110,7 +92,7 @@ export function SendNotification({}: Props) {
               name="personEmail"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel />
+                  <FormLabel>حساب المرسل اليه</FormLabel>
                   <FormControl>
                     <Input required {...field} placeholder="أدخل حساب العضو" />
                   </FormControl>
@@ -124,7 +106,7 @@ export function SendNotification({}: Props) {
             name="message"
             render={({ field }) => (
               <FormItem>
-                <FormLabel />
+                <FormLabel>رسالة الاشعار</FormLabel>
                 <FormControl>
                   <Input {...field} placeholder="أدخل الإشعار" />
                 </FormControl>

@@ -5,7 +5,6 @@ import { CiClock2 } from "react-icons/ci";
 import { SlCalender } from "react-icons/sl";
 import { IoGitNetwork } from "react-icons/io5";
 import { CgNametag } from "react-icons/cg";
-import { getUserData } from "@/actions/set-user-data";
 
 type Props = {};
 
@@ -100,8 +99,6 @@ const instructions = [
   },
 ];
 export default async function CheckoutPage({}: Props) {
-  const userData = await getUserData();
-
   return (
     <div className="content">
       <div className="grid md:grid-cols-2 gap-4 bg-white shadow-2xl rounded-xl overflow-clip">
@@ -112,7 +109,7 @@ export default async function CheckoutPage({}: Props) {
             <span>{order.doctorName}</span>
           </div>
           {OrderData.map((order) => (
-            <div className="flex gap-4 mt-6">
+            <div className="flex gap-4 mt-6" key={order.id}>
               {order.icon}
               <div className="gap-2">
                 <p>{order.text}</p>
@@ -123,7 +120,7 @@ export default async function CheckoutPage({}: Props) {
         </div>
         <div className="py-8 px-4">
           <Suspense fallback={<h1>Loading...</h1>}>
-            <CheckoutForm data={userData} />
+            <CheckoutForm />
           </Suspense>
         </div>
       </div>

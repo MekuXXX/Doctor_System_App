@@ -1,8 +1,9 @@
-import { getDoctors } from "@/actions/doctor";
 import DiscountBadge from "@/components/main/DiscountBadge";
-import DoctorsView, { RenderedDoctorData } from "@/components/main/DoctorsView";
+import DoctorsView from "@/components/main/DoctorsView";
 import FAQ from "@/components/main/FAQ";
 import MainSearch from "@/components/main/MainSearch";
+import { isUserOnline } from "@/lib/compare-times";
+import { db } from "@/lib/db";
 import React from "react";
 
 type Props = {
@@ -15,47 +16,66 @@ type Props = {
 };
 
 export default async function page({ searchParams }: Props) {
-  // data = data.filter(
-  //   (p) =>
-  //     p.gender === searchParams.gender &&
-  //     p.name.includes(searchParams.text || "")
-  // );
-  const doctors = await getDoctors();
-  if (doctors.error) return <h1>Error in get doctors data</h1>;
-  // let availableNow: DoctorType[] = [];
-  // let notAvailableNow: DoctorType[] = [];
-  // data.forEach((doctor) =>
-  //   doctor.status ? availableNow.push(doctor) : notAvailableNow.push(doctor)
-  // );
+  const doctors = await db.user.findMany({
+    where: { role: "DOCTOR" },
+    select: {
+      id: true,
+      name: true,
+      image: true,
+      DoctorData: {
+        select: {
+          id: true,
+          master: {
+            select: { name: true },
+          },
+          doctorActive: {
+            select: {
+              isActive: true,
+              from: true,
+              to: true,
+            },
+          },
+          Rate: true,
+        },
+      },
+    },
+  });
 
+  const activeDoctors: any[] = [];
+  const inActiveDoctors: any[] = [];
+  doctors.forEach((doctor) => {
+    const isActive = isUserOnline(
+      doctor?.DoctorData?.doctorActive?.from!,
+      doctor?.DoctorData?.doctorActive?.to!
+    );
+    if (doctor.DoctorData?.doctorActive?.isActive && isActive)
+      activeDoctors.push(doctor);
+    else inActiveDoctors.push(doctor);
+  });
   return (
     <div className="content">
       <MainSearch />
       <DiscountBadge />
 
-      <DoctorsView
-        title="المتاحين الان"
-        description="بامكانك الحجز والتحدث فوراً"
-        doctors={doctors.data as RenderedDoctorData[]}
-        className="feature"
-      />
-      {/* {availableNow.length !== 0 && (
+      {activeDoctors.length !== 0 && (
         <DoctorsView
           title="المتاحين الان"
           description="بامكانك الحجز والتحدث فوراً"
-          data={availableNow}
+          doctors={activeDoctors!}
+          isActive={true}
           className="feature"
         />
       )}
-      {notAvailableNow.length !== 0 && (
+      {inActiveDoctors.length !== 0 && (
         <DoctorsView
           title="الغير متاحين الان"
           description="يمكنك الحجز من خلال الجدول الوقت الذي يناسبك"
-          data={notAvailableNow}
+          doctors={inActiveDoctors as any}
+          isActive={false}
           className="feature"
         />
       )}
-      {availableNow.length === 0 && notAvailableNow.length === 0 && (
+      {/* {availableNow.length === 0 && notAvailableNow.length === 0 && (
         <p className="text-xl my-8 font-extrabold text-center">لا توجد نتائج</p>
       )} */}
       <FAQ />

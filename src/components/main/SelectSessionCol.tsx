@@ -33,7 +33,7 @@ export default function SelectSessionCol({ times }: Props) {
       </h3>
       <div className="p-3 grid gap-4 min-w-fit">
         {first.map((session: any) => (
-          <Link href={"/checkout"}>
+          <Link href={"/checkout"} key={session.id}>
             <div
               key={session.id}
               className="p-2 rounded bg-red-700/50 text-white text-sm min-w-fit"
@@ -57,7 +57,7 @@ export default function SelectSessionCol({ times }: Props) {
           </CollapsibleTrigger>
           <CollapsibleContent className="space-y-2">
             {collapsed.map((session: any) => (
-              <Link href={"/checkout"} className=" block">
+              <Link href={"/checkout"} className=" block" key={session.id}>
                 <div
                   key={session.id}
                   className="p-2 rounded bg-red-700/50 text-white text-sm min-w-fit"

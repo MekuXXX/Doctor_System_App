@@ -1,9 +1,6 @@
-import React, { Suspense } from "react";
+import React from "react";
 import { PiDotsNineBold } from "react-icons/pi";
-import {
-  DashHeaderTitle,
-  DashHeaderTitleFallback,
-} from "@/components/dashboard/DashHeaderTitle";
+import { DashHeaderTitle } from "@/components/dashboard/DashHeaderTitle";
 import { ModeToggle } from "@/components/global/ModeToggle";
 import { FullScreenToggle } from "@/components/global/FullScreenToggle";
 import { Button } from "@/components/ui/button";
@@ -21,9 +18,7 @@ export default async function DashHeader({}: Props) {
   return (
     <header className="fx-between grow items-center py-2">
       <div className="flex gap-4 items-center">
-        <Suspense fallback={<DashHeaderTitleFallback />}>
-          <DashHeaderTitle />
-        </Suspense>
+        <DashHeaderTitle />
         {/* {status && <p className=" text-sm">{userData?.geoplugin_timezone}</p>} */}
       </div>
       <div className="flex gap-4 items-center">

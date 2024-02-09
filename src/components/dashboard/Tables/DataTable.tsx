@@ -86,6 +86,7 @@ export function DataTable<TData, TValue>({
     },
   });
 
+  // TODO: add loading spinner and error messages
   if (isLoading) return <h1>Loading..</h1>;
   if (isError) return <h1>Error</h1>;
   return (

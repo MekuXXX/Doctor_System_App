@@ -1,12 +1,11 @@
-"use client";
 import React from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "../ui/accordion";
+} from "@/components/ui/accordion";
 
 type Props = {};
 const accordionData = {

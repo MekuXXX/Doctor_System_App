@@ -1,11 +1,12 @@
 import React from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import CurrencyConvert from "../global/CurrencyConvert";
 
 type Props = {
   image: string;
   time?: string;
-  price: string;
+  price: number;
 };
 
 export default function SessionPackage({ image, time, price }: Props) {
@@ -26,7 +27,7 @@ export default function SessionPackage({ image, time, price }: Props) {
         </div>
         <div className="grid gap-2">
           <h3 className="text-2xl font-semibold"> جلسة {time} ساعة</h3>
-          <p className="text-lg">السعر: EGP {price}</p>
+          <CurrencyConvert currency={price} />
           <Button className="bg-[#e63946] text-white py-2 px-4 rounded">
             إدفع الآن
           </Button>

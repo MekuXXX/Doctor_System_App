@@ -35,13 +35,13 @@ export default async function DoctorDataPage({ params: { id } }: Props) {
       article: true,
       breif: true,
       country: true,
+      Rate: true,
+      doctorRank: true,
+      certificate: true,
       doctorActive: {
         select: { isActive: true, from: true, to: true },
       },
       master: { select: { name: true } },
-      Rate: true,
-      doctorRank: true,
-      certificate: true,
       doctor: {
         select: {
           id: true,
@@ -49,6 +49,7 @@ export default async function DoctorDataPage({ params: { id } }: Props) {
           image: true,
         },
       },
+      doctorSessions: true,
     },
   });
   if (!doctor) redirect("/");
@@ -58,19 +59,18 @@ export default async function DoctorDataPage({ params: { id } }: Props) {
     <div className="content">
       <div className="feature mx-auto grid md:grid-cols-2 gap-4 items-start">
         <div className="grid gap-8 p-4 ">
-          <Card className="min-w-fit px-4 max-h-[15rem]">
+          <Card className="min-w-fit px-4">
             <CardHeader>
               <CardTitle className="text-lg font-semibold">
                 {doctor?.doctor?.name}
               </CardTitle>
             </CardHeader>
-            <CardContent className="flex items-center gap-4">
-              <div className="w-[100px] relative">
+            <CardContent className="flex gap-4">
+              <div className="w-[200px] h-[200px] relative">
                 <Image
                   src={doctor.doctor?.image}
                   alt={`Dr.${doctor.doctor?.name}`}
-                  width={100}
-                  height={200}
+                  fill
                   objectFit="cover"
                 />
               </div>
@@ -79,7 +79,6 @@ export default async function DoctorDataPage({ params: { id } }: Props) {
                 <p className="text-sm font-medium text-yellow-400 flex items-center">
                   تقييم {rate}
                 </p>
-                <p className="text-sm text-gray-600">الروابط:</p>
               </div>
             </CardContent>
             <CardFooter className="text-right">
@@ -119,7 +118,13 @@ export default async function DoctorDataPage({ params: { id } }: Props) {
             <SessionPackage
               image={doctor.doctor?.image || ""}
               time="نصف"
-              price="989.99"
+              price={doctor?.doctorSessions?.halfSessions!}
+            />
+
+            <SessionPackage
+              image={doctor.doctor?.image || ""}
+              time="نصف"
+              price={doctor?.doctorSessions?.hourSessions!}
             />
 
             {/* <SessionPackage image={doctorData?.image || ""} price="1249.99" /> */}

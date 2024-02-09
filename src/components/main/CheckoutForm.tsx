@@ -6,15 +6,13 @@ import CheckoutElements from "@/components/main/CheckoutElements";
 import { Button } from "@/components/ui/button";
 import { UseCoupon } from "@/components/main/UseCoupon";
 
-type Props = {
-  data: any;
-};
+type Props = {};
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || ""
 );
 
-export default function CheckoutForm({ data }: Props) {
+export default function CheckoutForm({}: Props) {
   const [clientSecret, setClientSecret] = useState("");
   const [hasCoupon, setHasCoupon] = useState(false);
 

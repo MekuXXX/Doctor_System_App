@@ -55,8 +55,6 @@ export default function DashDoctorOnlineSettings({ user, getData }: Props) {
       to: user.DoctorData.doctorActive.to,
       halfSession: String(data.DoctorData.doctorSessions.halfSessions),
       hourSession: String(data.DoctorData.doctorSessions.hourSessions),
-      twoSessions: String(data.DoctorData.doctorSessions.twoSessions),
-      fourSessions: String(data.DoctorData.doctorSessions.fourSessions),
     },
   });
 
@@ -76,7 +74,6 @@ export default function DashDoctorOnlineSettings({ user, getData }: Props) {
           if (res.error) {
             setError(res.error);
           } else if (res.success) {
-            form.reset();
             setSuccess(res.success);
           }
         }
@@ -199,42 +196,6 @@ export default function DashDoctorOnlineSettings({ user, getData }: Props) {
                       type="number"
                       {...field}
                     />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-          <div className="md:flex gap-4 items-center">
-            <FormField
-              control={form.control}
-              name="twoSessions"
-              render={({ field }) => (
-                <FormItem className="w-full">
-                  <FormLabel className="mb-1 text-sm font-medium leading-none">
-                    سعر الجلساتين
-                  </FormLabel>
-                  <FormControl>
-                    <Input {...field} className="w-full" type="number" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="fourSessions"
-              render={({ field }) => (
-                <FormItem className="w-full">
-                  <FormLabel
-                    className="mb-1 text-sm font-medium leading-none"
-                    htmlFor="60-min-duration"
-                  >
-                    سعر الأربع جلسات
-                  </FormLabel>
-                  <FormControl>
-                    <Input {...field} className="w-full" type="number" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

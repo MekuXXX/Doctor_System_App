@@ -21,11 +21,6 @@ export type RenderedDoctorData = {
       doctorId: string;
     }[];
     id: string;
-    doctorRank: DoctorRank;
-    article: string;
-    breif: string;
-    country: string;
-    certificate: string;
   };
   id: string;
   name: string;
@@ -37,6 +32,7 @@ type Props = {
   title: string;
   description: string;
   className?: string;
+  isActive?: boolean;
 };
 
 export default function DoctorsView({
@@ -44,14 +40,15 @@ export default function DoctorsView({
   description,
   doctors,
   className,
+  isActive,
 }: Props) {
   return (
     <div className={cn("mt-4 mb-8", className)}>
       <h1 className="mt-4 text-2xl mb-4 font-extrabold">{title}</h1>
       <p className=" text-sm -mt-1 mb-8 text">{description}</p>
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-y-8 gap-x-4">
-        {doctors.map((doctor) => (
-          <DoctorCard key={doctor.id} doctor={doctor} />
+        {doctors?.map((doctor) => (
+          <DoctorCard key={doctor.id} doctor={doctor} isActive={isActive} />
         ))}
       </div>
     </div>

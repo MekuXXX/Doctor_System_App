@@ -37,6 +37,24 @@ model User {
   isTwoFactorEnabled    Boolean                @default(false)
   twoFactorConfirmation TwoFactorConfirmation?
   DoctorData            DoctorData?
+  notificationSent      Notification[]         @relation(name: "sender")
+  notificationReceived  Notification[]         @relation(name: "receiver")
+}
+
+enum Notification_Status {
+  READ
+  NEW
+}
+
+model Notification {
+  id         String              @id @default(cuid())
+  message    String
+  link       String?
+  status     Notification_Status
+  senderId   String // Store the ID of the sender user
+  receiverId String // Store the ID of the receiver user
+  sender     User                @relation(name: "sender", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver   User                @relation(name: "receiver", fields: [receiverId], references: [id], onDelete: Cascade)
 }
 
 enum DoctorRank {

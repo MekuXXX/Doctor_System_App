@@ -1,39 +1,70 @@
 import React from "react";
-import { data } from "@/app/(home)/page";
-import DoctorsView, { DoctorType } from "@/components/main/DoctorsView";
+import DoctorsView from "@/components/main/DoctorsView";
+import { db } from "@/lib/db";
+import { isUserOnline } from "@/lib/compare-times";
 
 type Props = {};
 
-export default function DoctorsPage({}: Props) {
-  let availableNow: DoctorType[] = [];
-  let notAvailableNow: DoctorType[] = [];
-  data.forEach((doctor) =>
-    doctor.status ? availableNow.push(doctor) : notAvailableNow.push(doctor)
-  );
+export default async function DoctorsPage({}: Props) {
+  const doctors = await db.user.findMany({
+    where: { role: "DOCTOR" },
+    select: {
+      id: true,
+      name: true,
+      image: true,
+      DoctorData: {
+        select: {
+          id: true,
+          master: {
+            select: { name: true },
+          },
+          doctorActive: {
+            select: {
+              isActive: true,
+              from: true,
+              to: true,
+            },
+          },
+          Rate: true,
+        },
+      },
+    },
+  });
 
+  const activeDoctors: any[] = [];
+  const inActiveDoctors: any[] = [];
+  doctors.forEach((doctor) => {
+    const isActive = isUserOnline(
+      doctor?.DoctorData?.doctorActive?.from!,
+      doctor?.DoctorData?.doctorActive?.to!
+    );
+    if (doctor.DoctorData?.doctorActive?.isActive && isActive)
+      activeDoctors.push(doctor);
+    else inActiveDoctors.push(doctor);
+  });
   return (
     <div className="content">
-      {availableNow.length !== 0 && (
+      {activeDoctors.length !== 0 && (
         <DoctorsView
           title="المتاحين الان"
           description="بامكانك الحجز والتحدث فوراً"
-          data={availableNow}
+          doctors={activeDoctors!}
+          isActive={true}
           className="feature"
         />
       )}
-      {notAvailableNow.length !== 0 && (
+      {inActiveDoctors.length !== 0 && (
         <DoctorsView
           title="الغير متاحين الان"
           description="يمكنك الحجز من خلال الجدول الوقت الذي يناسبك"
-          data={notAvailableNow}
+          doctors={inActiveDoctors as any}
+          isActive={false}
           className="feature"
         />
       )}
-      {availableNow.length === 0 && notAvailableNow.length === 0 && (
-        <h1 className="text-xl my-8 font-extrabold text-center">
-          لا توجد نتائج
-        </h1>
-      )}
+      {/* {availableNow.length === 0 && notAvailableNow.length === 0 && (
+        <p className="text-xl my-8 font-extrabold text-center">لا توجد نتائج</p>
+      )} */}
     </div>
   );
 }

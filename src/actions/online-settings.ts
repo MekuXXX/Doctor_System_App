@@ -25,8 +25,6 @@ export const saveOnlineSettings = async (
           update: {
             doctorSessions: {
               update: {
-                twoSessions: Number(parsedData.data.twoSessions),
-                fourSessions: Number(parsedData.data.fourSessions),
                 halfSessions: Number(parsedData.data.halfSession),
                 hourSessions: Number(parsedData.data.hourSession),
               },
