@@ -1,7 +1,9 @@
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { SelectValue, SelectTrigger, Select } from "@/components/ui/select";
+import React from "react";
 import SelectSessionCol from "./SelectSessionCol";
+import moment from "moment";
+import { getWeekDayName } from "@/lib/moment";
+import { db } from "@/lib/db";
+import { getScheduleSessionsByDay } from "@/actions/schedule";
 
 const sessionsTimes = [
   {
@@ -31,14 +33,46 @@ const sessionsTimes = [
   },
 ];
 
-export default function SelectSessions() {
+type Props = {
+  doctorId: string;
+};
+
+export default async function SelectSessions({ doctorId }: Props) {
+  const firstDay = moment();
+  const secondDay = moment().add(1, "days");
+  const thirdDay = moment().add(2, "days");
+
+  const threeDays = [
+    {
+      day: getWeekDayName(firstDay),
+      date: firstDay,
+    },
+    {
+      day: getWeekDayName(secondDay),
+      date: secondDay,
+    },
+    {
+      day: getWeekDayName(thirdDay),
+      date: thirdDay,
+    },
+  ];
+
+  const data = await Promise.all(
+    threeDays.map((day) =>
+      getScheduleSessionsByDay(doctorId, day.day as "FRIDAY")
+    )
+  );
   return (
     <div className="flex items-start gap-2 justify-center md:justify-start">
-      <SelectSessionCol times={sessionsTimes} />
-
-      <SelectSessionCol times={sessionsTimes} />
-
-      <SelectSessionCol times={sessionsTimes} />
+      {threeDays.map((day, ind) => (
+        <SelectSessionCol
+          key={day.day}
+          doctorId={doctorId}
+          day={day.day as "FRIDAY"}
+          date={day.date.format("ddd D/MM")}
+          initialDate={data[ind].data!}
+        />
+      ))}
     </div>
   );
 }

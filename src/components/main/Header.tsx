@@ -51,8 +51,8 @@ export default async function Header({}: Props) {
     user?.user.role === "USER"
       ? USER_DASHBOARD
       : user?.user.role === "ADMIN"
-        ? ADMIN_DASHBOARD
-        : DOCTOR_DASHBOARD;
+      ? ADMIN_DASHBOARD
+      : DOCTOR_DASHBOARD;
   return (
     <header dir="rtl" className="content">
       <div className="flex justify-between items-center">
@@ -76,17 +76,13 @@ export default async function Header({}: Props) {
         </nav>
 
         <div className="grid gap-2 items-center grid-cols-2">
-          <MainButton>احجز الان</MainButton>
           {user ? (
             <DropdownMenu dir="rtl">
               <DropdownMenuTrigger asChild>
-                <Button
-                  className="flex gap-2 text-main hover:text-white hover:bg-main"
-                  variant={"outline"}
-                >
+                <MainButton className="flex gap-2">
                   <span>{user.user?.name}</span>
                   <IoMdArrowDropdown />
-                </Button>
+                </MainButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
                 <DropdownMenuLabel dir="rtl">إعدادات</DropdownMenuLabel>

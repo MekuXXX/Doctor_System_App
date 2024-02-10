@@ -8,20 +8,53 @@ import {
 import { Button } from "@/components/ui/button";
 import { FaLongArrowAltDown } from "react-icons/fa";
 import Link from "next/link";
+import { DayOfWeek, DoctorScheduleSession } from "@prisma/client";
+import { useQuery } from "@tanstack/react-query";
+import { getScheduleSessionsByDay } from "@/actions/schedule";
+import { getDoctorSessionTimeByType } from "@/lib/doctor-session";
+import { convertToAmAndPm } from "@/lib/moment";
 
 type Props = {
-  times: any;
+  doctorId: string;
+  day: DayOfWeek;
+  date: string;
+  initialDate: DoctorScheduleSession[];
 };
 
-export default function SelectSessionCol({ times }: Props) {
+export default function SelectSessionCol({
+  doctorId,
+  day,
+  date,
+  initialDate,
+}: Props) {
   const [isOpen, setIsOpen] = useState(false);
-  const first: any = [];
-  const collapsed: any = [];
+  const refetchInterval = process.env.NEXT_PUBLIC_REFETCH_INTERVAL || 5000;
+  const {
+    data: times,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["sessions", day],
+    queryFn: async () => {
+      const data = await getScheduleSessionsByDay(doctorId, day);
+      if (data.error) throw new Error(data.error);
+      return data.data;
+    },
+    initialData: initialDate,
+    refetchInterval: Number(refetchInterval),
+  });
 
-  for (let i = 0; i < times.length; ++i) {
-    if (i < 3) first.push(times[i]);
-    else collapsed.push(times[i]);
+  const first = [];
+  const collapsed = [];
+
+  for (let i = 0; i < times?.length!; ++i) {
+    if (i < 3) first.push(times?.[i]);
+    else collapsed.push(times?.[i]);
   }
+
+  // TODO: add loading spinner and error messages
+  if (isLoading) return <h1>Loading..</h1>;
+  if (isError) return <h1>Error..</h1>;
 
   return (
     <div
@@ -29,17 +62,16 @@ export default function SelectSessionCol({ times }: Props) {
       dir="ltr"
     >
       <h3 className="bg-main text-lg font-semibold mb-4 py-2 rounded text-white">
-        Tue 27/02
+        {date}
       </h3>
       <div className="p-3 grid gap-4 min-w-fit">
-        {first.map((session: any) => (
-          <Link href={"/checkout"} key={session.id}>
-            <div
-              key={session.id}
-              className="p-2 rounded bg-red-700/50 text-white text-sm min-w-fit"
-            >
-              <p>{session.time}</p>
-              <p>[{session.duration} minutes]</p>
+        {first.map((session) => (
+          <Link href={`/checkout?sessionId=${session?.id}`} key={session?.id}>
+            <div className="p-2 rounded bg-red-700/50 text-white text-sm min-w-fit">
+              <p>{convertToAmAndPm(session?.sessionTime!)}</p>
+              <p>
+                [{session?.sessionType === "HALF_HOUR" ? "30" : "60"} minutes]
+              </p>
             </div>
           </Link>
         ))}
@@ -56,14 +88,17 @@ export default function SelectSessionCol({ times }: Props) {
             </Button>
           </CollapsibleTrigger>
           <CollapsibleContent className="space-y-2">
-            {collapsed.map((session: any) => (
-              <Link href={"/checkout"} className=" block" key={session.id}>
-                <div
-                  key={session.id}
-                  className="p-2 rounded bg-red-700/50 text-white text-sm min-w-fit"
-                >
-                  <p className="min-w-fit">{session.time}</p>
-                  <p className="min-w-fit">[{session.duration} minutes]</p>
+            {collapsed.map((session) => (
+              <Link
+                href={`/checkout?sessionId=${session?.id}`}
+                key={session?.id}
+              >
+                <div className="p-2 rounded bg-red-700/50 text-white text-sm min-w-fit">
+                  <p>{convertToAmAndPm(session?.sessionTime!)}</p>
+                  <p>
+                    [{getDoctorSessionTimeByType(session?.sessionType!)}{" "}
+                    minutes]
+                  </p>
                 </div>
               </Link>
             ))}

@@ -72,3 +72,19 @@ export const saveDoctorSchedule = async (
     return { error: "حدث مشكلة أثناء حفظ الجدول" };
   }
 };
+
+export const getScheduleSessionsByDay = async (
+  doctorId: string,
+  day: DayOfWeek
+) => {
+  try {
+    const data = await db.doctorScheduleSession.findMany({
+      where: {
+        schedule: { dayOfWeek: day, doctor: { id: doctorId } },
+      },
+    });
+    return { success: "نجح الحصول على جلسات الطبيب", data };
+  } catch {
+    return { error: "حدث خطأ أثناء الحصول على جلسات الطبيب" };
+  }
+};

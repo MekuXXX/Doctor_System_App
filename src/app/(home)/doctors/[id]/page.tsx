@@ -58,61 +58,37 @@ export default async function DoctorDataPage({ params: { id } }: Props) {
     <div className="content">
       <div className="feature mx-auto grid md:grid-cols-2 gap-4 items-start">
         <div className="grid gap-8 p-4 ">
-          <Card className="min-w-fit px-4">
+          <Card className="w-fit px-4 shadow-lg">
             <CardHeader>
-              <CardTitle className="text-lg font-semibold">
+              <CardTitle className="text-2xl font-semibold">
                 {doctor?.doctor?.name}
               </CardTitle>
             </CardHeader>
-            <CardContent className="flex gap-4">
-              <div className="w-[200px] h-[200px] relative">
+            <CardContent className="flex gap-4 min-w-[30rem]">
+              <div className="w-[200px] h-[200px] relative overflow-clip rounded-sm">
                 <Image
                   src={doctor.doctor?.image}
                   alt={`Dr.${doctor.doctor?.name}`}
                   fill
-                  objectFit="cover"
+                  className=" object-cover"
                 />
               </div>
-              <div className="flex flex-col gap-3">
-                <p className="text-sm text-gray-600">{doctor.master?.name}</p>
-                <p className="text-sm font-medium text-yellow-400 flex items-center">
-                  تقييم {rate}
-                </p>
+              <div className="flex flex-col gap-8 justify-center">
+                <div>
+                  <h4 className="text-xl">التخصص</h4>
+                  <p className="text-lg text-gray-600">{doctor.master?.name}</p>
+                </div>
+                <div>
+                  <h4 className="text-xl">التقييم الكلى</h4>
+                  <StarRate rate={rate} />
+                </div>
               </div>
             </CardContent>
             <CardFooter className="text-right">
-              <p className="text-sm text-gray-600">{doctor.country}</p>
+              <p className="text-md text-gray-600">{doctor.country}</p>
             </CardFooter>
           </Card>
 
-          {/* <Card className="w-fit px-4 py-2">
-            <CardContent className="flex items-center gap-4">
-              <div className="w-[150px] h-[150px] relative">
-                <Image
-                  src={doctorData?.image || ""}
-                  alt={`Dr.${doctorData?.name}`}
-                  objectFit="cover"
-                  fill
-                />
-              </div>
-              <div className="flex flex-col gap-2 py-2">
-                <CardTitle className="text-lg font-semibold">
-                  {doctorData?.name}
-                </CardTitle>
-                <p className="text-sm text-gray-600 min-w-fit">
-                  {doctorData?.position}
-                </p>
-                <p className="text-sm font-medium text-yellow-400 flex items-center min-w-fit">
-                  تقييم {doctorData?.rate}
-                </p>
-                <p className="text-sm text-gray-600">الروابط:</p>
-                <p className="text-lg font-semibold mt-2">الد ولة</p>
-                <p className="text-sm text-gray-600">
-                  المملكة العربية السعودية
-                </p>
-              </div>
-            </CardContent>
-          </Card> */}
           <div className="space-y-2">
             <SessionPackage
               image={doctor.doctor?.image || ""}
@@ -144,7 +120,7 @@ export default async function DoctorDataPage({ params: { id } }: Props) {
             </div>
           </div>
           <ChangeTimezone />
-          <SelectSessions />
+          <SelectSessions doctorId={id} />
         </div>
 
         <div className="p-4">
@@ -154,9 +130,6 @@ export default async function DoctorDataPage({ params: { id } }: Props) {
               <TabsTrigger value="details">معلومات</TabsTrigger>
               <TabsTrigger value="article">المقال</TabsTrigger>
             </TabsList>
-            <div className="my-4 max-w-[350px] mx-auto flex justify-center">
-              <MainButton className="mx-auto w-full">احجز موعد الان</MainButton>
-            </div>
             <TabsContent value="rate" className="grid gap-2">
               {doctor.Rate.length > 0 ? (
                 doctor.Rate.map(({ id, message, patientName, rateValue }) => (
