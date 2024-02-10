@@ -1,6 +1,5 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { AvatarImage, AvatarFallback, Avatar } from "@/components/ui/avatar";
 import {
   Card,
   CardContent,
@@ -159,25 +158,31 @@ export default async function DoctorDataPage({ params: { id } }: Props) {
               <MainButton className="mx-auto w-full">احجز موعد الان</MainButton>
             </div>
             <TabsContent value="rate" className="grid gap-2">
-              {doctor.Rate.map(({ id, message, patientName, rateValue }) => (
-                <div
-                  key={id}
-                  className="border border-gray-200 rounded-lg p-4 dark:border-gray-800"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="relative w-12 h-12 overflow-clip rounded-full">
-                      <Image
-                        src={"/images/default.jpg"}
-                        alt={"المقيم " + patientName}
-                        fill
-                      />
+              {doctor.Rate.length > 0 ? (
+                doctor.Rate.map(({ id, message, patientName, rateValue }) => (
+                  <div
+                    key={id}
+                    className="border border-gray-200 rounded-lg p-4 dark:border-gray-800"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="relative w-12 h-12 overflow-clip rounded-full">
+                        <Image
+                          src={"/images/default.jpg"}
+                          alt={"المقيم " + patientName}
+                          fill
+                        />
+                      </div>
+                      <p className="font-semibold h-fit">{patientName}</p>
                     </div>
-                    <p className="font-semibold h-fit">{patientName}</p>
+                    <div className="mt-2 text-sm">{message}</div>
+                    <StarRate rate={rateValue} />
                   </div>
-                  <div className="mt-2 text-sm">{message}</div>
-                  <StarRate rate={rateValue} />
-                </div>
-              ))}
+                ))
+              ) : (
+                <h3 className="text-center my-4 text-2xl font-bold">
+                  لا توجد تقييمات
+                </h3>
+              )}
             </TabsContent>
             <TabsContent value="details">
               <h3 className=" text-main text-xl my-4 font-bold">حول المعالج</h3>

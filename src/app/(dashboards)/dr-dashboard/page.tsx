@@ -3,7 +3,6 @@ import { SlCalender } from "react-icons/sl";
 import { IoDiamondOutline } from "react-icons/io5";
 import { IoMdHeartEmpty } from "react-icons/io";
 import { RxPerson } from "react-icons/rx";
-import { SendNotification } from "@/components/global/SendNotification";
 
 type Props = {};
 const cardsData = [

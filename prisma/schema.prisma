@@ -82,25 +82,25 @@ model DoctorData {
   money          DoctorMoney?
   doctorActive   DoctorActive?
   doctorSessions DoctorSessions?
-  Schedule       Schedule?
+  doctorSchedule Schedule[]
 }
 
 model Schedule {
-  id             Int        @id @default(autoincrement())
+  id             String                  @id @default(cuid())
   doctorTimeZone String
-  dayOfWeek      DayOfWeek
-  sessions       Session[]
-  doctorId       String     @unique
-  doctor         DoctorData @relation(fields: [doctorId], references: [id])
+  dayOfWeek      DayOfWeek               @unique
+  sessions       DoctorScheduleSession[]
+  doctorId       String
+  doctor         DoctorData              @relation(fields: [doctorId], references: [id], onDelete: Cascade)
 }
 
-model Session {
-  id          Int         @id @default(autoincrement())
-  sessionType SessionType
-  sessionTime DateTime
-  price       Float
-  schedule    Schedule    @relation(fields: [scheduleId], references: [id])
-  scheduleId  Int
+model DoctorScheduleSession {
+  id           String      @id @default(cuid())
+  sessionType  SessionType
+  sessionTime  String
+  sessionPrice Float
+  schedule     Schedule    @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+  scheduleId   String
 }
 
 enum DayOfWeek {

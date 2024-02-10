@@ -1,7 +1,7 @@
 import * as z from "zod";
 
 export const dayScheduleSchema = z.object({
-  sessionType: z.enum(["half", "hour"]),
+  sessionType: z.enum(["HALF_HOUR", "HOUR"]),
   sessionTime: z
     .string()
     .regex(/\d\d:\d\d/, { message: "يجب أن يكون الوقت على هذا الشكل HH:MM" }),
