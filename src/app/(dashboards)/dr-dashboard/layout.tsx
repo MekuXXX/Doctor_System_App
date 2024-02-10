@@ -45,6 +45,11 @@ const sidebarLinks: SideBarLinkType = {
     },
     {
       id: 7,
+      link: "schedule",
+      text: "اعدادات جدول الحجز",
+    },
+    {
+      id: 8,
       link: "account",
       text: "حسابك",
     },

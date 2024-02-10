@@ -1,7 +1,7 @@
 import * as z from "zod";
 
 export const packagesSettingsSchema = z.object({
-  twoSessions: z
+  halfPackage: z
     .string()
 
     .min(1, { message: "يجب ادخال سعر الجلستين" })
@@ -12,7 +12,7 @@ export const packagesSettingsSchema = z.object({
       message: "الرقم المدخلة يجب أن يكون أكبر من الصفر",
     }),
 
-  fourSessions: z
+  hourPackage: z
     .string()
 
     .min(1, { message: "يجب ادخال سعر الأربع جلسات" })

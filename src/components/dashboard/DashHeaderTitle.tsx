@@ -74,6 +74,10 @@ const titles = [
     from: "packages settings",
     to: "اعدادات البكجات",
   },
+  {
+    from: "schedule",
+    to: "اعدادات جدول الحجز",
+  },
 ];
 
 const getArTitle = (titles: TitlesType, engTitle: string) => {

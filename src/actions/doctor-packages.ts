@@ -24,8 +24,8 @@ export const saveDoctorPackages = async (
           update: {
             doctorSessions: {
               update: {
-                twoSessions: Number(parsedData.data.twoSessions),
-                fourSessions: Number(parsedData.data.fourSessions),
+                halfPackage: Number(parsedData.data.halfPackage),
+                hourPackage: Number(parsedData.data.hourPackage),
               },
             },
           },

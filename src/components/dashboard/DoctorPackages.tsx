@@ -49,8 +49,8 @@ export function DashDoctorPackages({ user, getData, email }: Props) {
   const form = useForm<PackagesSettingsSchemaType>({
     resolver: zodResolver(packagesSettingsSchema),
     defaultValues: {
-      twoSessions: String(data.DoctorData.doctorSessions.twoSessions),
-      fourSessions: String(data.DoctorData.doctorSessions.fourSessions),
+      halfPackage: String(data.DoctorData.doctorSessions.halfPackage),
+      hourPackage: String(data.DoctorData.doctorSessions.hourPackage),
     },
   });
 
@@ -85,11 +85,11 @@ export function DashDoctorPackages({ user, getData, email }: Props) {
         <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-6">
           <FormField
             control={form.control}
-            name="twoSessions"
+            name="halfPackage"
             render={({ field }) => (
               <FormItem className="w-full">
                 <FormLabel className="mb-1 text-sm font-medium leading-none">
-                  سعر الجلساتين
+                  سعر الأربع جلسات نصف ساعة
                 </FormLabel>
                 <FormControl>
                   <Input {...field} className="w-full" type="number" />
@@ -101,14 +101,14 @@ export function DashDoctorPackages({ user, getData, email }: Props) {
 
           <FormField
             control={form.control}
-            name="fourSessions"
+            name="hourPackage"
             render={({ field }) => (
               <FormItem className="w-full">
                 <FormLabel
                   className="mb-1 text-sm font-medium leading-none"
                   htmlFor="60-min-duration"
                 >
-                  سعر الأربع جلسات
+                  سعر الأربع جلسات ساعة
                 </FormLabel>
                 <FormControl>
                   <Input {...field} className="w-full" type="number" />

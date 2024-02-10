@@ -82,6 +82,40 @@ model DoctorData {
   money          DoctorMoney?
   doctorActive   DoctorActive?
   doctorSessions DoctorSessions?
+  Schedule       Schedule?
+}
+
+model Schedule {
+  id             Int        @id @default(autoincrement())
+  doctorTimeZone String
+  dayOfWeek      DayOfWeek
+  sessions       Session[]
+  doctorId       String     @unique
+  doctor         DoctorData @relation(fields: [doctorId], references: [id])
+}
+
+model Session {
+  id          Int         @id @default(autoincrement())
+  sessionType SessionType
+  sessionTime DateTime
+  price       Float
+  schedule    Schedule    @relation(fields: [scheduleId], references: [id])
+  scheduleId  Int
+}
+
+enum DayOfWeek {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+enum SessionType {
+  HALF_HOUR
+  HOUR
 }
 
 enum Money_Request_Status {
@@ -104,7 +138,7 @@ model DoctorMoney {
   pending  Float      @default(0.00)
   ready    Float      @default(0.00)
   doctorId String     @unique
-  doctor   DoctorData @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  doctor   DoctorData @relation(fields: [doctorId], references: [id])
 }
 
 model DoctorActive {
@@ -125,8 +159,8 @@ model DoctorSessions {
   id           String     @id @default(uuid())
   halfSessions Float      @default(0.00)
   hourSessions Float      @default(0.00)
-  twoSessions  Float      @default(0.00)
-  fourSessions Float      @default(0.00)
+  halfPackage  Float      @default(0.00)
+  hourPackage  Float      @default(0.00)
   doctorId     String     @unique
   doctor       DoctorData @relation(fields: [doctorId], references: [id], onDelete: Cascade)
 }
