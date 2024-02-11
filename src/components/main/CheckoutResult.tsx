@@ -9,7 +9,8 @@ type Props = {};
 
 export default function CheckoutResult({}: Props) {
   const searchParams = useSearchParams();
-  const status = searchParams.get("status");
+  const status = searchParams?.get("status");
+  const message = searchParams?.get("message");
 
   return (
     <Card className="w-full max-w-md mx-auto">
@@ -69,7 +70,12 @@ export default function CheckoutResult({}: Props) {
             <div className="px-4 py-2 -mt-3">
               <h1 className="font-bold text-center text-3xl">
                 خطأ فى علمية الشراء
-              </h1>
+              </h1>{" "}
+              {message && (
+                <p className="mt-2 text-gray-600 text-sm text-center">
+                  {message}
+                </p>
+              )}
               <p className="mt-2 text-gray-600 text-sm text-center">
                 نحن نتأسف لم تتم عملية الشراء بنجاح برجاء اعادة المحاوله
               </p>

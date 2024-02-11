@@ -10,12 +10,12 @@ export default function CurrencyConvert({ currency, ...props }: Props) {
   const { data, isLoading, isError } = useUserData();
 
   // TODO: add loading spinner and error messages
-  if (isLoading) return <h1>Loading..</h1>;
-  if (isError) return <h1>Error..</h1>;
+  if (isLoading) return <span>Loading..</span>;
+  if (isError) return <span>Error..</span>;
   return (
-    <p {...props}>
+    <span {...props}>
       <span>{currency * data?.geoplugin_currencyConverter!}</span>{" "}
       <span>{data?.geoplugin_currencyCode}</span>
-    </p>
+    </span>
   );
 }

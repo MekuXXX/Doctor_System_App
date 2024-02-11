@@ -95,13 +95,13 @@ const getArTitle = (titles: TitlesType, engTitle: string) => {
 export type TitlesType = typeof titles;
 
 export function DashHeaderTitle({}: Props) {
-  const path = usePathname().split("/").slice(1);
+  const path = usePathname()?.split("/").slice(1);
   const { data: userData, isError, isLoading } = useUserData();
 
-  let pageHeader = path[path.length - 1];
-  if (pageHeader.includes("-")) pageHeader = pageHeader.split("-").join(" ");
+  let pageHeader = path?.[path.length - 1];
+  if (pageHeader?.includes("-")) pageHeader = pageHeader.split("-").join(" ");
 
-  pageHeader = getArTitle(titles, pageHeader);
+  pageHeader = getArTitle(titles, pageHeader!);
 
   // TODO: add loading spinner and error messages
   if (isLoading) return <h1>Loading..</h1>;

@@ -7,6 +7,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { StripePaymentElementOptions } from "@stripe/stripe-js";
 import { useUserData } from "@/hooks/use-user-data";
+import { toast } from "sonner";
+import { usePaymentIntent } from "@/hooks/use-payment-intent";
+import { usePathname, useRouter } from "next/navigation";
 
 type Props = {
   clientSecret: string;
@@ -15,8 +18,10 @@ type Props = {
 export default function CheckoutElements({ clientSecret }: Props) {
   const stripe = useStripe();
   const elements = useElements();
-  const { data, isError, isLoading } = useUserData();
-  const [message, setMessage] = React.useState<string>();
+  const { data, isLoading } = useUserData();
+  const router = useRouter();
+  const pathName = usePathname();
+  const { setIntentId } = usePaymentIntent();
   const [isPending, startTransition] = useTransition();
 
   // useEffect(() => {
@@ -35,16 +40,19 @@ export default function CheckoutElements({ clientSecret }: Props) {
     startTransition(async () => {
       const { error } = await stripe.confirmPayment({
         elements,
-        confirmParams: {
-          // Make sure to change this to your payment completion page
-          return_url: `${process.env.NEXT_PUBLIC_BASE_URL}/checkout/result?status=success`,
-        },
+        redirect: "if_required",
+        // confirmParams
       });
 
-      if (error.type === "card_error" || error.type === "validation_error") {
-        setMessage(error.message);
+      if (!error) {
+        setIntentId(null);
+        toast.success("تمت عملية الدفع بنجاح");
+        router.push(`${pathName}/result?status=success`);
       } else {
-        setMessage("حدث خطأ أثناء عملية الدفع");
+        toast.error("حدثت مشكلة أثناء عملية الدفع");
+        router.push(
+          `${pathName}/result?status=failed&message=${error.message}`
+        );
       }
     });
   };
@@ -55,16 +63,17 @@ export default function CheckoutElements({ clientSecret }: Props) {
 
   // TODO: add loading spinner and error messages
   if (isLoading) return <h1>Loading..</h1>;
-  if (isError) return <h1>Error..</h1>;
 
   return (
     <>
-      {status && (
+      {!isLoading ? (
         <p className="bg-main text-white p-3 mb-4 text-sm">
           لأمانك، تم تسجيل عنوان IP الخاص بك وموقعك {data?.geoplugin_request} [
           {data?.geoplugin_city}].
           <br /> نحن نقدر خصوصيتك ونلتزم بضمان تجربة دفع آمنة وموثوقة`
         </p>
+      ) : (
+        <p>Loading</p>
       )}
       <form id="payment-form" onSubmit={handleSubmit} className="grid gap-4">
         <PaymentElement id="payment-element" options={paymentElementOptions} />
@@ -77,8 +86,6 @@ export default function CheckoutElements({ clientSecret }: Props) {
             {isPending ? "جارى التحقق" : "ادفع الان"}
           </span>
         </Button>
-        {/* Show any error or success messages */}
-        {message && <div id="payment-message">{message}</div>}
       </form>
     </>
   );

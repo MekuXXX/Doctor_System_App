@@ -42,7 +42,7 @@ export default function MainSearch({}: Props) {
       search += parsed.data.price ? `price=${parsed.data.price}&` : "";
       search += parsed.data.gender ? `gender=${parsed.data.gender}&` : "";
       if (search) router.push(`${pathName}?${search}`);
-      else router.push(pathName);
+      else router.push(pathName!);
     }
   };
 

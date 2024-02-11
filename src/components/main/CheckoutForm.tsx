@@ -5,16 +5,22 @@ import { Elements } from "@stripe/react-stripe-js";
 import CheckoutElements from "@/components/main/CheckoutElements";
 import { Button } from "@/components/ui/button";
 import { UseCoupon } from "@/components/main/UseCoupon";
+import { DoctorScheduleSession } from "@prisma/client";
+import { usePaymentIntent } from "@/hooks/use-payment-intent";
 
-type Props = {};
+type Props = {
+  sessionData: DoctorScheduleSession;
+  date: string;
+};
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || ""
 );
 
-export default function CheckoutForm({}: Props) {
-  const [clientSecret, setClientSecret] = useState("");
+export default function CheckoutForm({ sessionData, date }: Props) {
   const [hasCoupon, setHasCoupon] = useState(false);
+  const { intentId, setIntentId } = usePaymentIntent();
+  const [clientSecret, setClientSecret] = useState("");
 
   useEffect(() => {
     // Create PaymentIntent as soon as the page loads
@@ -22,14 +28,20 @@ export default function CheckoutForm({}: Props) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        items: [{ id: "xl-tshirt", price: 30, payment_intent_id: "" }],
+        session: { ...sessionData, quantity: 1, date },
+        payment_intent_id:
+          window.localStorage.getItem("payment_intent_id") || intentId,
       }),
     })
       .then((res) => {
         return res.json();
       })
-      .then((data) => setClientSecret(data.clientSecret));
-  }, []);
+      .then((data) => {
+        setIntentId(data.payment_intent_id);
+        setClientSecret(data.clientSecret);
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [date, sessionData]);
 
   const options: StripeElementsOptions = {
     clientSecret: clientSecret,
