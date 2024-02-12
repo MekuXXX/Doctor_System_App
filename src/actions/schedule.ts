@@ -68,7 +68,6 @@ export const saveDoctorSchedule = async (
 
     return { success: "تم حفظ الجدول بنجاح" };
   } catch (err) {
-    console.log(err);
     return { error: "حدث مشكلة أثناء حفظ الجدول" };
   }
 };

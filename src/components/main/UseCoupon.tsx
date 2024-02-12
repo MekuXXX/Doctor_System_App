@@ -1,10 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -12,13 +11,22 @@ import {
 } from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { UseCouponSchemaType, useCouponSchema } from "@/schemas/useCoupon";
+import { UseCouponSchemaType, useCouponSchema } from "@/schemas/coupon";
 import { Input } from "@/components/ui/input";
-import MainButton from "@/components/global/MainButton";
+import { Button } from "@/components/ui/button";
+import { useRouter, useSearchParams } from "next/navigation";
+import { FormError } from "@/components/auth/form-error";
+import { isCouponExist } from "@/actions/coupon";
 
-type Props = {};
+type Props = {
+  setHasCoupon: React.Dispatch<React.SetStateAction<boolean>>;
+};
 
-export function UseCoupon() {
+export function UseCoupon({ setHasCoupon }: Props) {
+  const [error, setError] = useState("");
+  const searchParams = useSearchParams();
+  const coupon = searchParams?.get("coupon");
+  const router = useRouter();
   const form = useForm<UseCouponSchemaType>({
     resolver: zodResolver(useCouponSchema),
     defaultValues: {
@@ -27,8 +35,26 @@ export function UseCoupon() {
   });
 
   // 2. Define a submit handler.
-  const onSubmit = (values: UseCouponSchemaType) => {
-    console.log(values);
+  const onSubmit = async (data: UseCouponSchemaType) => {
+    setError("");
+    if (coupon === data.coupon) {
+      setHasCoupon(false);
+      return null;
+    }
+    try {
+      const parsedData = useCouponSchema.safeParse(data);
+      if (!parsedData.success) setError("البيانات الذى أدخلتها غير صحيحه");
+      else {
+        const isCouponValid = await isCouponExist(parsedData.data.coupon);
+        if (!isCouponValid) setError("الكوبون الذى أدخلته غير موجود");
+        else {
+          setHasCoupon(false);
+          router.push(
+            `${window.location.href}&coupon=${parsedData.data.coupon}`
+          );
+        }
+      }
+    } catch {}
   };
 
   return (
@@ -41,17 +67,14 @@ export function UseCoupon() {
             <FormItem>
               <FormLabel>الكوبون</FormLabel>
               <FormControl>
-                <Input
-                  type="text"
-                  onChange={field.onChange}
-                  value={field.value}
-                />
+                <Input type="text" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <MainButton>تطبيق</MainButton>
+        <FormError message={error} />
+        <Button disabled={form.formState.isSubmitting}>تطبيق</Button>
       </form>
     </Form>
   );

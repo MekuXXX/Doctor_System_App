@@ -9,7 +9,6 @@ import {
 } from "@/components/ui/card";
 import Image from "next/image";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import MainButton from "@/components/global/MainButton";
 import StarRate from "@/components/main/StarRate";
 import { FaWhatsapp } from "react-icons/fa";
 import SelectSessions from "@/components/main/SelectSessions";
@@ -56,15 +55,15 @@ export default async function DoctorDataPage({ params: { id } }: Props) {
 
   return (
     <div className="content">
-      <div className="feature mx-auto grid md:grid-cols-2 gap-4 items-start">
-        <div className="grid gap-8 p-4 ">
+      <div className="feature mx-auto grid lg:grid-cols-2 gap-4 items-start">
+        <div className="grid gap-8 p-4">
           <Card className="w-fit px-4 shadow-lg">
             <CardHeader>
               <CardTitle className="text-2xl font-semibold">
                 {doctor?.doctor?.name}
               </CardTitle>
             </CardHeader>
-            <CardContent className="flex gap-4 min-w-[30rem]">
+            <CardContent className="flex gap-4 min-w-[25rem]">
               <div className="w-[200px] h-[200px] relative overflow-clip rounded-sm">
                 <Image
                   src={doctor.doctor?.image}
@@ -89,21 +88,6 @@ export default async function DoctorDataPage({ params: { id } }: Props) {
             </CardFooter>
           </Card>
 
-          <div className="space-y-2">
-            <SessionPackage
-              image={doctor.doctor?.image || ""}
-              time="نصف"
-              price={doctor?.doctorSessions?.halfSessions!}
-            />
-
-            <SessionPackage
-              image={doctor.doctor?.image || ""}
-              time="نصف"
-              price={doctor?.doctorSessions?.hourSessions!}
-            />
-
-            {/* <SessionPackage image={doctorData?.image || ""} price="1249.99" /> */}
-          </div>
           <div>
             <h2 className="text-2xl font-bold text-main my-3">
               المواعيد المتاحه
@@ -121,6 +105,23 @@ export default async function DoctorDataPage({ params: { id } }: Props) {
           </div>
           <ChangeTimezone />
           <SelectSessions doctorId={id} />
+          <div className="space-y-2">
+            <SessionPackage
+              id={doctor.doctorSessions?.id!}
+              type={"HALF_HOUR"}
+              image={doctor.doctor?.image || ""}
+              description="باكج أربع جلسات نصف ساعة"
+              price={doctor?.doctorSessions?.halfSessions!}
+            />
+
+            <SessionPackage
+              id={doctor.doctorSessions?.id!}
+              type={"HOUR"}
+              image={doctor.doctor?.image || ""}
+              description="باكج أربع جلسات ساعة"
+              price={doctor?.doctorSessions?.hourSessions!}
+            />
+          </div>
         </div>
 
         <div className="p-4">

@@ -4,12 +4,17 @@ import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
 import { db } from "@/lib/db";
 import { createWherebyUrl } from "@/actions/whereby";
+import { PaymentData } from "@/components/main/CheckoutForm";
 
 export async function POST(req: NextRequest) {
   const user = await auth();
   if (!user) return NextResponse.redirect("/");
+  if (user.user.role === "DOCTOR" || user.user.role === "ADMIN") return null;
+  const { payment_intent_id, session } = (await req.json()) as {
+    payment_intent_id: string;
+    session: PaymentData;
+  };
 
-  const { payment_intent_id, session } = await req.json();
   const res = await fetch(process.env.EUROPE_IP!);
   const data = (await res.json()) as UserDataType;
   const totalEuro = Math.round(
@@ -39,6 +44,7 @@ export async function POST(req: NextRequest) {
         await db.session.update({
           where: {
             paymentIntentId: `User ${payment_intent_id}`,
+            user: { role: "USER" },
           },
           data: {
             date: session.date,
@@ -54,6 +60,7 @@ export async function POST(req: NextRequest) {
         await db.session.update({
           where: {
             paymentIntentId: `Doctor ${payment_intent_id}`,
+            user: { role: "DOCTOR" },
           },
           data: {
             date: session.date,

@@ -1,5 +1,5 @@
 import React, { Suspense } from "react";
-import CheckoutForm from "@/components/main/CheckoutForm";
+import CheckoutForm, { PaymentData } from "@/components/main/CheckoutForm";
 import { FaDollarSign } from "react-icons/fa6";
 import { CiClock2 } from "react-icons/ci";
 import { SlCalender } from "react-icons/sl";
@@ -13,11 +13,14 @@ import { getDoctorSessionTimeByType } from "@/lib/doctor-session";
 import moment from "moment";
 import Image from "next/image";
 import { auth } from "@/auth";
-import { DayOfWeek } from "react-day-picker";
+import { checkCoupon } from "@/actions/coupon";
+import { SessionType } from "@prisma/client";
 
 type Props = {
   searchParams: {
-    sessionId: string;
+    doctorPackageId: string;
+    type: SessionType;
+    coupon?: string;
   };
 };
 
@@ -70,27 +73,72 @@ const instructions = [
 إذا حدث أي مشكلة تقنیة قبل أو أثناء الجلسة ٬ الطبیب والعمیل یجب أن یتواصلوا مع فریق الدعم لحل المشكلة؛ إذا تم حل المشكلة سوف یتم استكمال الجلسة ٬ إذا لم یتم حلها سوف یتم تعویض العمیل بموعد آخر لاستكمال جلسته مع الطبیب`,
   },
 ];
+
 export default async function CheckoutPage({ searchParams }: Props) {
   const user = await auth();
   if (!user) redirect("/");
-  const { sessionId } = searchParams;
-  if (!sessionId) redirect("/");
-  const sessionData = await db.doctorScheduleSession.findUnique({
-    where: { id: sessionId },
+  if (user.user.role !== "USER") redirect("/");
+  const { doctorPackageId, type, coupon } = searchParams;
+  if (!doctorPackageId || !type) redirect("/");
+  const sessionData = await db.doctorSessions.findUnique({
+    where: { id: doctorPackageId },
+    include: {
+      doctor: {
+        select: {
+          doctor: {
+            select: {
+              name: true,
+              image: true,
+              DoctorData: {
+                select: { id: true },
+              },
+            },
+          },
+        },
+      },
+    },
   });
   if (!sessionData) redirect("/");
-  const { name, image } = user.user;
+  const { name, image, DoctorData } = sessionData.doctor.doctor;
 
   const currentDate = moment();
   const nextDayDate = getNextDayOfWeek(
     currentDate.format("dddd").toUpperCase() as any
   ).format("YYYY-MM-DD");
 
+  let checkCouponData;
+  const firstPrice =
+    type === "HOUR" ? sessionData.hourPackage : sessionData.halfPackage;
+
+  if (coupon)
+    checkCouponData = await checkCoupon(coupon, firstPrice, DoctorData?.id!);
+  if (checkCouponData?.error)
+    redirect(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/package-pay?doctorPackageId=${doctorPackageId}&type={${type}}&couponMessage=${checkCouponData.error}`
+    );
+
+  const resultPrice = checkCouponData?.success
+    ? firstPrice - checkCouponData.data.discount < 0
+      ? 0
+      : firstPrice - checkCouponData.data.discount
+    : firstPrice;
+
+  const newSessionData: PaymentData = {
+    type: "PACKAGE",
+    quantity: 4,
+    sessionPrice: resultPrice,
+    sessionType: type,
+    doctorId: DoctorData?.id!,
+    userId: user.user.id,
+  };
+  if (checkCouponData?.success)
+    newSessionData.coupon = checkCouponData.data.coupon;
+
   const OrderData = [
     {
       id: 1,
       text: "السعر",
-      text_bold: <CurrencyConvert currency={sessionData.sessionPrice!} />,
+      text_bold: <CurrencyConvert currency={newSessionData.sessionPrice!} />,
       icon: <FaDollarSign className="h-[1.5rem] w-[1.5rem]" />,
     },
 
@@ -100,24 +148,11 @@ export default async function CheckoutPage({ searchParams }: Props) {
       text_bold: "154EGP",
       icon: <FaDollarSign className="h-[1.5rem] w-[1.5rem]" />,
     },
-
-    {
-      id: 3,
-      text: "تاريخ الجلسة",
-      text_bold: nextDayDate,
-      icon: <SlCalender className="h-[1.5rem] w-[1.5rem]" />,
-    },
-    {
-      id: 4,
-      text: "وقت الجلسة",
-      text_bold: convertToAmAndPm(sessionData.sessionTime!),
-      icon: <CiClock2 className="h-[1.5rem] w-[1.5rem]" />,
-    },
     {
       id: 5,
       text: "مدة الجلسة",
       text_bold: `${getDoctorSessionTimeByType(
-        sessionData.sessionType!
+        newSessionData.sessionType
       )} دقيقة`,
       icon: <IoGitNetwork className="h-[1.5rem] w-[1.5rem]" />,
     },
@@ -156,8 +191,9 @@ export default async function CheckoutPage({ searchParams }: Props) {
           ))}
         </div>
         <div className="py-8 px-4">
-          <Suspense fallback={<h1>Loading...</h1>}>
-            <CheckoutForm sessionData={sessionData} date={nextDayDate} />
+          {/*TODO: add loading spinner */}
+          <Suspense fallback={<p>Loading...</p>}>
+            <CheckoutForm session={newSessionData} />
           </Suspense>
         </div>
       </div>

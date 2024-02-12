@@ -9,30 +9,29 @@ import { ADMIN_DASHBOARD } from "@/routes";
 
 type Props = {};
 
-const selectDoctors = async () => {
+const getData = async () => {
   "use server";
-  const data = await db.rate.findMany({
-    include: { doctor: { select: { doctor: { select: { name: true } } } } },
-  });
+  const data = await db.paymentLink.findMany();
   return data;
 };
 
 export default async function CouponsPage({}: Props) {
-  const data = await selectDoctors();
+  const data = await getData();
+
   return (
     <div className="content">
       <DataTable
         columns={columns}
         data={data}
-        keys={["rates"]}
-        queryFn={selectDoctors as any}
-        searchIn="doctor"
+        keys={["payment", "links"]}
+        queryFn={getData as any}
+        searchIn="coupon"
         childrenButtons={
           <div className="ml-2">
-            <Link href={`${ADMIN_DASHBOARD}/rates/add-rate`}>
+            <Link href={`${ADMIN_DASHBOARD}/payment-links/add-link`}>
               <Button variant={"outline"} className="flex gap-2">
                 <GoPlus className="w-[1.2rem] h-[1.2rem]" />
-                <span className="hidden md:block">إضافة تقييم</span>
+                <span className="hidden md:block">إضافة رابط</span>
               </Button>
             </Link>
           </div>

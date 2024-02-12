@@ -78,6 +78,14 @@ const titles = [
     from: "schedule",
     to: "اعدادات جدول الحجز",
   },
+  {
+    from: "payment links",
+    to: "روابط الدفع",
+  },
+  {
+    from: "add link",
+    to: "اضافة رابط دفع",
+  },
 ];
 
 const getArTitle = (titles: TitlesType, engTitle: string) => {

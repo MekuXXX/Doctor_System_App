@@ -28,10 +28,11 @@ import { toast } from "sonner";
 import { addRateSchema, AddRateSchemaType } from "@/schemas/rate";
 import { Textarea } from "@/components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { addRate, editRate, getRatesDoctors } from "@/actions/rate";
+import { addRate, editRate } from "@/actions/rate";
 import { Rate } from "@prisma/client";
 import { useQuery } from "@tanstack/react-query";
 import { ADMIN_DASHBOARD } from "@/routes";
+import { getSelectDoctors } from "@/actions/doctor";
 type Props = {
   propsData?: Rate;
 };
@@ -42,9 +43,9 @@ export function AddRate({ propsData }: Props) {
   const router = useRouter();
   const refetchInterval = process.env.NEXT_PUBLIC_REFETCH_INTERVAL || 5000;
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["doctors", "add", "edit"],
+    queryKey: ["doctors", "select"],
     queryFn: async () => {
-      const data = await getRatesDoctors();
+      const data = await getSelectDoctors();
       if (data.error) throw new Error(data.error);
       return data.data;
     },

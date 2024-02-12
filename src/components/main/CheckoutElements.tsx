@@ -9,7 +9,7 @@ import { StripePaymentElementOptions } from "@stripe/stripe-js";
 import { useUserData } from "@/hooks/use-user-data";
 import { toast } from "sonner";
 import { usePaymentIntent } from "@/hooks/use-payment-intent";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 type Props = {
   clientSecret: string;
@@ -20,7 +20,6 @@ export default function CheckoutElements({ clientSecret }: Props) {
   const elements = useElements();
   const { data, isLoading } = useUserData();
   const router = useRouter();
-  const pathName = usePathname();
   const { setIntentId } = usePaymentIntent();
   const [isPending, startTransition] = useTransition();
 
@@ -47,11 +46,13 @@ export default function CheckoutElements({ clientSecret }: Props) {
       if (!error) {
         setIntentId(null);
         toast.success("تمت عملية الدفع بنجاح");
-        router.push(`${pathName}/result?status=success`);
+        router.push(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/result?status=success`
+        );
       } else {
         toast.error("حدثت مشكلة أثناء عملية الدفع");
         router.push(
-          `${pathName}/result?status=failed&message=${error.message}`
+          `${process.env.NEXT_PUBLIC_BASE_URL}/result?status=failed&message=${error.message}`
         );
       }
     });

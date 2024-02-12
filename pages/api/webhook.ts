@@ -33,21 +33,36 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     let session;
     if (event.type! === "charge.succeeded") {
       session = event.data.object as Stripe.Charge;
-      await Promise.all([
+      const [_, doctor_session] = await Promise.all([
         await db.session.update({
-          where: { paymentIntentId: `User ${session.payment_intent}` },
+          where: {
+            paymentIntentId: `User ${session.payment_intent}`,
+            user: { role: "USER" },
+          },
           data: {
             status: "RESERVED",
           },
         }),
-
         await db.session.update({
-          where: { paymentIntentId: `Doctor ${session.payment_intent}` },
+          where: {
+            paymentIntentId: `Doctor ${session.payment_intent}`,
+            user: { role: "DOCTOR" },
+          },
           data: {
             status: "RESERVED",
           },
         }),
       ]);
+      await db.user.update({
+        where: { id: doctor_session.userId },
+        data: {
+          DoctorData: {
+            update: {
+              money: { update: { pending: doctor_session.doctorPrice } },
+            },
+          },
+        },
+      });
       console.log("Orders Updated");
     } else if (
       event.type === "charge.expired" ||

@@ -32,13 +32,13 @@ import {
 
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
-import { addCouponSchema, AddCouponSchemaType } from "@/schemas/addCoupon";
 import { FormError } from "@/components/auth/form-error";
-import { addCoupon, addDoctorCoupon } from "@/actions/coupon";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { ADMIN_DASHBOARD, DOCTOR_DASHBOARD } from "@/routes";
 import { ExtendedUser } from "../../../next-auth";
+import { AddCouponSchemaType, addCouponSchema } from "@/schemas/coupon";
+import { addCoupon, addDoctorCoupon } from "@/actions/coupon";
 
 type Props = {
   user?: ExtendedUser;

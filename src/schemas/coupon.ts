@@ -36,4 +36,9 @@ export const addCouponSchema = z
     { message: "يجب أن تكون النسبة أكبر من الصفر وأضغر أو تساوى 100" }
   );
 
+export const useCouponSchema = z.object({
+  coupon: z.string().length(20, { message: "الكوبون الذى أدخلتة غير صحيح" }),
+});
+
+export type UseCouponSchemaType = z.infer<typeof useCouponSchema>;
 export type AddCouponSchemaType = z.infer<typeof addCouponSchema>;

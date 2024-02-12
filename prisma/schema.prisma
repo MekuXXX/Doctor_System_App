@@ -83,12 +83,25 @@ model DoctorData {
   doctorActive   DoctorActive?
   doctorSessions DoctorSessions?
   doctorSchedule Schedule[]
+  paymentLink    PaymentLink[]
+}
+
+model PaymentLink {
+  id          String      @id @default(cuid())
+  date        DateTime
+  time        String
+  customPrice Float
+  doctorPrice Float
+  token       String      @unique
+  sessionType SessionType
+  doctorId    String
+  doctor      DoctorData  @relation(fields: [doctorId], references: [id], onDelete: Cascade)
 }
 
 model Schedule {
   id             String                  @id @default(cuid())
   doctorTimeZone String
-  dayOfWeek      DayOfWeek               @unique
+  dayOfWeek      DayOfWeek
   sessions       DoctorScheduleSession[]
   doctorId       String
   doctor         DoctorData              @relation(fields: [doctorId], references: [id], onDelete: Cascade)
@@ -267,6 +280,7 @@ model Coupon {
   to            DateTime?
   useTimes      String
   doctorId      String?
+  usage         Int          @default(0)
   doctor        DoctorData?  @relation(fields: [doctorId], references: [id], onDelete: Cascade)
 }
 

@@ -34,7 +34,7 @@ export default function SelectSessionCol({
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ["sessions", day],
+    queryKey: ["sessions", day, doctorId],
     queryFn: async () => {
       const data = await getScheduleSessionsByDay(doctorId, day);
       if (data.error) throw new Error(data.error);
@@ -66,7 +66,10 @@ export default function SelectSessionCol({
       </h3>
       <div className="p-3 grid gap-4 min-w-fit">
         {first.map((session) => (
-          <Link href={`/checkout?sessionId=${session?.id}`} key={session?.id}>
+          <Link
+            href={`/session-pay?sessionId=${session?.id}`}
+            key={session?.id}
+          >
             <div className="p-2 rounded bg-red-700/50 text-white text-sm min-w-fit">
               <p>{convertToAmAndPm(session?.sessionTime!)}</p>
               <p>
@@ -90,7 +93,7 @@ export default function SelectSessionCol({
           <CollapsibleContent className="space-y-2">
             {collapsed.map((session) => (
               <Link
-                href={`/checkout?sessionId=${session?.id}`}
+                href={`/session-pay?sessionId=${session?.id}`}
                 key={session?.id}
               >
                 <div className="p-2 rounded bg-red-700/50 text-white text-sm min-w-fit">

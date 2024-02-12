@@ -70,7 +70,7 @@ export const columns: ColumnDef<any>[] = [
     },
   },
   {
-    accessorKey: "useTimes",
+    accessorKey: "use times",
     header: ({ column }) => (
       <DataTableColumnHeader>الاستخدامات</DataTableColumnHeader>
     ),
@@ -81,6 +81,12 @@ export const columns: ColumnDef<any>[] = [
           : row.original.useTimes}
       </DataTableItem>
     ),
+  },
+
+  {
+    accessorKey: "used Time",
+    header: () => <DataTableColumnHeader>العدد المستخدم</DataTableColumnHeader>,
+    cell: ({ row }) => <DataTableItem>{row.original.usage}</DataTableItem>,
   },
   {
     accessorKey: "Actions",

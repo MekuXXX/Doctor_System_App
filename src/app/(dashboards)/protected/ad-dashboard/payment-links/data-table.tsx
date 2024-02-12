@@ -16,6 +16,9 @@ import { removeCoupon } from "@/actions/coupon";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { formatDate } from "@/lib/date";
+import moment from "moment";
+import { convertToAmAndPm } from "@/lib/moment";
+import { removePaymentLink } from "@/actions/payment-link";
 
 export const columns: ColumnDef<any>[] = [
   {
@@ -32,58 +35,45 @@ export const columns: ColumnDef<any>[] = [
     ),
   },
   {
-    accessorKey: "coupon",
-    header: () => <DataTableColumnHeader>رمز الكوبون</DataTableColumnHeader>,
-    cell: ({ row }) => <DataTableItem>{row.getValue("coupon")}</DataTableItem>,
-  },
-  {
-    accessorKey: "type",
-    header: () => (
-      <DataTableColumnHeader className="text-center">
-        مدة الكوبون
-      </DataTableColumnHeader>
-    ),
-    cell: ({ row }) => {
-      let time;
-      if (row.original.type === "LIMITED") time = "دائم";
-      else {
-        time = (
-          <>
-            {formatDate(row.original.from)}
-            <br />
-            {formatDate(row.original.to)}
-          </>
-        );
-      }
-      return <DataTableItem className="text-center">{time}</DataTableItem>;
-    },
-  },
-  {
-    accessorKey: "discount",
-    header: () => <DataTableColumnHeader>الخصم</DataTableColumnHeader>,
-    cell: ({ row }) => {
-      let value;
-      if (row.original.discountType === "VALUE")
-        value = row.original.discountValue + "$";
-      else value = row.original.discountValue + "%";
-      return <DataTableItem>{value}</DataTableItem>;
-    },
-  },
-  {
-    accessorKey: "use times",
-    header: () => <DataTableColumnHeader>الاستخدامات</DataTableColumnHeader>,
+    accessorKey: "date",
+    header: () => <DataTableColumnHeader>التاريخ</DataTableColumnHeader>,
     cell: ({ row }) => (
       <DataTableItem>
-        {row.original.type === "unlimited"
-          ? "غير محدود"
-          : row.original.useTimes}
+        {moment(row.original.date).format("DD-MM-YYYY")}
       </DataTableItem>
     ),
   },
   {
-    accessorKey: "used Time",
-    header: () => <DataTableColumnHeader>العدد المستخدم</DataTableColumnHeader>,
-    cell: ({ row }) => <DataTableItem>{row.original.usage}</DataTableItem>,
+    accessorKey: "time",
+    header: () => <DataTableColumnHeader>الوقت</DataTableColumnHeader>,
+    cell: ({ row }) => (
+      <DataTableItem>{convertToAmAndPm(row.original.time)}</DataTableItem>
+    ),
+  },
+  {
+    accessorKey: "price",
+    header: () => (
+      <DataTableColumnHeader className="text-center">
+        المبلغ
+      </DataTableColumnHeader>
+    ),
+    cell: ({ row }) => {
+      console.log(row.original);
+      return (
+        <DataTableItem className="text-center">
+          {row.original.doctorPrice + row.original.customPrice}$
+        </DataTableItem>
+      );
+    },
+  },
+  {
+    accessorKey: "link",
+    header: () => <DataTableColumnHeader>رابط الدفع</DataTableColumnHeader>,
+    cell: ({ row }) => {
+      return (
+        <DataTableItem>{`${process.env.NEXT_PUBLIC_BASE_URL}/pay?paymentLink=${row.original.token}`}</DataTableItem>
+      );
+    },
   },
   {
     accessorKey: "Actions",
@@ -92,7 +82,7 @@ export const columns: ColumnDef<any>[] = [
       const router = useRouter();
       const id = row.original.id;
       const handleDelete = async () => {
-        const res = await removeCoupon(id as string);
+        const res = await removePaymentLink(id as string);
         if (res.success) {
           toast.success(res.success);
         } else {
@@ -113,18 +103,20 @@ export const columns: ColumnDef<any>[] = [
             <DropdownMenuItem
               className="flex gap-2 items-center"
               onClick={() =>
-                navigator.clipboard.writeText(row.getValue("coupon"))
+                navigator.clipboard.writeText(
+                  `${process.env.NEXT_PUBLIC_BASE_URL}/pay?paymentLink=${row.original.token}`
+                )
               }
             >
               <FaClipboard className="h-[1.2rem] w-[1.2rem]" />
-              <span>نسخ الكوبون</span>
+              <span>نسخ الرابط</span>
             </DropdownMenuItem>
             <DropdownMenuItem
               className="flex gap-2 items-center"
               onClick={handleDelete}
             >
               <MdDelete className="h-[1.2rem] w-[1.2rem]" />
-              <span>حذف الكوبون</span>
+              <span>حذف الرابط</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

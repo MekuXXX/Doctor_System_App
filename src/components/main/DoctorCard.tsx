@@ -48,6 +48,7 @@ export default function DoctorCard({ doctor, isActive }: Props) {
             alt={"دكتور " + doctor.name}
             fill
             className=" object-cover w-full h-full"
+            sizes="9rem"
           />
         </div>
         <div className="text-center">

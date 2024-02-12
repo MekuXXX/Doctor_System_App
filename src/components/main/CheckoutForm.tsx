@@ -5,43 +5,59 @@ import { Elements } from "@stripe/react-stripe-js";
 import CheckoutElements from "@/components/main/CheckoutElements";
 import { Button } from "@/components/ui/button";
 import { UseCoupon } from "@/components/main/UseCoupon";
-import { DoctorScheduleSession } from "@prisma/client";
 import { usePaymentIntent } from "@/hooks/use-payment-intent";
+import { SessionType } from "@prisma/client";
+import { useSearchParams } from "next/navigation";
+import { FormError } from "../auth/form-error";
+
+export type PaymentData = {
+  type: "NORMAL" | "LINK" | "PACKAGE";
+  quantity: number;
+  sessionPrice: number;
+  sessionType: SessionType;
+  doctorId: string;
+  sessionTime?: string;
+  date?: string;
+  coupon?: string;
+  userId?: string;
+};
 
 type Props = {
-  sessionData: DoctorScheduleSession;
-  date: string;
+  session: PaymentData;
 };
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || ""
 );
 
-export default function CheckoutForm({ sessionData, date }: Props) {
+export default function CheckoutForm({ session }: Props) {
   const [hasCoupon, setHasCoupon] = useState(false);
   const { intentId, setIntentId } = usePaymentIntent();
   const [clientSecret, setClientSecret] = useState("");
+  const searchParams = useSearchParams();
+  const couponMessage = searchParams?.get("couponMessage") || "";
 
   useEffect(() => {
+    console.log(session);
     // Create PaymentIntent as soon as the page loads
-    fetch("/api/create-payment-intent", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        session: { ...sessionData, quantity: 1, date },
-        payment_intent_id:
-          window.localStorage.getItem("payment_intent_id") || intentId,
-      }),
-    })
-      .then((res) => {
-        return res.json();
-      })
-      .then((data) => {
-        setIntentId(data.payment_intent_id);
-        setClientSecret(data.clientSecret);
-      });
+    // fetch("/api/create-payment-intent", {
+    //   method: "POST",
+    //   headers: { "Content-Type": "application/json" },
+    //   body: JSON.stringify({
+    //     session,
+    //     payment_intent_id:
+    //       window.localStorage.getItem("payment_intent_id") || intentId,
+    //   }),
+    // })
+    //   .then((res) => {
+    //     return res.json();
+    //   })
+    //   .then((data) => {
+    //     setIntentId(data.payment_intent_id);
+    //     setClientSecret(data.clientSecret);
+    //   });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [date, sessionData]);
+  }, [session]);
 
   const options: StripeElementsOptions = {
     clientSecret: clientSecret,
@@ -53,14 +69,14 @@ export default function CheckoutForm({ sessionData, date }: Props) {
 
   return (
     <div>
-      {clientSecret && (
+      {/* {clientSecret && (
         <Elements options={options} stripe={stripePromise}>
           <CheckoutElements clientSecret={clientSecret} />
         </Elements>
-      )}
+      )} */}
       {hasCoupon ? (
         <div>
-          <UseCoupon />
+          <UseCoupon setHasCoupon={setHasCoupon} />
 
           <Button
             onClick={() => setHasCoupon(!hasCoupon)}
@@ -79,6 +95,7 @@ export default function CheckoutForm({ sessionData, date }: Props) {
           هل تمتلك كوبون؟
         </Button>
       )}
+      <FormError message={couponMessage} />
     </div>
   );
 }

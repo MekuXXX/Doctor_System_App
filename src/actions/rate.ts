@@ -4,18 +4,6 @@ import { db } from "@/lib/db";
 import { AddRateSchemaType, addRateSchema } from "@/schemas/rate";
 import { Rate } from "@prisma/client";
 
-export const getRatesDoctors = async () => {
-  try {
-    const data = await db.user.findMany({
-      where: { role: "DOCTOR" },
-      select: { name: true, DoctorData: { select: { id: true } } },
-    });
-    return { success: "نجح الحصول على بيانات الأطباء لاضافة التقييم", data };
-  } catch {
-    return { error: "حدث خطأ حين الوصول للأطباء", data: [] };
-  }
-};
-
 export const addRate = async (data: AddRateSchemaType) => {
   const parsedData = addRateSchema.safeParse(data);
 

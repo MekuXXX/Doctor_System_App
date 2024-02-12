@@ -53,6 +53,18 @@ export const getDoctors = async () => {
   }
 };
 
+export const getSelectDoctors = async () => {
+  try {
+    const data = await db.user.findMany({
+      where: { role: "DOCTOR" },
+      select: { name: true, DoctorData: { select: { id: true } } },
+    });
+    return { success: "نجح الحصول على بيانات الأطباء لاضافة التقييم", data };
+  } catch {
+    return { error: "حدث خطأ حين الوصول للأطباء", data: [] };
+  }
+};
+
 export const getDoctorById = async (id: string) => {
   try {
     const doctor = await db.user.findUnique({

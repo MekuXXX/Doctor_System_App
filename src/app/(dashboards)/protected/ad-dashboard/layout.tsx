@@ -53,6 +53,11 @@ const sidebarLinks: SideBarLinkType = {
       link: "requests",
       text: "طلبات السحب",
     },
+    {
+      id: 9,
+      link: "payment-links",
+      text: "روابط الدفع",
+    },
   ],
 };
 

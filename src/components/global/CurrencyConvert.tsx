@@ -14,7 +14,7 @@ export default function CurrencyConvert({ currency, ...props }: Props) {
   if (isError) return <span>Error..</span>;
   return (
     <span {...props}>
-      <span>{currency * data?.geoplugin_currencyConverter!}</span>{" "}
+      <span>{Math.round(currency * data?.geoplugin_currencyConverter!)}</span>{" "}
       <span>{data?.geoplugin_currencyCode}</span>
     </span>
   );
