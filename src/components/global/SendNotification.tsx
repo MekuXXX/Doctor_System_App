@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Form,
   FormControl,
@@ -23,36 +23,44 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
+import { FormError } from "../auth/form-error";
+import { FormSuccess } from "../auth/form-success";
+import { sendAdminNotification } from "@/actions/notifications";
 
 type Props = {};
 
 export function SendNotification({}: Props) {
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const form = useForm<SendNotificationSchemaType>({
     resolver: zodResolver(sendNotificationSchema),
-    mode: "onBlur",
+    defaultValues: {
+      message: "",
+      personEmail: undefined,
+      type: "" as "all",
+    },
   });
 
   const { watch, resetField } = form;
-  const notifType = watch("type");
+  const notificationType = watch("type");
 
   useEffect(() => {
-    if (notifType === "all") resetField("personEmail");
-  }, [notifType, resetField]);
+    if (notificationType === "all") resetField("personEmail");
+  }, [notificationType, resetField]);
 
-  const onSubmit = (data: SendNotificationSchemaType) => {
+  const onSubmit = async (data: SendNotificationSchemaType) => {
+    setError("");
+    setSuccess("");
     const parsedData = sendNotificationSchema.safeParse(data);
-    toast("أرسل لشخص واحد", {
-      // description: "الرسالة: " + parsedData.data.message,
-      action: {
-        label: "Undo",
-        onClick: () => console.log("Undo"),
-      },
-      style: {
-        display: "flex",
-        justifyContent: "space-between",
-      },
-    });
+    if (!parsedData.success) setError("خطأ فى البيانات المدخلة");
+    else {
+      // TODO: Hit the end point with message
+      const res = await sendAdminNotification(parsedData.data);
+      if (res.error) setError(res.error);
+      else {
+        setSuccess(res.success!);
+      }
+    }
   };
   return (
     <div className="border p-4 rounded-xl bg-white dark:bg-inherit h-full">
@@ -86,7 +94,7 @@ export function SendNotification({}: Props) {
               </FormItem>
             )}
           />
-          {notifType === "person" && (
+          {notificationType === "person" && (
             <FormField
               control={form.control}
               name="personEmail"
@@ -114,7 +122,11 @@ export function SendNotification({}: Props) {
               </FormItem>
             )}
           />
-          <Button type="submit">إرسال</Button>
+          <FormError message={error} />
+          <FormSuccess message={success} />
+          <Button type="submit" disabled={form.formState.isSubmitting}>
+            إرسال
+          </Button>
         </form>
       </Form>
     </div>

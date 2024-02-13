@@ -58,7 +58,6 @@ export const columns: ColumnDef<any>[] = [
       </DataTableColumnHeader>
     ),
     cell: ({ row }) => {
-      console.log(row.original);
       return (
         <DataTableItem className="text-center">
           {row.original.doctorPrice + row.original.customPrice}$

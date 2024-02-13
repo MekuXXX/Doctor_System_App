@@ -6,8 +6,6 @@ export async function POST(req: NextRequest) {
   const body = await req.text();
   const sig = req.headers.get("stripe-signature");
   const stripeWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET as string;
-  console.log(sig);
-  console.log(stripeWebhookSecret);
 
   if (!body || !sig)
     return NextResponse.json({ error: "Must provide a signature and body" });

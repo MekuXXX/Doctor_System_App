@@ -94,7 +94,6 @@ export default function AddDoctor({ masters: mastersProps }: Props) {
           const formData = new FormData();
           formData.append("image", parsedData.data.image);
           parsedData.data.image = formData;
-          console.log(parsedData);
           let res = await addDoctor(parsedData.data);
           if (res.error) {
             setError(res.error);

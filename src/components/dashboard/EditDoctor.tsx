@@ -129,7 +129,6 @@ export default function EditDoctor({
           } else if (res.success) {
             toast.success(res.success);
             if (role === "ADMIN") {
-              console.log("Done");
               router.refresh();
               router.push(`${ADMIN_DASHBOARD}/members`);
             }
@@ -149,7 +148,6 @@ export default function EditDoctor({
         const res = await reset({ email: data?.email as string });
         if (res.error) setError(res.error);
         else setSuccess(res.success);
-        console.log(res);
       } catch {
         setError("حدث خطأ أثناء ارسال رسالة اعادة التعيين");
       }

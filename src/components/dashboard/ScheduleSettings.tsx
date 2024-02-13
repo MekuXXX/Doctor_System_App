@@ -77,8 +77,6 @@ export default function ScheduleSettings({ userId, initialData }: Props) {
       : fieldInitialData;
   }
 
-  console.log(defaultValues);
-
   const form = useForm<ScheduleSettingsSchemaType>({
     resolver: zodResolver(scheduleSettingsSchema),
     defaultValues,

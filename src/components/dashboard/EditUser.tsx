@@ -114,7 +114,6 @@ export default function EditUser({ user: initialData, email, role }: Props) {
         const res = await reset({ email: user?.email as string });
         if (res.error) setError(res.error);
         else setSuccess(res.success);
-        console.log(res);
       } catch {
         setError("حدث خطأ أثناء ارسال رسالة اعادة التعيين");
       }

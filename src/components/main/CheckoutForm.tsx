@@ -40,24 +40,23 @@ export default function CheckoutForm({ session }: Props) {
   useEffect(() => {
     console.log(session);
     // Create PaymentIntent as soon as the page loads
-    // fetch("/api/create-payment-intent", {
-    //   method: "POST",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify({
-    //     session,
-    //     payment_intent_id:
-    //       window.localStorage.getItem("payment_intent_id") || intentId,
-    //   }),
-    // })
-    //   .then((res) => {
-    //     return res.json();
-    //   })
-    //   .then((data) => {
-    //     setIntentId(data.payment_intent_id);
-    //     setClientSecret(data.clientSecret);
-    //   });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [session]);
+    fetch("/api/create-payment-intent", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        session,
+        payment_intent_id:
+          window.localStorage.getItem("payment_intent_id") || intentId,
+      }),
+    })
+      .then((res) => {
+        return res.json();
+      })
+      .then((data) => {
+        setIntentId(data.payment_intent_id);
+        setClientSecret(data.clientSecret);
+      });
+  }, [intentId, session, setIntentId]);
 
   const options: StripeElementsOptions = {
     clientSecret: clientSecret,
@@ -69,11 +68,11 @@ export default function CheckoutForm({ session }: Props) {
 
   return (
     <div>
-      {/* {clientSecret && (
+      {clientSecret && (
         <Elements options={options} stripe={stripePromise}>
           <CheckoutElements clientSecret={clientSecret} />
         </Elements>
-      )} */}
+      )}
       {hasCoupon ? (
         <div>
           <UseCoupon setHasCoupon={setHasCoupon} />

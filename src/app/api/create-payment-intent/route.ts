@@ -23,12 +23,7 @@ export async function POST(req: NextRequest) {
 
   const doctorPrice = Math.round(session.sessionPrice * 0.8);
   const sessionLink = await createWherebyUrl();
-  const doctor = await db.schedule.findUnique({
-    where: {
-      id: session.scheduleId,
-    },
-    select: { doctor: { select: { doctor: { select: { id: true } } } } },
-  });
+
   let paymentIntent;
   try {
     if (payment_intent_id) {
@@ -66,7 +61,7 @@ export async function POST(req: NextRequest) {
             date: session.date,
             doctorPrice,
             sessionPrice: session.sessionPrice,
-            userId: doctor?.doctor.doctor.id as string,
+            userId: session.doctorId,
             type: session.sessionType,
             link: sessionLink.hostRoomUrl,
             time: session.sessionTime,
@@ -78,6 +73,9 @@ export async function POST(req: NextRequest) {
     paymentIntent = await stripe.paymentIntents.create({
       amount: totalEuro,
       currency: "eur",
+      metadata: {
+        dummy_Data: "Hello world",
+      },
       automatic_payment_methods: {
         enabled: true,
       },
@@ -86,12 +84,12 @@ export async function POST(req: NextRequest) {
       await Promise.all([
         await db.session.create({
           data: {
-            date: session.date,
+            date: session.date!,
             doctorPrice,
             sessionPrice: session.sessionPrice,
             userId: user.user.id!,
             type: session.sessionType,
-            time: session.sessionTime,
+            time: session.sessionTime!,
             link: sessionLink.hostRoomUrl,
 
             paymentIntentId: `User ${paymentIntent.id}`,
@@ -100,13 +98,13 @@ export async function POST(req: NextRequest) {
 
         await db.session.create({
           data: {
-            date: session.date,
+            date: session.date!,
             doctorPrice,
             sessionPrice: session.sessionPrice,
-            userId: doctor?.doctor.doctor.id as string,
+            userId: session.doctorId,
             type: session.sessionType,
             link: sessionLink.hostRoomUrl,
-            time: session.sessionTime,
+            time: session.sessionTime!,
             paymentIntentId: `Doctor ${paymentIntent.id}`,
           },
         }),

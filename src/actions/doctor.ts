@@ -199,7 +199,6 @@ export const editDoctor = async (
     } else {
       if (DEFAULT_IMG !== lastImage) {
         const prevImage = cwd() + "/public" + lastImage;
-        console.log(DEFAULT_IMG);
         await unlink(prevImage);
       }
       const file = parsedData.data.image;
@@ -252,7 +251,6 @@ export const editUser = async (
     } else {
       if (DEFAULT_IMG !== lastImage) {
         const prevImage = cwd() + "/public" + lastImage;
-        console.log(DEFAULT_IMG);
         await unlink(prevImage);
       }
       const file = parsedData.data.image;
