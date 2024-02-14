@@ -70,11 +70,14 @@ export default async function CheckoutPage({ searchParams }: Props) {
   const sessionData = await db.paymentLink.findUnique({
     where: { token: paymentLink },
     include: {
-      doctor: { select: { doctor: { select: { name: true, image: true } } } },
+      doctor: {
+        select: { doctor: { select: { name: true, image: true, id: true } } },
+      },
     },
   });
   if (!sessionData) redirect("/");
-  const { name, image } = sessionData.doctor.doctor;
+  if (sessionData.status === "PAID") redirect("/result?status=success");
+  const { name, image, id } = sessionData.doctor.doctor;
 
   const tax = 5;
   const nextDayDate = moment(sessionData.date).format("DD-MM-YYYY");
@@ -102,10 +105,10 @@ export default async function CheckoutPage({ searchParams }: Props) {
     sessionPrice: resultPrice,
     sessionTime: convertToAmAndPm(sessionData.time),
     sessionType: sessionData.sessionType as "HOUR",
-    doctorId: sessionData.doctorId,
+    doctorId: id,
     date: nextDayDate,
+    paymentLinkToken: paymentLink,
   };
-
   if (user?.user) newSessionData.userId = user.user.id;
 
   if (checkCouponData?.success)
@@ -165,6 +168,7 @@ export default async function CheckoutPage({ searchParams }: Props) {
                 src={image!}
                 alt={`Dr.${name}`}
                 fill
+                sizes="6rem"
                 className=" object-cover"
               />
             </div>

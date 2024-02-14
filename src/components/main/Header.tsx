@@ -56,7 +56,7 @@ export default async function Header({}: Props) {
   return (
     <header dir="rtl" className="content">
       <div className="flex justify-between items-center">
-        <Link href={"/"}>
+        <Link href={"/"} className="block">
           <Image src={Logo} alt="Logo" />
         </Link>
         <nav className="fixed bottom-0 left-0 py-4 px-12 w-full md:w-fit md:relative bg-white z-10 dark:bg-dark md:bg-transparent">
@@ -65,7 +65,7 @@ export default async function Header({}: Props) {
               <li key={id}>
                 <Link
                   href={link}
-                  className="flex items-center gap-4 flex-col hover:text-main transition"
+                  className="flex items-center gap-4 flex-col hover:text-main transition text-nowrap"
                 >
                   {icon}
                   <span>{text}</span>
@@ -75,7 +75,7 @@ export default async function Header({}: Props) {
           </ul>
         </nav>
 
-        <div className="grid gap-2 items-center grid-cols-2">
+        <div className="grid gap-2 items-center">
           {user ? (
             <DropdownMenu dir="rtl">
               <DropdownMenuTrigger asChild>

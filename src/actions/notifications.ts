@@ -2,6 +2,7 @@
 
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
+import { getNotificationDate } from "@/lib/moment";
 import { pusherServer } from "@/lib/pusher";
 import {
   SendNotificationSchemaType,
@@ -38,7 +39,7 @@ export const sendAdminNotification = async (
       image: admin.user.image!,
       message: parsedData.data.message,
       name: admin.user.name!,
-      date: moment().format("hh:mm A, Do MMMM YYYY"),
+      date: getNotificationDate(),
     };
 
     if (parsedData.data.type === "person") {

@@ -101,11 +101,6 @@ export default async function CheckoutPage({ searchParams }: Props) {
   if (!sessionData) redirect("/");
   const { name, image, DoctorData } = sessionData.doctor.doctor;
 
-  const currentDate = moment();
-  const nextDayDate = getNextDayOfWeek(
-    currentDate.format("dddd").toUpperCase() as any
-  ).format("YYYY-MM-DD");
-
   let checkCouponData;
   const firstPrice =
     type === "HOUR" ? sessionData.hourPackage : sessionData.halfPackage;
@@ -176,6 +171,7 @@ export default async function CheckoutPage({ searchParams }: Props) {
                 alt={`Dr.${name}`}
                 fill
                 className=" object-cover"
+                sizes="6rem"
               />
             </div>
             <span>{name}</span>

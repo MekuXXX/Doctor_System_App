@@ -39,6 +39,33 @@ model User {
   DoctorData            DoctorData?
   newNotifications      Int                    @default(0)
   notifications         Notification[]
+  userPackage           UserPackage?
+}
+
+enum PaymentStatus {
+  WAITING_PAY
+  PAID
+}
+
+model UserPackage {
+  id              String          @id @default(cuid())
+  userId          String          @unique
+  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  doctorsPackages DoctorPackage[]
+}
+
+model DoctorPackage {
+  id            String        @id @default(cuid())
+  paymentIntent String        @unique
+  status        PaymentStatus @default(WAITING_PAY)
+  number        Int
+  type          SessionType
+  doctorId      String
+  price         Float
+  coupon        String?
+  doctor        DoctorData    @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  userId        String
+  user          UserPackage   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Notification {
@@ -79,18 +106,20 @@ model DoctorData {
   doctorSessions DoctorSessions?
   doctorSchedule Schedule[]
   paymentLink    PaymentLink[]
+  DoctorPakage   DoctorPackage[]
 }
 
 model PaymentLink {
-  id          String      @id @default(cuid())
+  id          String        @id @default(cuid())
   date        DateTime
   time        String
   customPrice Float
   doctorPrice Float
-  token       String      @unique
+  token       String        @unique
   sessionType SessionType
   doctorId    String
-  doctor      DoctorData  @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  status      PaymentStatus @default(WAITING_PAY)
+  doctor      DoctorData    @relation(fields: [doctorId], references: [id], onDelete: Cascade)
 }
 
 model Schedule {
@@ -181,8 +210,7 @@ model Session {
   status          SessionStatus @default(WAITING_PAY)
   type            SessionType
   link            String
-  sessionPrice    Float
-  doctorPrice     Float
+  price           Float
   date            String
   time            String
   coupon          String?

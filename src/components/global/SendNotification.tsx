@@ -58,6 +58,7 @@ export function SendNotification({}: Props) {
       const res = await sendAdminNotification(parsedData.data);
       if (res.error) setError(res.error);
       else {
+        form.reset();
         setSuccess(res.success!);
       }
     }
@@ -102,7 +103,7 @@ export function SendNotification({}: Props) {
                 <FormItem>
                   <FormLabel>حساب المرسل اليه</FormLabel>
                   <FormControl>
-                    <Input required {...field} placeholder="أدخل حساب العضو" />
+                    <Input required {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -116,7 +117,7 @@ export function SendNotification({}: Props) {
               <FormItem>
                 <FormLabel>رسالة الاشعار</FormLabel>
                 <FormControl>
-                  <Input {...field} placeholder="أدخل الإشعار" />
+                  <Input {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

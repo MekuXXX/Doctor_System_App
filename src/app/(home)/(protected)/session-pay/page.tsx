@@ -89,6 +89,7 @@ export default async function CheckoutPage({ searchParams }: Props) {
                 select: {
                   name: true,
                   image: true,
+                  id: true,
                   DoctorData: {
                     select: { id: true },
                   },
@@ -101,7 +102,7 @@ export default async function CheckoutPage({ searchParams }: Props) {
     },
   });
   if (!sessionData) redirect("/");
-  const { name, image, DoctorData } = sessionData.schedule.doctor.doctor;
+  const { name, image, DoctorData, id } = sessionData.schedule.doctor.doctor;
 
   const currentDate = moment();
   const nextDayDate = getNextDayOfWeek(
@@ -132,7 +133,7 @@ export default async function CheckoutPage({ searchParams }: Props) {
     sessionPrice: resultPrice,
     sessionTime: convertToAmAndPm(sessionData.sessionTime),
     sessionType: sessionData.sessionType,
-    doctorId: DoctorData?.id!,
+    doctorId: id,
     date: nextDayDate,
     userId: user.user.id,
   };
@@ -193,6 +194,7 @@ export default async function CheckoutPage({ searchParams }: Props) {
                 src={image!}
                 alt={`Dr.${name}`}
                 fill
+                sizes="6rem"
                 className=" object-cover"
               />
             </div>

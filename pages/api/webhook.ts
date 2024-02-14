@@ -3,7 +3,13 @@ import { NextApiRequest, NextApiResponse } from "next";
 import Stripe from "stripe";
 import { stripe } from "@/lib/stripe";
 import { db } from "@/lib/db";
+import { pusherServer } from "@/lib/pusher";
+import { Notification, SessionType } from "@prisma/client";
+import { getNotificationDate } from "@/lib/moment";
+import { PaymentType } from "@/components/main/CheckoutForm";
 //Securing a connection to firebase from backend
+
+type NotificationUserType = { name: string; image: string; type: SessionType };
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "POST") {
@@ -33,17 +39,39 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     let session;
     if (event.type! === "charge.succeeded") {
       session = event.data.object as Stripe.Charge;
-      const [_, doctor_session] = await Promise.all([
-        await db.session.update({
-          where: {
-            paymentIntentId: `User ${session.payment_intent}`,
-            user: { role: "USER" },
-          },
-          data: {
-            status: "RESERVED",
-          },
-        }),
-        await db.session.update({
+      const type = session.metadata.type as PaymentType;
+      let doctorMoney: number;
+      let doctorId: string;
+      let userData: NotificationUserType;
+      let doctorData: NotificationUserType;
+      if (type === "NORMAL" || type === "LINK") {
+        if (session.metadata.user === "true") {
+          const data = await db.session.update({
+            where: {
+              paymentIntentId: `User ${session.payment_intent}`,
+              user: { role: "USER" },
+            },
+            data: {
+              status: "RESERVED",
+            },
+            select: {
+              type: true,
+              user: { select: { name: true, image: true } },
+            },
+          });
+          userData = {
+            name: data.user.image,
+            image: data.user.image,
+            type: data.type,
+          };
+        }
+        if (type === "LINK") {
+          await db.paymentLink.update({
+            where: { token: session.metadata.token },
+            data: { status: "PAID" },
+          });
+        }
+        const data = await db.session.update({
           where: {
             paymentIntentId: `Doctor ${session.payment_intent}`,
             user: { role: "DOCTOR" },
@@ -51,18 +79,86 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           data: {
             status: "RESERVED",
           },
-        }),
-      ]);
-      await db.user.update({
-        where: { id: doctor_session.userId },
-        data: {
-          DoctorData: {
-            update: {
-              money: { update: { pending: doctor_session.doctorPrice } },
+          select: {
+            type: true,
+            price: true,
+            user: { select: { name: true, image: true, id: true } },
+          },
+        });
+        doctorMoney = data.price;
+        doctorData = {
+          name: data.user.name,
+          image: data.user.image,
+          type: data.type,
+        };
+        doctorId = data.user.id;
+      } else if (type === "PACKAGE") {
+        const data = await db.doctorPackage.update({
+          where: { paymentIntent: `${session.payment_intent}` },
+          data: { status: "PAID" },
+          select: {
+            type: true,
+            price: true,
+            user: { select: { user: { select: { name: true, image: true } } } },
+            doctor: {
+              select: {
+                doctor: { select: { name: true, image: true, id: true } },
+              },
             },
           },
-        },
-      });
+        });
+        userData = {
+          name: data.user.user.name,
+          image: data.user.user.image,
+          type: data.type,
+        };
+        doctorData = {
+          name: data.doctor.doctor.name,
+          image: data.doctor.doctor.image,
+          type: data.type,
+        };
+        doctorMoney = data.price;
+        doctorId = data.doctor.doctor.id;
+      }
+      // if (doctorId && doctorMoney) {
+      //   await db.user.update({
+      //     where: { id: doctorId},
+      //     data: {
+      //       DoctorData: {
+      //         update: {
+      //           money: { update: { pending: doctorMoney } },
+      //         },
+      //       },
+      //     },
+      //   });
+      // }
+      console.log(userData!);
+      console.log(doctorData!);
+      console.log(doctorMoney!);
+      console.log(doctorId!);
+      // const user_notification = {
+      //   name: doctor_session.user.name,
+      //   date: getNotificationDate(),
+      //   image: doctor_session.user.image,
+      //   message: "لقد اشتريت جلسة من الطبيب " + doctor_session.user.name,
+      // };
+      // pusherServer.trigger(
+      //   "notifications",
+      //   `new-notification:${user_session.userId}`,
+      //   user_notification
+      // );
+
+      // pusherServer.trigger(
+      //   "notifications",
+      //   `new-notification:${doctor_session.userId}`,
+
+      //   {
+      //     name: user_session.user.name,
+      //     date: getNotificationDate(),
+      //     image: user_session.user.image,
+      //     message: "لقد اشترى " + user_session.user.name + " منك جلسة",
+      //   } as Notification
+      // );
       console.log("Orders Updated");
     } else if (
       event.type === "charge.expired" ||

@@ -237,7 +237,7 @@ export function AddPaymentLink({ initialData, getDoctors }: Props) {
           <FormError message={error} />
           <div className=" text-center">
             <Button type="submit" disabled={form.formState.isSubmitting}>
-              اضافة الكوبون
+              اضافة رابط
             </Button>
           </div>
         </form>

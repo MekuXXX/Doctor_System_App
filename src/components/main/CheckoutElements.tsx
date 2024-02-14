@@ -20,7 +20,6 @@ export default function CheckoutElements({ clientSecret }: Props) {
   const elements = useElements();
   const { data, isLoading } = useUserData();
   const router = useRouter();
-  const { setIntentId } = usePaymentIntent();
   const [isPending, startTransition] = useTransition();
 
   // useEffect(() => {
@@ -44,7 +43,7 @@ export default function CheckoutElements({ clientSecret }: Props) {
       });
 
       if (!error) {
-        setIntentId(null);
+        window.localStorage.setItem("payment_intent_id", "Payment Done");
         toast.success("تمت عملية الدفع بنجاح");
         router.push(
           `${process.env.NEXT_PUBLIC_BASE_URL}/result?status=success`

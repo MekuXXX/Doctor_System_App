@@ -77,13 +77,11 @@ export function Notifications({
         type="button"
         ref={buttonRef}
         onClick={handleClick}
-        className={`
-        inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm p-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500
-        `}
+        className={`bg-background border-input hover:bg-accent hover:text-accent-foreground text-black dark:text-white px-2`}
       >
         {newNotification > 0 && (
           <span
-            className={`absolute w-4 h-4 rounded-full top-1 right-1 bg-main animate-bounce -z-0 grid place-content-center text-white text-xs`}
+            className={`absolute w-4 h-4 rounded-full top-1 right-1 bg-main animate-bounce -z-0 grid place-content-center text-xs`}
           >
             {newNotification}
           </span>
@@ -93,7 +91,7 @@ export function Notifications({
       {isOpen && (
         <div
           ref={dropdownRef}
-          className="absolute z-10 left-0 top-full mt-1 min-w-[20rem] max-h-[20rem] rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 overflow-y-auto"
+          className="absolute z-10 left-0 top-full mt-1 min-w-[20rem] max-h-[20rem] rounded-md shadow-lg bg-white dark:bg-dark ring-1 ring-black ring-opacity-5 overflow-y-auto"
           role="menu"
           dir="rtl"
           aria-labelledby="menu-button"
@@ -118,10 +116,10 @@ export function Notifications({
                     className="rounded-full"
                   />
                   <div dir="rtl">
-                    <h4 className=" text-[#3d4465] font-bold cursor-pointer w-fit">
+                    <h4 className="font-bold cursor-pointer w-fit">
                       {notification.name}
                     </h4>
-                    <p className="text-sm text-black/50">
+                    <p className="text-sm text-black/50 dark:text-white/50">
                       {notification.message}
                     </p>
                     <small dir="ltr" className="text-[#6c757d] text-xs">

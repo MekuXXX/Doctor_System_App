@@ -40,3 +40,7 @@ export const getNextDayOfWeek = (dayName: DayOfWeek) => {
 
   return nextDate;
 };
+
+export const getNotificationDate = () => {
+  return moment().format("hh:mm A, Do MMMM YYYY");
+};

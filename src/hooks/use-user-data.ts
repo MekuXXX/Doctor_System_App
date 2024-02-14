@@ -38,6 +38,6 @@ export const useUserData = () => {
       const data = await res.json();
       return data as UserDataType;
     },
-    refetchInterval: Number(refetchInterval),
+    // refetchInterval: Number(refetchInterval),
   });
 };

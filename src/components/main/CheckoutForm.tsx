@@ -5,13 +5,14 @@ import { Elements } from "@stripe/react-stripe-js";
 import CheckoutElements from "@/components/main/CheckoutElements";
 import { Button } from "@/components/ui/button";
 import { UseCoupon } from "@/components/main/UseCoupon";
-import { usePaymentIntent } from "@/hooks/use-payment-intent";
 import { SessionType } from "@prisma/client";
 import { useSearchParams } from "next/navigation";
 import { FormError } from "../auth/form-error";
 
+export type PaymentType = "NORMAL" | "LINK" | "PACKAGE";
+
 export type PaymentData = {
-  type: "NORMAL" | "LINK" | "PACKAGE";
+  type: PaymentType;
   quantity: number;
   sessionPrice: number;
   sessionType: SessionType;
@@ -19,6 +20,7 @@ export type PaymentData = {
   sessionTime?: string;
   date?: string;
   coupon?: string;
+  paymentLinkToken?: string;
   userId?: string;
 };
 
@@ -32,12 +34,12 @@ const stripePromise = loadStripe(
 
 export default function CheckoutForm({ session }: Props) {
   const [hasCoupon, setHasCoupon] = useState(false);
-  const { intentId, setIntentId } = usePaymentIntent();
   const [clientSecret, setClientSecret] = useState("");
   const searchParams = useSearchParams();
   const couponMessage = searchParams?.get("couponMessage") || "";
 
   useEffect(() => {
+    console.log(window.localStorage.getItem("payment_intent_id"));
     console.log(session);
     // Create PaymentIntent as soon as the page loads
     fetch("/api/create-payment-intent", {
@@ -45,18 +47,20 @@ export default function CheckoutForm({ session }: Props) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         session,
-        payment_intent_id:
-          window.localStorage.getItem("payment_intent_id") || intentId,
+        payment_intent_id: window.localStorage.getItem("payment_intent_id"),
       }),
     })
       .then((res) => {
         return res.json();
       })
       .then((data) => {
-        setIntentId(data.payment_intent_id);
+        window.localStorage.setItem(
+          "payment_intent_id",
+          data.payment_intent_id
+        );
         setClientSecret(data.clientSecret);
       });
-  }, [intentId, session, setIntentId]);
+  }, [session]);
 
   const options: StripeElementsOptions = {
     clientSecret: clientSecret,
