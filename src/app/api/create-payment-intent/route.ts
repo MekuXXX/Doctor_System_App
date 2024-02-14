@@ -8,7 +8,11 @@ import { PaymentData } from "@/components/main/CheckoutForm";
 
 export async function POST(req: NextRequest) {
   const user = await auth();
-  if (user?.user.role === "DOCTOR" || user?.user.role === "ADMIN") return null;
+  if (user?.user.role === "DOCTOR" || user?.user.role === "ADMIN")
+    return NextResponse.json(
+      { error: "لا يمكن للأدمن ولا الطبيب الذهاب لصفحة الشراء" },
+      { status: 402 }
+    );
   const { payment_intent_id, session } = (await req.json()) as {
     payment_intent_id: string;
     session: PaymentData;

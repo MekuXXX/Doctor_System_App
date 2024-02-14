@@ -22,7 +22,11 @@ import { FormError } from "@/components/auth/form-error";
 import { FormSuccess } from "@/components/auth/form-success";
 import { login } from "@/actions/login";
 
-export const LoginForm = () => {
+type Props = {
+  isAdmin: boolean;
+};
+
+export const LoginForm = ({ isAdmin }: Props) => {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams?.get("callbackUrl");
   const urlError =
@@ -48,7 +52,7 @@ export const LoginForm = () => {
     setSuccess("");
 
     startTransition(() => {
-      login(values, callbackUrl)
+      login(values, isAdmin, callbackUrl)
         .then((data) => {
           if (data?.error) {
             form.reset();

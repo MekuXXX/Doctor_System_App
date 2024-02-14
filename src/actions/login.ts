@@ -17,6 +17,7 @@ import { getTwoFactorConfirmationByUserId } from "@/data/two-factor-confirmation
 
 export const login = async (
   values: LoginSchemaType,
+  isAdmin: boolean,
   callbackUrl?: string | null
 ) => {
   const validatedFields = LoginSchema.safeParse(values);
@@ -28,6 +29,10 @@ export const login = async (
   const { email, password, code } = validatedFields.data;
 
   const existingUser = await getUserByEmail(email);
+  if (!isAdmin) {
+    if (existingUser?.role === "ADMIN")
+      return { error: "الحساب الذى أدخلتة غير صحيح" };
+  }
 
   if (!existingUser || !existingUser.email || !existingUser.password) {
     return { error: "الحساب الذى أدخلتة غير موجود" };
