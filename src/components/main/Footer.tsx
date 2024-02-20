@@ -91,7 +91,7 @@ export default function Footer({}: Props) {
           </div>
         </div>
       </div>
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center pb-16 md:pb-0">
         <p className="text-sm">
           جميع الحقوق محفوظة لموقع
           <span>

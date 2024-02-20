@@ -8,7 +8,6 @@ import {
   SendNotificationSchemaType,
   sendNotificationSchema,
 } from "@/schemas/sendNotification";
-import moment from "moment";
 import { redirect } from "next/navigation";
 
 export const getUserNotifications = async (id: string) => {
@@ -17,6 +16,7 @@ export const getUserNotifications = async (id: string) => {
     const notifications = await db.notification.findMany({
       where: { userId: id },
       take: 10,
+      orderBy: { date: "desc" },
     });
     return { success: "نجح الحصول على الاشعارات", data: notifications };
   } catch {

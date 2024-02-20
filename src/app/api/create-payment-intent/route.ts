@@ -25,10 +25,7 @@ export async function POST(req: NextRequest) {
   if (session.type === "LINK") metadata.token = session.paymentLinkToken;
 
   const res = await fetch(process.env.EUROPE_IP!);
-  const data = (await res.json()) as UserDataType;
-  const totalEuro = Math.round(
-    session.sessionPrice * data.geoplugin_currencyConverter * 100
-  );
+  const totalEuro = Math.round(session.sessionPrice * 100);
   const doctorPrice = Math.round(session.sessionPrice * 0.8);
   const sessionLink = await createWherebyUrl();
 
@@ -57,7 +54,6 @@ export async function POST(req: NextRequest) {
               price: doctorPrice,
               userId: session.userId,
               type: session.sessionType,
-              time: session.sessionTime,
               link: sessionLink.hostRoomUrl,
               coupon: session.coupon,
               paymentIntentId: `User ${paymentIntent.id}`,
@@ -76,7 +72,6 @@ export async function POST(req: NextRequest) {
             userId: session.doctorId,
             type: session.sessionType,
             link: sessionLink.hostRoomUrl,
-            time: session.sessionTime,
             paymentIntentId: `Doctor ${paymentIntent.id}`,
             coupon: session.coupon,
           },
@@ -117,7 +112,6 @@ export async function POST(req: NextRequest) {
               price: doctorPrice,
               userId: session.userId,
               type: session.sessionType,
-              time: session.sessionTime!,
               link: sessionLink.hostRoomUrl,
               coupon: session.coupon,
               paymentIntentId: `User ${paymentIntent.id}`,
@@ -132,7 +126,6 @@ export async function POST(req: NextRequest) {
             userId: session.doctorId,
             type: session.sessionType,
             link: sessionLink.hostRoomUrl,
-            time: session.sessionTime!,
             coupon: session.coupon,
             paymentIntentId: `Doctor ${paymentIntent.id}`,
           },

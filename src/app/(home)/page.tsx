@@ -1,3 +1,4 @@
+import { isDoctorBusy } from "@/actions/doctor";
 import DiscountBadge from "@/components/main/DiscountBadge";
 import DoctorsView from "@/components/main/DoctorsView";
 import FAQ from "@/components/main/FAQ";
@@ -6,16 +7,9 @@ import { isUserOnline } from "@/lib/compare-times";
 import { db } from "@/lib/db";
 import React from "react";
 
-type Props = {
-  params: {};
-  searchParams: {
-    text?: string;
-    price?: string;
-    gender?: string;
-  };
-};
+type Props = {};
 
-export default async function page({ searchParams }: Props) {
+export default async function page({}: Props) {
   const doctors = await db.user.findMany({
     where: { role: "DOCTOR" },
     select: {
@@ -36,25 +30,33 @@ export default async function page({ searchParams }: Props) {
             },
           },
           Rate: true,
+          doctorSessions: true,
         },
       },
     },
   });
 
+  const busyDoctors: any[] = [];
   const activeDoctors: any[] = [];
   const inActiveDoctors: any[] = [];
-  doctors.forEach((doctor) => {
-    const isActive = isUserOnline(
-      doctor?.DoctorData?.doctorActive?.from!,
-      doctor?.DoctorData?.doctorActive?.to!
-    );
-    if (doctor.DoctorData?.doctorActive?.isActive && isActive)
+
+  for (let doctor of doctors) {
+    const isBusy = await isDoctorBusy(doctor?.id);
+    if (isBusy) {
+      busyDoctors.push(doctor);
+    } else if (
+      doctor.DoctorData?.doctorActive?.isActive &&
+      isUserOnline(
+        doctor?.DoctorData?.doctorActive?.from!,
+        doctor?.DoctorData?.doctorActive?.to!
+      )
+    )
       activeDoctors.push(doctor);
     else inActiveDoctors.push(doctor);
-  });
+  }
+
   return (
     <div className="content">
-      <MainSearch />
       <DiscountBadge />
 
       {activeDoctors.length !== 0 && (
@@ -63,6 +65,15 @@ export default async function page({ searchParams }: Props) {
           description="بامكانك الحجز والتحدث فوراً"
           doctors={activeDoctors!}
           isActive={true}
+          className="feature"
+        />
+      )}
+      {busyDoctors.length !== 0 && (
+        <DoctorsView
+          title="المشغولون الان"
+          description="بامكانك التحدث بعد انتهاء الجلسة"
+          doctors={busyDoctors!}
+          isActive={false}
           className="feature"
         />
       )}
@@ -75,9 +86,14 @@ export default async function page({ searchParams }: Props) {
           className="feature"
         />
       )}
-      {/* {availableNow.length === 0 && notAvailableNow.length === 0 && (
-        <p className="text-xl my-8 font-extrabold text-center">لا توجد نتائج</p>
-      )} */}
+
+      {activeDoctors.length === 0 &&
+        inActiveDoctors.length === 0 &&
+        busyDoctors.length === 0 && (
+          <p className="text-xl my-8 font-extrabold text-center">
+            لا توجد نتائج
+          </p>
+        )}
       <FAQ />
     </div>
   );

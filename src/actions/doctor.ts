@@ -19,6 +19,7 @@ import {
   doctorDetailsSchema,
 } from "@/schemas/doctorDetails";
 import { DEFAULT_IMG } from "@/lib/constants";
+import moment, { now } from "moment";
 
 export const getDoctors = async () => {
   try {
@@ -300,5 +301,38 @@ export const editDoctorDetails = async (
     return { success: "تم تعديل بيانات الطبيب بنجاح" };
   } catch {
     return { error: "حدث خطأ أثناء تعديل بيانات الطبيب" };
+  }
+};
+
+export const isDoctorBusy = async (doctorId: string) => {
+  try {
+    const sessionStart = moment();
+    const sessionEnd = sessionStart.clone().add(2.5, "hours");
+    const sessions = await db.session.findMany({
+      where: {
+        date: {
+          gte: sessionStart.toDate(),
+          lte: sessionEnd.toDate(),
+        },
+        status: { not: "WAITING_PAY" },
+        user: {
+          id: doctorId,
+        },
+      },
+    });
+    return sessions.length > 0;
+  } catch {
+    return false;
+  }
+};
+
+export const isSessionBought = async (doctorId: string, date: Date) => {
+  try {
+    const session = await db.session.findMany({
+      where: { userId: doctorId, date: date, status: { not: "WAITING_PAY" } },
+    });
+    return session.length > 0;
+  } catch (err) {
+    return false;
   }
 };

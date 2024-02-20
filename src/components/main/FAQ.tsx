@@ -57,7 +57,7 @@ const accordionData = {
 
 export default function FAQ({}: Props) {
   return (
-    <div className="content bg-[#e5e5e5] dark:bg-[#020817] rounded-xl my-4">
+    <div className="content border rounded-xl my-4">
       <Tabs defaultValue="general" dir="rtl" className="breakout">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="general">

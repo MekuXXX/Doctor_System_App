@@ -5,7 +5,8 @@ import {
   ScheduleSettingsSchemaType,
   scheduleSettingsSchema,
 } from "@/schemas/schedule";
-import { DayOfWeek } from "@prisma/client";
+import { DayOfWeek, DoctorScheduleSession } from "@prisma/client";
+import moment from "moment";
 
 export const getDoctorSchedule = async (doctorId: string) => {
   try {
@@ -77,12 +78,73 @@ export const getScheduleSessionsByDay = async (
   day: DayOfWeek
 ) => {
   try {
+    const currentTime = moment().add(30, "minutes");
     const data = await db.doctorScheduleSession.findMany({
       where: {
         schedule: { dayOfWeek: day, doctor: { id: doctorId } },
       },
     });
-    return { success: "نجح الحصول على جلسات الطبيب", data };
+
+    if (data.length === 0) return { success: "لا توجد جلسات اليوم", data: [] };
+
+    const doctorSessions = await db.session.findMany({
+      where: {
+        user: { DoctorData: { id: doctorId }, role: "DOCTOR" },
+        status: { not: "WAITING_PAY" },
+      },
+    });
+
+    const newData = data.filter((session) => {
+      const sessionTime = moment().set({
+        hour: parseInt(session.sessionTime.substring(0, 2)), // Extract hour from time string
+        minute: parseInt(session.sessionTime.substring(3, 5)), // Extract minute from time string
+        second: 0,
+        millisecond: 0,
+      });
+      return sessionTime > currentTime;
+    });
+
+    let filteredData: DoctorScheduleSession[] = [];
+
+    newData.forEach((session) => {
+      let isExist = false;
+      let scheduleTime = moment().set({
+        hour: parseInt(session.sessionTime.substring(0, 2)), // Extract hour from time string
+        minute: parseInt(session.sessionTime.substring(3, 5)), // Extract minute from time string
+        second: 0,
+
+        millisecond: 0,
+      });
+      doctorSessions.forEach((doctorSession) => {
+        if (moment(doctorSession.date).format() === scheduleTime.format()) {
+          isExist = true;
+        }
+      });
+
+      if (!isExist) filteredData.push(session);
+    });
+
+    const newArray = filteredData.toSorted((a, b) => {
+      const firstSessionTime = moment().set({
+        hour: parseInt(a.sessionTime.substring(0, 2)), // Extract hour from time string
+        minute: parseInt(a.sessionTime.substring(3, 5)), // Extract minute from time string
+        second: 0,
+
+        millisecond: 0,
+      });
+
+      const secondSessionTime = moment().set({
+        hour: parseInt(b.sessionTime.substring(0, 2)), // Extract hour from time string
+        minute: parseInt(b.sessionTime.substring(3, 5)), // Extract minute from time string
+        second: 0,
+
+        millisecond: 0,
+      });
+
+      return firstSessionTime < secondSessionTime ? -1 : 1;
+    });
+
+    return { success: "نجح الحصول على جلسات الطبيب", data: newArray };
   } catch {
     return { error: "حدث خطأ أثناء الحصول على جلسات الطبيب" };
   }

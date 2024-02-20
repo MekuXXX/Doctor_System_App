@@ -17,8 +17,7 @@ export type PaymentData = {
   sessionPrice: number;
   sessionType: SessionType;
   doctorId: string;
-  sessionTime?: string;
-  date?: string;
+  date?: Date;
   coupon?: string;
   paymentLinkToken?: string;
   userId?: string;

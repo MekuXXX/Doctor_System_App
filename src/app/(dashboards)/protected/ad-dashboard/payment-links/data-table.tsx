@@ -19,6 +19,7 @@ import { formatDate } from "@/lib/date";
 import moment from "moment";
 import { convertToAmAndPm } from "@/lib/moment";
 import { removePaymentLink } from "@/actions/payment-link";
+import { StatusBadge } from "@/components/main/StatusBadge";
 
 export const columns: ColumnDef<any>[] = [
   {
@@ -70,8 +71,27 @@ export const columns: ColumnDef<any>[] = [
     header: () => <DataTableColumnHeader>رابط الدفع</DataTableColumnHeader>,
     cell: ({ row }) => {
       return (
-        <DataTableItem>{`${process.env.NEXT_PUBLIC_BASE_URL}/pay?paymentLink=${row.original.token}`}</DataTableItem>
+        <DataTableItem>{`${process.env.NEXT_PUBLIC_BASE_URL}/link-pay?paymentLink=${row.original.token}`}</DataTableItem>
       );
+    },
+  },
+  {
+    accessorKey: "status",
+    header: () => <DataTableColumnHeader>الحالة</DataTableColumnHeader>,
+    cell: ({ row }) => {
+      let status;
+      if (row.original.status === "PAID")
+        status = (
+          <StatusBadge className="bg-green-200 text-green-800">تمت</StatusBadge>
+        );
+      else
+        status = (
+          <StatusBadge className="bg-orange-200 text-orange-800">
+            انتظار
+          </StatusBadge>
+        );
+
+      return <DataTableItem>{status}</DataTableItem>;
     },
   },
   {
@@ -103,7 +123,7 @@ export const columns: ColumnDef<any>[] = [
               className="flex gap-2 items-center"
               onClick={() =>
                 navigator.clipboard.writeText(
-                  `${process.env.NEXT_PUBLIC_BASE_URL}/pay?paymentLink=${row.original.token}`
+                  `${process.env.NEXT_PUBLIC_BASE_URL}/link-pay?paymentLink=${row.original.token}`
                 )
               }
             >

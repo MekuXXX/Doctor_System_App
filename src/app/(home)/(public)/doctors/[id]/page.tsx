@@ -17,6 +17,9 @@ import ChangeTimezone from "@/components/main/ChangeTimezone";
 import { db } from "@/lib/db";
 import { redirect } from "next/navigation";
 import { calculateRate } from "@/lib/rate";
+import { isDoctorBusy } from "@/actions/doctor";
+import { isUserOnline } from "@/lib/compare-times";
+import { FastSession } from "@/components/main/FastSession";
 
 type Props = {
   params: {
@@ -52,6 +55,11 @@ export default async function DoctorDataPage({ params: { id } }: Props) {
   });
   if (!doctor) redirect("/");
   const rate = calculateRate(doctor.Rate);
+  const isBusy = await isDoctorBusy(doctor.doctor.id);
+  const isOnline = isUserOnline(
+    doctor.doctorActive?.from!,
+    doctor.doctorActive?.to!
+  );
 
   return (
     <div className="content">
@@ -70,6 +78,7 @@ export default async function DoctorDataPage({ params: { id } }: Props) {
                   alt={`Dr.${doctor.doctor?.name}`}
                   fill
                   className=" object-cover"
+                  sizes="15rem"
                 />
               </div>
               <div className="flex flex-col gap-8 justify-center">
@@ -103,6 +112,27 @@ export default async function DoctorDataPage({ params: { id } }: Props) {
               </Button>
             </div>
           </div>
+          {!isBusy && isOnline && doctor.doctorActive?.isActive && (
+            <>
+              <FastSession
+                id={doctor.doctorSessions?.id!}
+                type={"HALF_HOUR"}
+                image={doctor.doctor?.image || ""}
+                description="احجز الان جلسة فورية نصف ساعة"
+                price={doctor?.doctorSessions?.halfSessions!}
+                doctorId={doctor.doctor.id}
+              />
+
+              <FastSession
+                id={doctor.doctorSessions?.id!}
+                type={"HOUR"}
+                image={doctor.doctor?.image || ""}
+                description="احجز الان جلسة فورية ساعة"
+                price={doctor?.doctorSessions?.hourSessions!}
+                doctorId={doctor.doctor.id}
+              />
+            </>
+          )}
           <ChangeTimezone />
           <SelectSessions doctorId={id} />
           <div className="space-y-2">
@@ -111,7 +141,7 @@ export default async function DoctorDataPage({ params: { id } }: Props) {
               type={"HALF_HOUR"}
               image={doctor.doctor?.image || ""}
               description="باكج أربع جلسات نصف ساعة"
-              price={doctor?.doctorSessions?.halfSessions!}
+              price={doctor?.doctorSessions?.halfPackage!}
             />
 
             <SessionPackage
@@ -119,7 +149,7 @@ export default async function DoctorDataPage({ params: { id } }: Props) {
               type={"HOUR"}
               image={doctor.doctor?.image || ""}
               description="باكج أربع جلسات ساعة"
-              price={doctor?.doctorSessions?.hourSessions!}
+              price={doctor?.doctorSessions?.hourPackage!}
             />
           </div>
         </div>

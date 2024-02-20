@@ -1,7 +1,7 @@
 import React from "react";
 import DoctorCard from "./DoctorCard";
 import { cn } from "@/lib/utils";
-import { DoctorData, DoctorRank, User } from "@prisma/client";
+import { DoctorSessions } from "@prisma/client";
 
 export type RenderedDoctorData = {
   DoctorData: {
@@ -20,6 +20,7 @@ export type RenderedDoctorData = {
       patientName: string;
       doctorId: string;
     }[];
+    doctorSessions: DoctorSessions;
     id: string;
   };
   id: string;

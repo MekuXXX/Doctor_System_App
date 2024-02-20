@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Collapsible,
   CollapsibleContent,
@@ -8,11 +8,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { FaLongArrowAltDown } from "react-icons/fa";
 import Link from "next/link";
-import { DayOfWeek, DoctorScheduleSession } from "@prisma/client";
+import { DayOfWeek, DoctorScheduleSession, Session } from "@prisma/client";
 import { useQuery } from "@tanstack/react-query";
 import { getScheduleSessionsByDay } from "@/actions/schedule";
 import { getDoctorSessionTimeByType } from "@/lib/doctor-session";
 import { convertToAmAndPm } from "@/lib/moment";
+import { isSessionBought } from "@/actions/doctor";
 
 type Props = {
   doctorId: string;
@@ -28,6 +29,9 @@ export default function SelectSessionCol({
   initialDate,
 }: Props) {
   const [isOpen, setIsOpen] = useState(false);
+  const [filteredTimes, setFilteredTimes] = useState<DoctorScheduleSession[]>(
+    []
+  );
   const refetchInterval = process.env.NEXT_PUBLIC_REFETCH_INTERVAL || 5000;
   const {
     data: times,
@@ -66,17 +70,14 @@ export default function SelectSessionCol({
       </h3>
       <div className="p-3 grid gap-4 min-w-fit">
         {first.map((session) => (
-          <Link
-            href={`/session-pay?sessionId=${session?.id}`}
-            key={session?.id}
-          >
+          <a href={`/session-pay?sessionId=${session?.id}`} key={session?.id}>
             <div className="p-2 rounded bg-red-700/50 text-white text-sm min-w-fit">
               <p>{convertToAmAndPm(session?.sessionTime!)}</p>
               <p>
                 [{session?.sessionType === "HALF_HOUR" ? "30" : "60"} minutes]
               </p>
             </div>
-          </Link>
+          </a>
         ))}
 
         <Collapsible
@@ -92,7 +93,7 @@ export default function SelectSessionCol({
           </CollapsibleTrigger>
           <CollapsibleContent className="space-y-2">
             {collapsed.map((session) => (
-              <Link
+              <a
                 href={`/session-pay?sessionId=${session?.id}`}
                 key={session?.id}
               >
@@ -103,7 +104,7 @@ export default function SelectSessionCol({
                     minutes]
                   </p>
                 </div>
-              </Link>
+              </a>
             ))}
           </CollapsibleContent>
         </Collapsible>

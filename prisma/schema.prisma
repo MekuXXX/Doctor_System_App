@@ -211,8 +211,7 @@ model Session {
   type            SessionType
   link            String
   price           Float
-  date            String
-  time            String
+  date            DateTime
   coupon          String?
   userId          String
   paymentIntentId String        @unique

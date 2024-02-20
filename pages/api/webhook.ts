@@ -9,7 +9,14 @@ import { getNotificationDate } from "@/lib/moment";
 import { PaymentType } from "@/components/main/CheckoutForm";
 //Securing a connection to firebase from backend
 
-type NotificationUserType = { name: string; image: string; type: SessionType };
+type NotificationUserType = {
+  id: string;
+  paymentType: PaymentType;
+  name: string;
+  image: string;
+  type: SessionType;
+  newNotificationsNum: number;
+};
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "POST") {
@@ -56,21 +63,33 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             },
             select: {
               type: true,
-              user: { select: { name: true, image: true } },
+              user: {
+                select: {
+                  name: true,
+                  image: true,
+                  id: true,
+                  newNotifications: true,
+                },
+              },
             },
           });
           userData = {
-            name: data.user.image,
+            name: data.user.name,
             image: data.user.image,
             type: data.type,
+            id: data.user.id,
+            paymentType: "NORMAL",
+            newNotificationsNum: data.user.newNotifications,
           };
         }
+
         if (type === "LINK") {
           await db.paymentLink.update({
             where: { token: session.metadata.token },
             data: { status: "PAID" },
           });
         }
+
         const data = await db.session.update({
           where: {
             paymentIntentId: `Doctor ${session.payment_intent}`,
@@ -82,7 +101,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           select: {
             type: true,
             price: true,
-            user: { select: { name: true, image: true, id: true } },
+            user: {
+              select: {
+                name: true,
+                image: true,
+                id: true,
+                newNotifications: true,
+              },
+            },
           },
         });
         doctorMoney = data.price;
@@ -90,8 +116,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           name: data.user.name,
           image: data.user.image,
           type: data.type,
+          id: data.user.id,
+          paymentType: "NORMAL",
+          newNotificationsNum: data.user.newNotifications,
         };
-        doctorId = data.user.id;
       } else if (type === "PACKAGE") {
         const data = await db.doctorPackage.update({
           where: { paymentIntent: `${session.payment_intent}` },
@@ -99,66 +127,138 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           select: {
             type: true,
             price: true,
-            user: { select: { user: { select: { name: true, image: true } } } },
+            user: {
+              select: {
+                user: {
+                  select: {
+                    name: true,
+                    image: true,
+                    id: true,
+                    newNotifications: true,
+                  },
+                },
+              },
+            },
             doctor: {
               select: {
-                doctor: { select: { name: true, image: true, id: true } },
+                doctor: {
+                  select: {
+                    name: true,
+                    image: true,
+                    id: true,
+                    newNotifications: true,
+                  },
+                },
               },
             },
           },
         });
+
         userData = {
           name: data.user.user.name,
           image: data.user.user.image,
           type: data.type,
+          id: data.user.user.id,
+          paymentType: "PACKAGE",
+          newNotificationsNum: data.user.user.newNotifications,
         };
         doctorData = {
           name: data.doctor.doctor.name,
           image: data.doctor.doctor.image,
           type: data.type,
+          id: data.doctor.doctor.id,
+          newNotificationsNum: data.doctor.doctor.newNotifications,
+          paymentType: "PACKAGE",
         };
         doctorMoney = data.price;
-        doctorId = data.doctor.doctor.id;
       }
-      // if (doctorId && doctorMoney) {
-      //   await db.user.update({
-      //     where: { id: doctorId},
-      //     data: {
-      //       DoctorData: {
-      //         update: {
-      //           money: { update: { pending: doctorMoney } },
-      //         },
-      //       },
-      //     },
-      //   });
-      // }
-      console.log(userData!);
-      console.log(doctorData!);
-      console.log(doctorMoney!);
-      console.log(doctorId!);
-      // const user_notification = {
-      //   name: doctor_session.user.name,
-      //   date: getNotificationDate(),
-      //   image: doctor_session.user.image,
-      //   message: "لقد اشتريت جلسة من الطبيب " + doctor_session.user.name,
-      // };
-      // pusherServer.trigger(
-      //   "notifications",
-      //   `new-notification:${user_session.userId}`,
-      //   user_notification
-      // );
 
-      // pusherServer.trigger(
-      //   "notifications",
-      //   `new-notification:${doctor_session.userId}`,
+      if (doctorId! && doctorMoney!) {
+        await db.user.update({
+          where: { id: doctorId },
+          data: {
+            DoctorData: {
+              update: {
+                money: { update: { pending: doctorMoney } },
+              },
+            },
+          },
+        });
+      }
 
-      //   {
-      //     name: user_session.user.name,
-      //     date: getNotificationDate(),
-      //     image: user_session.user.image,
-      //     message: "لقد اشترى " + user_session.user.name + " منك جلسة",
-      //   } as Notification
-      // );
+      let userMessage = "لقد اشتريت من أحد الأطباء",
+        doctorMessage = "لقد اشترى أحد العملاء منك";
+      if (doctorData!.paymentType === "NORMAL") {
+        if (userData!) {
+          doctorMessage = `لقد اشترى منك ${userData!.name} جلسة ${
+            userData!.type === "HALF_HOUR" ? "نصف" : ""
+          } ساعة`;
+        }
+
+        userMessage = `لقد اشتريت جلسة ${
+          doctorData!.type === "HOUR" ? "" : "نصف"
+        } ساعة من الطبيب  ${doctorData!.name}`;
+      } else if (doctorData!.paymentType === "PACKAGE") {
+        doctorMessage = `لقد اشترى منك ${userData!.name} باكج ${
+          userData!.type === "HALF_HOUR" ? "نصف" : ""
+        } ساعة`;
+
+        userMessage = `لقد اشتريت باكج ${
+          doctorData!.type === "HOUR" ? "" : "نصف"
+        } ساعة من الطبيب  ${doctorData!.name}`;
+      }
+
+      if (userData!) {
+        const user_notification = {
+          name: doctorData!.name,
+          date: getNotificationDate(),
+          image: doctorData!.image,
+          message: userMessage,
+        };
+
+        pusherServer.trigger(
+          "notifications",
+          `new-notification:${userData!.id}`,
+          user_notification
+        );
+
+        await db.user.update({
+          where: { id: userData.id },
+          data: {
+            newNotifications: { increment: 1 },
+            notifications: {
+              create: user_notification,
+            },
+          },
+        });
+      }
+
+      const doctor_notification = {
+        name: userData!.name,
+        date: getNotificationDate(),
+        image: userData!.image,
+        message: doctorMessage,
+      };
+
+      pusherServer.trigger(
+        "notifications",
+        `new-notification:${doctorData!.id}`,
+        doctor_notification
+      );
+      console.log(doctorData!.id);
+      console.log(doctor_notification);
+      const doctor = await db.user.update({
+        where: { id: doctorData!.id, role: "DOCTOR" },
+        data: {
+          newNotifications: { increment: 1 },
+          notifications: {
+            create: doctor_notification,
+          },
+        },
+      });
+
+      console.log(doctor);
+
       console.log("Orders Updated");
     } else if (
       event.type === "charge.expired" ||

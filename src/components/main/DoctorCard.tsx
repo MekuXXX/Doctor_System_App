@@ -21,8 +21,10 @@ type Props = {
 export default function DoctorCard({ doctor, isActive }: Props) {
   const rate = calculateRate(doctor.DoctorData?.Rate);
   const discount = 20;
-  const priceA = 50;
-  const priceB = 20;
+  let lowestPrice = doctor.DoctorData?.doctorSessions?.halfSessions;
+
+  if (doctor.DoctorData?.doctorSessions?.hourSessions < lowestPrice)
+    lowestPrice = doctor.DoctorData.doctorSessions?.hourSessions;
 
   return (
     <Card className="bg-white dark:bg-dark rounded-lg border shadow-md p-4 min-w-[15rem]">
@@ -65,10 +67,10 @@ export default function DoctorCard({ doctor, isActive }: Props) {
         </MainButton>
         <div className="flex items-center justify-between w-full">
           <div className="text-lg font-bold">
-            <CurrencyConvert currency={priceB} />
+            <CurrencyConvert currency={lowestPrice} />
           </div>
           <div className="text-sm text-gray-500 line-through">
-            <CurrencyConvert currency={priceA} />
+            <CurrencyConvert currency={0} />
           </div>
         </div>
       </CardFooter>

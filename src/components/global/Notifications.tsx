@@ -6,6 +6,8 @@ import { useEffect, useRef, useState } from "react";
 import { pusherClient } from "@/lib/pusher";
 import { Notification, UserRole } from "@prisma/client";
 import { removeNewNotificationsNumber } from "@/actions/notifications";
+import useSound from "use-sound";
+
 type Props = {
   initialData: Notification[];
   userId: string;
@@ -19,6 +21,7 @@ export function Notifications({
   newNotifications,
   role,
 }: Props) {
+  const [play] = useSound("/sounds/mixkit-correct-answer-tone-2870.wav");
   const [notifications, setNotifications] =
     useState<Notification[]>(initialData);
   const [newNotification, setNewNotification] = useState(newNotifications);
@@ -50,6 +53,7 @@ export function Notifications({
   useEffect(() => {
     pusherClient.subscribe("notifications");
     const handleOnNotification = (notification: Notification) => {
+      play();
       setNewNotification(newNotification + 1);
       setNotifications(() => [...notifications, notification]);
     };
@@ -63,7 +67,7 @@ export function Notifications({
     return () => {
       pusherClient.unsubscribe("notifications");
     };
-  }, [notifications, userId, newNotification, role]);
+  }, [notifications, userId, newNotification, role, play]);
 
   const handleClick = async () => {
     setNewNotification(0);
@@ -98,7 +102,7 @@ export function Notifications({
         >
           <p className="p-2 border-b font-bold select-none">اشعارات</p>
           <ul
-            className="min-w-fit p-2 flex flex-col-reverse gap-4"
+            className="min-w-fit p-2 gap-4"
             dir="rtl"
             aria-labelledby="menu-button"
           >

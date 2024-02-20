@@ -15,6 +15,7 @@ import Image from "next/image";
 import { auth } from "@/auth";
 import { checkCoupon } from "@/actions/coupon";
 import { SessionType } from "@prisma/client";
+import { TAX } from "@/lib/constants";
 
 type Props = {
   searchParams: {
@@ -121,7 +122,7 @@ export default async function CheckoutPage({ searchParams }: Props) {
   const newSessionData: PaymentData = {
     type: "PACKAGE",
     quantity: 4,
-    sessionPrice: resultPrice,
+    sessionPrice: resultPrice + TAX,
     sessionType: type,
     doctorId: DoctorData?.id!,
     userId: user.user.id,
@@ -140,7 +141,7 @@ export default async function CheckoutPage({ searchParams }: Props) {
     {
       id: 2,
       text: "المبلغ الضريبى",
-      text_bold: "154EGP",
+      text_bold: <CurrencyConvert currency={Number(process.env.TAX!)} />,
       icon: <FaDollarSign className="h-[1.5rem] w-[1.5rem]" />,
     },
     {

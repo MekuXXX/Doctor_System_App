@@ -14,24 +14,13 @@ import moment from "moment";
 import Image from "next/image";
 import { auth } from "@/auth";
 import { checkCoupon } from "@/actions/coupon";
-import { isSessionBought } from "@/actions/doctor";
 import { TAX } from "@/lib/constants";
 
 type Props = {
   searchParams: {
-    sessionId: string;
+    paymentLink: string;
     coupon?: string;
   };
-};
-
-const order = {
-  id: "UTJzWVNhbTJPajFWdlNQejVGWmE4UT09",
-  doctorName: "أحمد السيد",
-  price: 25,
-  price_2: 15,
-  data: new Date(),
-  time: new Date().getTime(),
-  duration: 30,
 };
 
 const instructions = [
@@ -76,75 +65,56 @@ const instructions = [
 
 export default async function CheckoutPage({ searchParams }: Props) {
   const user = await auth();
-  if (!user) redirect("/");
-  if (user.user.role !== "USER") redirect("/");
-  const { sessionId, coupon } = searchParams;
-  if (!sessionId) redirect("/");
-  const sessionData = await db.doctorScheduleSession.findUnique({
-    where: { id: sessionId },
+  if (user && user.user.role !== "USER") redirect("/");
+  const { paymentLink, coupon } = searchParams;
+  if (!paymentLink) redirect("/");
+  const sessionData = await db.paymentLink.findUnique({
+    where: { token: paymentLink },
     include: {
-      schedule: {
-        select: {
-          dayOfWeek: true,
-          doctor: {
-            select: {
-              doctor: {
-                select: {
-                  name: true,
-                  image: true,
-                  id: true,
-                  DoctorData: {
-                    select: { id: true },
-                  },
-                },
-              },
-            },
-          },
-        },
+      doctor: {
+        select: { doctor: { select: { name: true, image: true, id: true } } },
       },
     },
   });
   if (!sessionData) redirect("/");
-  const { name, image, DoctorData, id } = sessionData.schedule.doctor.doctor;
+  if (sessionData.status === "PAID") redirect("/result?status=success");
+  const { name, image, id } = sessionData.doctor.doctor;
 
-  const nextDayDate = getNextDayOfWeek(sessionData.schedule.dayOfWeek).set({
-    hour: parseInt(sessionData.sessionTime.substring(0, 2)), // Extract hour from time string
-    minute: parseInt(sessionData.sessionTime.substring(3, 5)), // Extract minute from time string
+  const tax = 5;
+  const nextDayDate = moment(sessionData.date).set({
+    hour: parseInt(sessionData.time.substring(0, 2)), // Extract hour from time string
+    minute: parseInt(sessionData.time.substring(3, 5)), // Extract minute from time string
     second: 0,
     millisecond: 0,
   });
 
-  const isBought = await isSessionBought(id, nextDayDate.toDate());
-  if (isBought) redirect("/");
-
-  const time = convertToAmAndPm(sessionData.sessionTime);
+  const price = Math.round(
+    sessionData.customPrice + sessionData.doctorPrice + tax
+  );
   let checkCouponData;
   if (coupon)
-    checkCouponData = await checkCoupon(
-      coupon,
-      sessionData.sessionPrice,
-      DoctorData?.id!
-    );
+    checkCouponData = await checkCoupon(coupon, price, sessionData.doctorId);
   if (checkCouponData?.error)
     redirect(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/session-pay?sessionId=${sessionId}&couponMessage=${checkCouponData.error}`
+      `${process.env.NEXT_PUBLIC_BASE_URL}/pay?paymentLink=${paymentLink}&couponMessage=${checkCouponData.error}`
     );
 
   const resultPrice = checkCouponData?.success
-    ? sessionData.sessionPrice - checkCouponData.data.discount < 0
+    ? price - checkCouponData.data.discount < 0
       ? 0
-      : sessionData.sessionPrice - checkCouponData.data.discount
-    : sessionData.sessionPrice;
+      : price - checkCouponData.data.discount
+    : price;
 
   const newSessionData: PaymentData = {
-    type: "NORMAL",
+    type: "LINK",
     quantity: 1,
     sessionPrice: resultPrice + TAX,
-    sessionType: sessionData.sessionType,
+    sessionType: sessionData.sessionType as "HOUR",
     doctorId: id,
     date: nextDayDate.toDate(),
-    userId: user.user.id,
+    paymentLinkToken: paymentLink,
   };
+  if (user?.user) newSessionData.userId = user.user.id;
 
   if (checkCouponData?.success)
     newSessionData.coupon = checkCouponData.data.coupon;
@@ -173,7 +143,7 @@ export default async function CheckoutPage({ searchParams }: Props) {
     {
       id: 4,
       text: "وقت الجلسة",
-      text_bold: time!,
+      text_bold: convertToAmAndPm(sessionData.time),
       icon: <CiClock2 className="h-[1.5rem] w-[1.5rem]" />,
     },
     {
@@ -220,7 +190,6 @@ export default async function CheckoutPage({ searchParams }: Props) {
           ))}
         </div>
         <div className="py-8 px-4">
-          {/*TODO: add loading spinner */}
           <Suspense fallback={<p>Loading...</p>}>
             <CheckoutForm session={newSessionData} />
           </Suspense>

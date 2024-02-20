@@ -2,12 +2,18 @@ import React from "react";
 import DoctorsView from "@/components/main/DoctorsView";
 import { db } from "@/lib/db";
 import { isUserOnline } from "@/lib/compare-times";
+import { isDoctorBusy } from "@/actions/doctor";
 
-type Props = {};
+type Props = {
+  params: {};
+  searchParams: {
+    search?: string;
+  };
+};
 
-export default async function DoctorsPage({}: Props) {
+export default async function DoctorsPage({ searchParams }: Props) {
   const doctors = await db.user.findMany({
-    where: { role: "DOCTOR" },
+    where: { role: "DOCTOR", name: { contains: searchParams.search } },
     select: {
       id: true,
       name: true,
@@ -26,22 +32,31 @@ export default async function DoctorsPage({}: Props) {
             },
           },
           Rate: true,
+          doctorSessions: true,
         },
       },
     },
   });
 
+  const busyDoctors: any[] = [];
   const activeDoctors: any[] = [];
   const inActiveDoctors: any[] = [];
-  doctors.forEach((doctor) => {
-    const isActive = isUserOnline(
-      doctor?.DoctorData?.doctorActive?.from!,
-      doctor?.DoctorData?.doctorActive?.to!
-    );
-    if (doctor.DoctorData?.doctorActive?.isActive && isActive)
+
+  for (let doctor of doctors) {
+    const isBusy = await isDoctorBusy(doctor?.id);
+    if (isBusy) {
+      busyDoctors.push(doctor);
+    } else if (
+      doctor.DoctorData?.doctorActive?.isActive &&
+      isUserOnline(
+        doctor?.DoctorData?.doctorActive?.from!,
+        doctor?.DoctorData?.doctorActive?.to!
+      )
+    )
       activeDoctors.push(doctor);
     else inActiveDoctors.push(doctor);
-  });
+  }
+
   return (
     <div className="content">
       {activeDoctors.length !== 0 && (
@@ -62,9 +77,13 @@ export default async function DoctorsPage({}: Props) {
           className="feature"
         />
       )}
-      {/* {availableNow.length === 0 && notAvailableNow.length === 0 && (
-        <p className="text-xl my-8 font-extrabold text-center">لا توجد نتائج</p>
-      )} */}
+      {activeDoctors.length === 0 &&
+        inActiveDoctors.length === 0 &&
+        busyDoctors.length === 0 && (
+          <p className="text-xl my-8 font-extrabold text-center">
+            لا توجد نتائج
+          </p>
+        )}
     </div>
   );
 }

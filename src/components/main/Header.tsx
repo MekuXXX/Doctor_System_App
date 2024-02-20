@@ -20,6 +20,12 @@ import { auth } from "@/auth";
 import { LogoutButton } from "@/components/auth/logout-button";
 import { LoginButton } from "@/components/auth/login-button";
 import { ADMIN_DASHBOARD, DOCTOR_DASHBOARD, USER_DASHBOARD } from "@/routes";
+import { getUserNotifications } from "@/actions/notifications";
+import { db } from "@/lib/db";
+import { Notifications } from "@/components/global/Notifications";
+import { ModeToggle } from "@/components/global/ModeToggle";
+import { FullScreenToggle } from "@/components/global/FullScreenToggle";
+import MainSearch from "@/components/main/MainSearch";
 
 type Props = {};
 
@@ -53,48 +59,75 @@ export default async function Header({}: Props) {
       : user?.user.role === "ADMIN"
       ? ADMIN_DASHBOARD
       : DOCTOR_DASHBOARD;
+  let notifications, newNotifications;
+  if (user) {
+    notifications = await getUserNotifications(user.user.id!);
+    newNotifications = await db.user.findUnique({
+      where: { id: user.user.id },
+      select: { newNotifications: true },
+    });
+  }
+
   return (
     <header dir="rtl" className="content">
       <div className="flex justify-between items-center">
-        <Link href={"/"} className="block">
-          <Image src={Logo} alt="Logo" />
-        </Link>
-        <nav className="fixed bottom-0 left-0 py-4 px-12 w-full md:w-fit md:relative bg-white z-10 dark:bg-dark md:bg-transparent">
-          <ul className="flex justify-between items-center gap-4">
-            {pages.map(({ id, link, text, icon }) => (
-              <li key={id}>
-                <Link
-                  href={link}
-                  className="flex items-center gap-4 flex-col hover:text-main transition text-nowrap"
-                >
-                  {icon}
-                  <span>{text}</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
-
-        <div className="grid gap-2 items-center">
+        <div className="flex gap-4 items-center">
+          <Link href={"/"} className="block">
+            <Image src={Logo} alt="Logo" />
+          </Link>
+          <nav className="w-full md:w-fit fixed bottom-0 left-0 md:relative bg-white z-10 dark:bg-dark md:bg-transparent">
+            <ul className="flex justify-around items-center gap-4">
+              {pages.map(({ id, link, text, icon }) => (
+                <li key={id}>
+                  <Link
+                    href={link}
+                    className="flex items-center gap-4 flex-col hover:text-main transition text-nowrap"
+                  >
+                    {icon}
+                    <span>{text}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        </div>
+        <div className="flex gap-4 items-center justify-center">
+          <MainSearch />
+          <div>
+            <ModeToggle />
+          </div>
+          <div>
+            <FullScreenToggle />
+          </div>
           {user ? (
-            <DropdownMenu dir="rtl">
-              <DropdownMenuTrigger asChild>
-                <MainButton className="flex gap-2">
-                  <span>{user.user?.name}</span>
-                  <IoMdArrowDropdown />
-                </MainButton>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuLabel dir="rtl">إعدادات</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  <Link href={dashboard}>حسابى</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <LogoutButton>تسجيل الخروج</LogoutButton>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <>
+              <div>
+                <Notifications
+                  initialData={notifications?.data!}
+                  userId={user.user.id!}
+                  newNotifications={newNotifications?.newNotifications!}
+                  role={user.user.role!}
+                />
+              </div>
+              <DropdownMenu dir="rtl">
+                <DropdownMenuTrigger asChild>
+                  <MainButton className="flex gap-2">
+                    <span>{user.user?.name}</span>
+                    <IoMdArrowDropdown />
+                  </MainButton>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuLabel dir="rtl">إعدادات</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem>
+                    <Link href={dashboard}>حسابى</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <LogoutButton>تسجيل الخروج</LogoutButton>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </>
           ) : (
             <MainButton>
               <LoginButton>تسجيل الدخول</LoginButton>

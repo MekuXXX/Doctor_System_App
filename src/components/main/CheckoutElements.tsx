@@ -22,12 +22,6 @@ export default function CheckoutElements({ clientSecret }: Props) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
-  // useEffect(() => {
-  //   if (!stripe || !clientSecret) {
-  //     return;
-  //   }
-  // }, [stripe]);
-
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
@@ -45,7 +39,7 @@ export default function CheckoutElements({ clientSecret }: Props) {
       if (!error) {
         window.localStorage.setItem("payment_intent_id", "Payment Done");
         toast.success("تمت عملية الدفع بنجاح");
-        router.push(
+        router.replace(
           `${process.env.NEXT_PUBLIC_BASE_URL}/result?status=success`
         );
       } else {
