@@ -121,7 +121,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           newNotificationsNum: data.user.newNotifications,
         };
       } else if (type === "PACKAGE") {
-        const data = await db.doctorPackage.update({
+        const data = await db.userPackage.update({
           where: { paymentIntent: `${session.payment_intent}` },
           data: { status: "PAID" },
           select: {
@@ -129,14 +129,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             price: true,
             user: {
               select: {
-                user: {
-                  select: {
-                    name: true,
-                    image: true,
-                    id: true,
-                    newNotifications: true,
-                  },
-                },
+                name: true,
+                image: true,
+                id: true,
+                newNotifications: true,
               },
             },
             doctor: {
@@ -155,12 +151,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         });
 
         userData = {
-          name: data.user.user.name,
-          image: data.user.user.image,
+          name: data.user.name,
+          image: data.user.image,
           type: data.type,
-          id: data.user.user.id,
+          id: data.user.id,
           paymentType: "PACKAGE",
-          newNotificationsNum: data.user.user.newNotifications,
+          newNotificationsNum: data.user.newNotifications,
         };
         doctorData = {
           name: data.doctor.doctor.name,
@@ -245,9 +241,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         `new-notification:${doctorData!.id}`,
         doctor_notification
       );
-      console.log(doctorData!.id);
-      console.log(doctor_notification);
-      const doctor = await db.user.update({
+
+      await db.user.update({
         where: { id: doctorData!.id, role: "DOCTOR" },
         data: {
           newNotifications: { increment: 1 },
@@ -256,8 +251,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           },
         },
       });
-
-      console.log(doctor);
 
       console.log("Orders Updated");
     } else if (

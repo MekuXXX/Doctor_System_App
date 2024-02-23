@@ -55,7 +55,7 @@ export function Notifications({
     const handleOnNotification = (notification: Notification) => {
       play();
       setNewNotification(newNotification + 1);
-      setNotifications(() => [...notifications, notification]);
+      setNotifications(() => [notification, ...notifications]);
     };
 
     if (role !== "ADMIN") {

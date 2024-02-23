@@ -24,7 +24,6 @@ export async function POST(req: NextRequest) {
   metadata.user = session.userId ? true : false;
   if (session.type === "LINK") metadata.token = session.paymentLinkToken;
 
-  const res = await fetch(process.env.EUROPE_IP!);
   const totalEuro = Math.round(session.sessionPrice * 100);
   const doctorPrice = Math.round(session.sessionPrice * 0.8);
   const sessionLink = await createWherebyUrl();
@@ -77,19 +76,16 @@ export async function POST(req: NextRequest) {
           },
         });
       } else {
-        await db.doctorPackage.update({
+        await db.userPackage.update({
           where: {
-            paymentIntent: paymentIntent.id,
-            user: { user: { role: "USER" } },
+            paymentIntent: payment_intent_id,
           },
           data: {
-            paymentIntent: paymentIntent.id,
-            number: session.quantity,
-            doctorId: session.doctorId,
-            userId: session.userId,
+            status: "WAITING_PAY",
+            remain: session.quantity,
             type: session.sessionType,
-            coupon: session.coupon,
             price: doctorPrice,
+            paymentIntent: paymentIntent.id,
           },
         });
       }
@@ -131,41 +127,20 @@ export async function POST(req: NextRequest) {
           },
         });
       } else if (session.type === "PACKAGE") {
-        await db.user.update({
-          where: { id: session.userId, role: "USER" },
+        await db.userPackage.create({
           data: {
-            userPackage: {
-              upsert: {
-                create: {
-                  doctorsPackages: {
-                    create: {
-                      paymentIntent: paymentIntent.id,
-                      number: session.quantity,
-                      type: session.sessionType,
-                      price: doctorPrice,
-                      coupon: session.coupon,
-                      doctorId: session.doctorId,
-                    },
-                  },
-                },
-                update: {
-                  doctorsPackages: {
-                    create: {
-                      paymentIntent: paymentIntent.id,
-                      number: session.quantity,
-                      doctorId: session.doctorId,
-                      type: session.sessionType,
-                      price: doctorPrice,
-                      coupon: session.coupon,
-                    },
-                  },
-                },
-              },
-            },
+            status: "WAITING_PAY",
+            doctorId: session.doctorId,
+            remain: session.quantity,
+            type: session.sessionType,
+            price: doctorPrice,
+            userId: session.userId!,
+            paymentIntent: paymentIntent.id,
           },
         });
       } else throw new Error(`Unknown payment type`);
     } catch (err) {
+      console.log(err);
       return NextResponse.json(
         { error: "حدثت مشكلة أثناء انشاء الطلب" },
         { status: 500 }

@@ -14,7 +14,7 @@ import moment from "moment";
 import Image from "next/image";
 import { auth } from "@/auth";
 import { checkCoupon } from "@/actions/coupon";
-import { isDoctorBusy } from "@/actions/doctor";
+import { isDoctorBusy, isHavePackageToBuy } from "@/actions/doctor";
 import { SessionType } from "@prisma/client";
 import { TAX } from "@/lib/constants";
 
@@ -97,7 +97,7 @@ export default async function CheckoutPage({ searchParams }: Props) {
 
   const sessionTime = moment().add(15, "minutes");
 
-  const time = convertToAmAndPm(sessionTime.format("HH:ss"));
+  const time = sessionTime.format("HH:ss A");
   const firstPrice =
     type === "HALF_HOUR"
       ? sessionData.DoctorData?.doctorSessions?.halfSessions!
@@ -128,6 +128,12 @@ export default async function CheckoutPage({ searchParams }: Props) {
 
   if (checkCouponData?.success)
     newSessionData.coupon = checkCouponData.data.coupon;
+
+  const isHavePackage = await isHavePackageToBuy(
+    newSessionData.doctorId,
+    newSessionData.userId!,
+    newSessionData.sessionType
+  );
 
   const OrderData = [
     {
@@ -199,7 +205,10 @@ export default async function CheckoutPage({ searchParams }: Props) {
         <div className="py-8 px-4">
           {/*TODO: add loading spinner */}
           <Suspense fallback={<p>Loading...</p>}>
-            <CheckoutForm session={newSessionData} />
+            <CheckoutForm
+              session={newSessionData}
+              isUsePackage={isHavePackage}
+            />
           </Suspense>
         </div>
       </div>

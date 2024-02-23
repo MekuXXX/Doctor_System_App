@@ -127,6 +127,7 @@ export default async function CheckoutPage({ searchParams }: Props) {
     doctorId: DoctorData?.id!,
     userId: user.user.id,
   };
+
   if (checkCouponData?.success)
     newSessionData.coupon = checkCouponData.data.coupon;
 

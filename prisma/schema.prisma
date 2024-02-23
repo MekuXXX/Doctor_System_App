@@ -39,7 +39,7 @@ model User {
   DoctorData            DoctorData?
   newNotifications      Int                    @default(0)
   notifications         Notification[]
-  userPackage           UserPackage?
+  userPackage           UserPackage[]
 }
 
 enum PaymentStatus {
@@ -48,10 +48,16 @@ enum PaymentStatus {
 }
 
 model UserPackage {
-  id              String          @id @default(cuid())
-  userId          String          @unique
-  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  doctorsPackages DoctorPackage[]
+  id            String        @id @default(cuid())
+  userId        String
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  doctorId      String
+  doctor        DoctorData    @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  status        PaymentStatus
+  type          SessionType
+  price         Float
+  paymentIntent String        @unique
+  remain        Int
 }
 
 model DoctorPackage {
@@ -60,12 +66,10 @@ model DoctorPackage {
   status        PaymentStatus @default(WAITING_PAY)
   number        Int
   type          SessionType
-  doctorId      String
   price         Float
   coupon        String?
+  doctorId      String
   doctor        DoctorData    @relation(fields: [doctorId], references: [id], onDelete: Cascade)
-  userId        String
-  user          UserPackage   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Notification {
@@ -107,6 +111,7 @@ model DoctorData {
   doctorSchedule Schedule[]
   paymentLink    PaymentLink[]
   DoctorPakage   DoctorPackage[]
+  paidPackages   UserPackage[]
 }
 
 model PaymentLink {

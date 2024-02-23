@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { UseCoupon } from "@/components/main/UseCoupon";
 import { SessionType } from "@prisma/client";
 import { useSearchParams } from "next/navigation";
-import { FormError } from "../auth/form-error";
+import { FormError } from "@/components/auth/form-error";
+import { PackagePay } from "@/components/dashboard/PackagePay";
 
 export type PaymentType = "NORMAL" | "LINK" | "PACKAGE";
 
@@ -25,18 +26,18 @@ export type PaymentData = {
 
 type Props = {
   session: PaymentData;
+  isUsePackage?: boolean;
 };
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || ""
 );
 
-export default function CheckoutForm({ session }: Props) {
+export default function CheckoutForm({ session, isUsePackage }: Props) {
   const [hasCoupon, setHasCoupon] = useState(false);
   const [clientSecret, setClientSecret] = useState("");
   const searchParams = useSearchParams();
   const couponMessage = searchParams?.get("couponMessage") || "";
-
   useEffect(() => {
     console.log(window.localStorage.getItem("payment_intent_id"));
     console.log(session);
@@ -58,7 +59,8 @@ export default function CheckoutForm({ session }: Props) {
           data.payment_intent_id
         );
         setClientSecret(data.clientSecret);
-      });
+      })
+      .catch((err) => console.log(err));
   }, [session]);
 
   const options: StripeElementsOptions = {
@@ -75,6 +77,9 @@ export default function CheckoutForm({ session }: Props) {
         <Elements options={options} stripe={stripePromise}>
           <CheckoutElements clientSecret={clientSecret} />
         </Elements>
+      )}
+      {session.type !== "PACKAGE" && isUsePackage && (
+        <PackagePay session={session} isUsePackage={isUsePackage} />
       )}
       {hasCoupon ? (
         <div>

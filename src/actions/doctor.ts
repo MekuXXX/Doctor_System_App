@@ -20,6 +20,12 @@ import {
 } from "@/schemas/doctorDetails";
 import { DEFAULT_IMG } from "@/lib/constants";
 import moment, { now } from "moment";
+import { SessionType } from "@prisma/client";
+import { PaymentData } from "@/components/main/CheckoutForm";
+import { createWherebyUrl } from "@/actions/whereby";
+import { v4 as uuidV4 } from "uuid";
+import { getNotificationDate } from "@/lib/moment";
+import { pusherServer } from "@/lib/pusher";
 
 export const getDoctors = async () => {
   try {
@@ -334,5 +340,166 @@ export const isSessionBought = async (doctorId: string, date: Date) => {
     return session.length > 0;
   } catch (err) {
     return false;
+  }
+};
+
+export const isHavePackageToBuy = async (
+  doctorId: string,
+  userId: string,
+  type: SessionType
+) => {
+  try {
+    if (!doctorId || !userId || !type) return false;
+    const packageData = await db.userPackage.findFirst({
+      where: {
+        status: "PAID",
+        doctor: { doctor: { id: doctorId } },
+        userId,
+        type,
+        remain: { gt: 0 },
+      },
+      select: { id: true, remain: true },
+    });
+
+    return Object.keys(packageData!).length !== 0;
+  } catch {
+    return false;
+  }
+};
+
+export const buySessionByPackages = async (session: PaymentData) => {
+  try {
+    if (!session) return { error: "هناك خطأ فى بيانات الجلسة" };
+
+    const packageData = await db.userPackage.findFirst({
+      where: {
+        status: "PAID",
+        doctor: { doctor: { id: session.doctorId } },
+        userId: session.userId,
+        type: session.sessionType,
+        remain: { gt: 0 },
+      },
+      select: { id: true, remain: true },
+    });
+
+    if (!packageData || packageData.remain === 0) {
+      return { error: "لا يوجد رصيد فىى البكجات للشراء  بها" };
+    }
+
+    const sessionLink = await createWherebyUrl();
+    const generateIntent = uuidV4();
+    const [userData, doctorData] = await Promise.all([
+      db.user.update({
+        where: {
+          id: session.userId!,
+        },
+        data: {
+          newNotifications: { increment: 1 },
+          sessions: {
+            create: {
+              date: session.date!,
+              price: 0,
+              type: session.sessionType,
+              link: sessionLink.hostRoomUrl,
+              coupon: session.coupon,
+              status: "RESERVED",
+              paymentIntentId: `User ${generateIntent}`,
+            },
+          },
+        },
+        select: {
+          name: true,
+          image: true,
+          id: true,
+        },
+      }),
+
+      db.user.update({
+        where: {
+          id: session.doctorId,
+          role: "DOCTOR",
+        },
+        data: {
+          newNotifications: { increment: 1 },
+          sessions: {
+            create: {
+              date: session.date!,
+              price: 0,
+              type: session.sessionType,
+              link: sessionLink.hostRoomUrl,
+              coupon: session.coupon,
+              status: "RESERVED",
+              paymentIntentId: `Doctor ${generateIntent}`,
+            },
+          },
+        },
+        select: {
+          name: true,
+          image: true,
+          id: true,
+        },
+      }),
+      db.userPackage.update({
+        where: { id: packageData.id },
+        data: { remain: { decrement: 1 } },
+      }),
+    ]);
+
+    let userMessage = "لقد اشتريت من أحد الأطباء",
+      doctorMessage = "لقد اشترى أحد العملاء منك";
+
+    doctorMessage = `لقد اشترى منك ${userData.name} جلسة ${
+      session.sessionType === "HALF_HOUR" ? "نصف" : ""
+    } ساعة`;
+
+    userMessage = `لقد اشتريت جلسة ${
+      session.sessionType === "HOUR" ? "" : "نصف"
+    } ساعة`;
+
+    const user_notification = {
+      name: doctorData.name,
+      date: getNotificationDate(),
+      image: doctorData.image,
+      message: userMessage,
+    };
+
+    const doctor_notification = {
+      name: userData.name,
+      date: getNotificationDate(),
+      image: userData.image,
+      message: doctorMessage,
+    };
+    await Promise.all([
+      db.notification.create({
+        data: {
+          userId: userData.id,
+          ...user_notification,
+        },
+      }),
+
+      db.notification.create({
+        data: {
+          userId: doctorData.id,
+          ...doctor_notification,
+        },
+      }),
+    ]);
+
+    console.log(doctor_notification);
+    pusherServer.trigger(
+      "notifications",
+      `new-notification:${doctorData.id}`,
+      doctor_notification
+    );
+
+    pusherServer.trigger(
+      "notifications",
+      `new-notification:${userData.id}`,
+      user_notification
+    );
+    return { success: "تم الشراء بنجاح" };
+  } catch (err) {
+    console.log(err);
+    return { error: "حدث خطأ أثناء الشراء باستخدام البكجات" };
   }
 };

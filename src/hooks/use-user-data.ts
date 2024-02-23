@@ -35,7 +35,7 @@ export const useUserData = () => {
     queryKey: ["user-data"],
     queryFn: async () => {
       const res = await fetch(
-        "http://www.geoplugin.net/json.gp?base_currency=EUR"
+        "http://www.geoplugin.net/json.gp?ip=41.47.255.255&base_currency=EUR"
       );
       const data = await res.json();
       return data as UserDataType;
