@@ -14,6 +14,7 @@ type NotificationUserType = {
   paymentType: PaymentType;
   name: string;
   image: string;
+  email: string;
   type: SessionType;
   newNotificationsNum: number;
 };
@@ -68,6 +69,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                   name: true,
                   image: true,
                   id: true,
+                  email: true,
                   newNotifications: true,
                 },
               },
@@ -79,6 +81,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             type: data.type,
             id: data.user.id,
             paymentType: "NORMAL",
+            email: data.user.email,
             newNotificationsNum: data.user.newNotifications,
           };
         }
@@ -106,6 +109,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                 name: true,
                 image: true,
                 id: true,
+                email: true,
                 newNotifications: true,
               },
             },
@@ -117,6 +121,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           image: data.user.image,
           type: data.type,
           id: data.user.id,
+          email: data.user.email,
           paymentType: "NORMAL",
           newNotificationsNum: data.user.newNotifications,
         };
@@ -133,6 +138,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                 image: true,
                 id: true,
                 newNotifications: true,
+                email: true,
               },
             },
             doctor: {
@@ -143,6 +149,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                     image: true,
                     id: true,
                     newNotifications: true,
+                    email: true,
                   },
                 },
               },
@@ -157,6 +164,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           id: data.user.id,
           paymentType: "PACKAGE",
           newNotificationsNum: data.user.newNotifications,
+          email: data.user.email,
         };
         doctorData = {
           name: data.doctor.doctor.name,
@@ -165,6 +173,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           id: data.doctor.doctor.id,
           newNotificationsNum: data.doctor.doctor.newNotifications,
           paymentType: "PACKAGE",
+          email: data.doctor.doctor.email,
         };
         doctorMoney = data.price;
       }
@@ -205,6 +214,37 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       }
 
       if (userData!) {
+        const isConversationExist = await db.user.findFirst({
+          where: {
+            id: userData.id,
+            conversations: {
+              some: {
+                users: { some: { id: doctorData!.id } },
+              },
+            },
+          },
+        });
+
+        if (!isConversationExist) {
+          await db.conversation.create({
+            data: {
+              users: {
+                connect: [
+                  {
+                    id: userData.id,
+                    name: userData.name,
+                    email: userData.email,
+                  },
+                  {
+                    id: doctorData!.id,
+                    name: doctorData!.name,
+                    email: doctorData!.email,
+                  },
+                ],
+              },
+            },
+          });
+        }
         const user_notification = {
           name: doctorData!.name,
           date: getNotificationDate(),

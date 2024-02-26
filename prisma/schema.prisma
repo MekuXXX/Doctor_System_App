@@ -28,18 +28,20 @@ model User {
   email                 String                 @unique
   emailVerified         DateTime?
   phone                 String?
-  gender                USER_GENDER            @default(MALE)
   image                 String                 @default("/images/default.jpg")
   password              String?
+  isTwoFactorEnabled    Boolean                @default(false)
+  newNotifications      Int                    @default(0)
+  gender                USER_GENDER            @default(MALE)
   role                  UserRole               @default(USER)
   accounts              Account[]
   sessions              Session[]
-  isTwoFactorEnabled    Boolean                @default(false)
   twoFactorConfirmation TwoFactorConfirmation?
   DoctorData            DoctorData?
-  newNotifications      Int                    @default(0)
   notifications         Notification[]
   userPackage           UserPackage[]
+  conversations         Conversation[]
+  messages              Message[]
 }
 
 enum PaymentStatus {
@@ -60,17 +62,17 @@ model UserPackage {
   remain        Int
 }
 
-model DoctorPackage {
-  id            String        @id @default(cuid())
-  paymentIntent String        @unique
-  status        PaymentStatus @default(WAITING_PAY)
-  number        Int
-  type          SessionType
-  price         Float
-  coupon        String?
-  doctorId      String
-  doctor        DoctorData    @relation(fields: [doctorId], references: [id], onDelete: Cascade)
-}
+// model DoctorPackage {
+//   id            String        @id @default(cuid())
+//   paymentIntent String        @unique
+//   status        PaymentStatus @default(WAITING_PAY)
+//   number        Int
+//   type          SessionType
+//   price         Float
+//   coupon        String?
+//   doctorId      String
+//   doctor        DoctorData    @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+// }
 
 model Notification {
   id      String  @id @default(cuid())
@@ -110,7 +112,7 @@ model DoctorData {
   doctorSessions DoctorSessions?
   doctorSchedule Schedule[]
   paymentLink    PaymentLink[]
-  DoctorPakage   DoctorPackage[]
+  // DoctorPakage   DoctorPackage[]
   paidPackages   UserPackage[]
 }
 
@@ -200,6 +202,29 @@ model DoctorSessions {
   hourPackage  Float      @default(0.00)
   doctorId     String     @unique
   doctor       DoctorData @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+}
+
+model Conversation {
+  id            String   @id @default(cuid())
+  createdAt     DateTime @default(now())
+  lastMessageAt DateTime @default(now())
+
+  messages Message[]
+
+  users User[]
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  body      String?
+  image     String?
+  createdAt DateTime @default(now())
+
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  senderId String
+  sender   User   @relation(fields: [senderId], references: [id], onDelete: Cascade)
 }
 
 enum SessionStatus {

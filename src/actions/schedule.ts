@@ -101,7 +101,9 @@ export const getScheduleSessionsByDay = async (
         second: 0,
         millisecond: 0,
       });
-      return sessionTime > currentTime;
+      return currentTime.format("dddd").toUpperCase() !== day
+        ? true
+        : sessionTime > currentTime;
     });
 
     let filteredData: DoctorScheduleSession[] = [];

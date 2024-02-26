@@ -411,6 +411,7 @@ export const buySessionByPackages = async (session: PaymentData) => {
           name: true,
           image: true,
           id: true,
+          email: true,
         },
       }),
 
@@ -437,6 +438,7 @@ export const buySessionByPackages = async (session: PaymentData) => {
           name: true,
           image: true,
           id: true,
+          email: true,
         },
       }),
       db.userPackage.update({
@@ -444,6 +446,38 @@ export const buySessionByPackages = async (session: PaymentData) => {
         data: { remain: { decrement: 1 } },
       }),
     ]);
+
+    const isConversationExist = await db.user.findFirst({
+      where: {
+        id: userData.id,
+        conversations: {
+          some: {
+            users: { some: { id: doctorData!.id } },
+          },
+        },
+      },
+    });
+
+    if (!isConversationExist) {
+      await db.conversation.create({
+        data: {
+          users: {
+            connect: [
+              {
+                id: userData.id,
+                name: userData.name,
+                email: userData.email,
+              },
+              {
+                id: doctorData!.id,
+                name: doctorData!.name,
+                email: doctorData!.email,
+              },
+            ],
+          },
+        },
+      });
+    }
 
     let userMessage = "لقد اشتريت من أحد الأطباء",
       doctorMessage = "لقد اشترى أحد العملاء منك";
@@ -485,7 +519,6 @@ export const buySessionByPackages = async (session: PaymentData) => {
       }),
     ]);
 
-    console.log(doctor_notification);
     pusherServer.trigger(
       "notifications",
       `new-notification:${doctorData.id}`,

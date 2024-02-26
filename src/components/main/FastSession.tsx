@@ -15,8 +15,8 @@ type Props = {
 
 export function FastSession({ description, price, id, type, doctorId }: Props) {
   return (
-    <div className="bg-[#2a65ba] rounded-lg p-4 text-white max-w-sm mx-auto shadow-lg">
-      <div className="p-4 grid place-content-center">
+    <div className="bg-[#2a65ba] rounded-lg p-4 text-white w-[24rem]  mx-auto shadow-lg">
+      <div className="p-4 grid place-content-center gap-2">
         <h3 className="text-2xl font-semibold min-w-fit">{description}</h3>
         <CurrencyConvert currency={price} />
         <a

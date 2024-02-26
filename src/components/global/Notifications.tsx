@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { BsBellFill } from "react-icons/bs";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { pusherClient } from "@/lib/pusher";
 import { Notification, UserRole } from "@prisma/client";
 import { removeNewNotificationsNumber } from "@/actions/notifications";
@@ -47,16 +47,17 @@ export function Notifications({
     return () => document.removeEventListener("click", onClickOutside);
   }, []);
 
-  const handleItemClick = (item: any) => {
-    setIsOpen(false);
-  };
-  useEffect(() => {
-    pusherClient.subscribe("notifications");
-    const handleOnNotification = (notification: Notification) => {
+  const handleOnNotification = useCallback(
+    (notification: Notification) => {
       play();
       setNewNotification(newNotification + 1);
       setNotifications(() => [notification, ...notifications]);
-    };
+    },
+    [newNotification, notifications, play]
+  );
+
+  useEffect(() => {
+    pusherClient.subscribe("notifications");
 
     if (role !== "ADMIN") {
       pusherClient.bind("new-notification", handleOnNotification);
@@ -65,9 +66,18 @@ export function Notifications({
     pusherClient.bind(`new-notification:${userId}`, handleOnNotification);
 
     return () => {
+      pusherClient.unbind("new-notification", handleOnNotification);
+      pusherClient.unbind(`new-notification:${userId}`, handleOnNotification);
       pusherClient.unsubscribe("notifications");
     };
-  }, [notifications, userId, newNotification, role, play]);
+  }, [
+    notifications,
+    userId,
+    newNotification,
+    role,
+    play,
+    handleOnNotification,
+  ]);
 
   const handleClick = async () => {
     setNewNotification(0);

@@ -10,6 +10,7 @@ import Image from "next/image";
 import { redirect } from "next/navigation";
 import { getUserNotifications } from "@/actions/notifications";
 import { db } from "@/lib/db";
+import ChatButton from "@/components/global/ChatButton";
 
 type Props = {};
 
@@ -35,6 +36,7 @@ export default async function DashHeader({}: Props) {
           <div>
             <ModeToggle />
           </div>
+          <ChatButton />
           <div>
             <FullScreenToggle />
           </div>

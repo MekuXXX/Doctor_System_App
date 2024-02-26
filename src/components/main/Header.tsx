@@ -26,6 +26,7 @@ import { Notifications } from "@/components/global/Notifications";
 import { ModeToggle } from "@/components/global/ModeToggle";
 import { FullScreenToggle } from "@/components/global/FullScreenToggle";
 import MainSearch from "@/components/main/MainSearch";
+import ChatButton from "@/components/global/ChatButton";
 
 type Props = {};
 
@@ -93,22 +94,17 @@ export default async function Header({}: Props) {
         </div>
         <div className="flex gap-4 items-center justify-center">
           <MainSearch />
-          <div>
-            <ModeToggle />
-          </div>
-          <div>
-            <FullScreenToggle />
-          </div>
+          <ModeToggle />
+          <FullScreenToggle />
           {user ? (
             <>
-              <div>
-                <Notifications
-                  initialData={notifications?.data!}
-                  userId={user.user.id!}
-                  newNotifications={newNotifications?.newNotifications!}
-                  role={user.user.role!}
-                />
-              </div>
+              <ChatButton />
+              <Notifications
+                initialData={notifications?.data!}
+                userId={user.user.id!}
+                newNotifications={newNotifications?.newNotifications!}
+                role={user.user.role!}
+              />
               <DropdownMenu dir="rtl">
                 <DropdownMenuTrigger asChild>
                   <MainButton className="flex gap-2">
