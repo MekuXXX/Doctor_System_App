@@ -122,7 +122,7 @@ export default async function CheckoutPage({ searchParams }: Props) {
   const newSessionData: PaymentData = {
     type: "PACKAGE",
     quantity: 4,
-    sessionPrice: resultPrice + TAX,
+    sessionPrice: resultPrice,
     sessionType: type,
     doctorId: DoctorData?.id!,
     userId: user.user.id,

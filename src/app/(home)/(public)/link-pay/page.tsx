@@ -108,7 +108,7 @@ export default async function CheckoutPage({ searchParams }: Props) {
   const newSessionData: PaymentData = {
     type: "LINK",
     quantity: 1,
-    sessionPrice: resultPrice + TAX,
+    sessionPrice: resultPrice,
     sessionType: sessionData.sessionType as "HOUR",
     doctorId: id,
     date: nextDayDate.toDate(),

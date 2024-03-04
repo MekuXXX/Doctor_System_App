@@ -7,6 +7,7 @@ import { pusherServer } from "@/lib/pusher";
 import { Notification, SessionType } from "@prisma/client";
 import { getNotificationDate } from "@/lib/moment";
 import { PaymentType } from "@/components/main/CheckoutForm";
+import { TAX } from "@/lib/constants";
 //Securing a connection to firebase from backend
 
 type NotificationUserType = {
@@ -53,57 +54,16 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       let userData: NotificationUserType;
       let doctorData: NotificationUserType;
       if (type === "NORMAL" || type === "LINK") {
-        if (session.metadata.user === "true") {
-          const data = await db.session.update({
-            where: {
-              paymentIntentId: `User ${session.payment_intent}`,
-              user: { role: "USER" },
-            },
-            data: {
-              status: "RESERVED",
-            },
-            select: {
-              type: true,
-              user: {
-                select: {
-                  name: true,
-                  image: true,
-                  id: true,
-                  email: true,
-                  newNotifications: true,
-                },
-              },
-            },
-          });
-          userData = {
-            name: data.user.name,
-            image: data.user.image,
-            type: data.type,
-            id: data.user.id,
-            paymentType: "NORMAL",
-            email: data.user.email,
-            newNotificationsNum: data.user.newNotifications,
-          };
-        }
-
-        if (type === "LINK") {
-          await db.paymentLink.update({
-            where: { token: session.metadata.token },
-            data: { status: "PAID" },
-          });
-        }
-
         const data = await db.session.update({
           where: {
-            paymentIntentId: `Doctor ${session.payment_intent}`,
-            user: { role: "DOCTOR" },
+            paymentIntentId: `${session.payment_intent}`,
           },
           data: {
             status: "RESERVED",
           },
           select: {
             type: true,
-            price: true,
+            doctorPrice: true,
             user: {
               select: {
                 name: true,
@@ -113,25 +73,56 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                 newNotifications: true,
               },
             },
+            doctor: {
+              select: {
+                doctor: {
+                  select: {
+                    name: true,
+                    image: true,
+                    id: true,
+                    email: true,
+                    newNotifications: true,
+                  },
+                },
+              },
+            },
           },
         });
-        doctorMoney = data.price;
-        doctorData = {
-          name: data.user.name,
-          image: data.user.image,
+        doctorMoney = data.doctorPrice;
+        userData = {
+          name: data.user?.name!,
+          image: data.user?.image!,
           type: data.type,
-          id: data.user.id,
-          email: data.user.email,
+          id: data.user?.id!,
           paymentType: "NORMAL",
-          newNotificationsNum: data.user.newNotifications,
+          email: data.user?.email!,
+          newNotificationsNum: data.user?.newNotifications!,
         };
+
+        doctorData = {
+          name: data.doctor.doctor.name,
+          image: data.doctor.doctor.image,
+          type: data.type,
+          id: data.doctor.doctor.id,
+          email: data.doctor.doctor.email,
+          paymentType: "NORMAL",
+          newNotificationsNum: data.doctor.doctor.newNotifications,
+        };
+
+        if (type === "LINK") {
+          await db.paymentLink.update({
+            where: { token: session.metadata.token },
+            data: { status: "PAID" },
+          });
+        }
       } else if (type === "PACKAGE") {
         const data = await db.userPackage.update({
           where: { paymentIntent: `${session.payment_intent}` },
           data: { status: "PAID" },
           select: {
             type: true,
-            price: true,
+            doctorPrice: true,
+
             user: {
               select: {
                 name: true,
@@ -175,7 +166,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           paymentType: "PACKAGE",
           email: data.doctor.doctor.email,
         };
-        doctorMoney = data.price;
+        doctorMoney = data.doctorPrice;
       }
 
       if (doctorId! && doctorMoney!) {

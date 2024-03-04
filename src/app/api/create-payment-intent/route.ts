@@ -5,6 +5,8 @@ import { stripe } from "@/lib/stripe";
 import { db } from "@/lib/db";
 import { createWherebyUrl } from "@/actions/whereby";
 import { PaymentData } from "@/components/main/CheckoutForm";
+import { TAX } from "@/lib/constants";
+import moment from "moment";
 
 export async function POST(req: NextRequest) {
   const user = await auth();
@@ -24,9 +26,10 @@ export async function POST(req: NextRequest) {
   metadata.user = session.userId ? true : false;
   if (session.type === "LINK") metadata.token = session.paymentLinkToken;
 
-  const totalEuro = Math.round(session.sessionPrice * 100);
-  const doctorPrice = Math.round(session.sessionPrice * 0.8);
+  const doctorPrice = session.sessionPrice;
+  const patientPrice = Math.round(session.sessionPrice + TAX);
   const sessionLink = await createWherebyUrl();
+  const validUntil = moment().add(45, "days");
 
   let paymentIntent;
   try {
@@ -36,46 +39,31 @@ export async function POST(req: NextRequest) {
         throw new Error("Old payment intent");
       if (paymentIntent) {
         paymentIntent = await stripe.paymentIntents.update(payment_intent_id, {
-          amount: totalEuro,
+          amount: patientPrice * 100,
           metadata: metadata,
         });
       }
 
       if (session.type === "NORMAL" || session.type === "LINK") {
-        if (session.userId) {
-          await db.session.update({
-            where: {
-              paymentIntentId: `User ${payment_intent_id}`,
-              user: { role: "USER" },
-            },
-            data: {
-              date: session.date,
-              price: doctorPrice,
-              userId: session.userId,
-              type: session.sessionType,
-              link: sessionLink.hostRoomUrl,
-              coupon: session.coupon,
-              paymentIntentId: `User ${paymentIntent.id}`,
-            },
-          });
-        }
-
         await db.session.update({
           where: {
-            paymentIntentId: `Doctor ${payment_intent_id}`,
-            user: { role: "DOCTOR" },
+            paymentIntentId: payment_intent_id,
           },
           data: {
             date: session.date,
-            price: doctorPrice,
-            userId: session.doctorId,
+            doctorPrice: doctorPrice,
+            patientPrice: patientPrice,
+            sessionPrice: session.sessionPrice,
+            doctorId: session.doctorId,
+            userId: session.userId,
             type: session.sessionType,
             link: sessionLink.hostRoomUrl,
-            paymentIntentId: `Doctor ${paymentIntent.id}`,
             coupon: session.coupon,
+            paymentIntentId: paymentIntent.id,
           },
         });
       } else {
+        const validUntil = moment().add(45, "days");
         await db.userPackage.update({
           where: {
             paymentIntent: payment_intent_id,
@@ -84,15 +72,18 @@ export async function POST(req: NextRequest) {
             status: "WAITING_PAY",
             remain: session.quantity,
             type: session.sessionType,
-            price: doctorPrice,
+            doctorPrice: doctorPrice,
+            patientPrice: patientPrice,
+            sessionPrice: session.sessionPrice,
             paymentIntent: paymentIntent.id,
+            validUntil: validUntil.toDate(),
           },
         });
       }
     } else throw new Error("Payment intent id not exist");
   } catch (err) {
     paymentIntent = await stripe.paymentIntents.create({
-      amount: totalEuro,
+      amount: patientPrice * 100,
       currency: "eur",
       metadata: metadata,
       automatic_payment_methods: {
@@ -101,29 +92,18 @@ export async function POST(req: NextRequest) {
     });
     try {
       if (session.type === "NORMAL" || session.type === "LINK") {
-        if (session.userId) {
-          await db.session.create({
-            data: {
-              date: session.date!,
-              price: doctorPrice,
-              userId: session.userId,
-              type: session.sessionType,
-              link: sessionLink.hostRoomUrl,
-              coupon: session.coupon,
-              paymentIntentId: `User ${paymentIntent.id}`,
-            },
-          });
-        }
-
         await db.session.create({
           data: {
             date: session.date!,
-            price: doctorPrice,
-            userId: session.doctorId,
+            doctorPrice: doctorPrice,
+            patientPrice: patientPrice,
+            sessionPrice: session.sessionPrice,
+            userId: session.userId!,
+            doctorId: session.doctorId,
             type: session.sessionType,
             link: sessionLink.hostRoomUrl,
             coupon: session.coupon,
-            paymentIntentId: `Doctor ${paymentIntent.id}`,
+            paymentIntentId: paymentIntent.id,
           },
         });
       } else if (session.type === "PACKAGE") {
@@ -133,8 +113,11 @@ export async function POST(req: NextRequest) {
             doctorId: session.doctorId,
             remain: session.quantity,
             type: session.sessionType,
-            price: doctorPrice,
+            doctorPrice: doctorPrice,
+            patientPrice: patientPrice,
+            sessionPrice: session.sessionPrice,
             userId: session.userId!,
+            validUntil: validUntil.toDate(),
             paymentIntent: paymentIntent.id,
           },
         });

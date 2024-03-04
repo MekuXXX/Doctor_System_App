@@ -4,6 +4,46 @@ import { db } from "@/lib/db";
 import { RequestMoneySchemaType, requestMoneySchema } from "@/schemas/money";
 import { Money_Request_Status } from "@prisma/client";
 
+export const deleteDoctorMoney = async (doctorId: string, money: number) => {
+  try {
+    const doctorMoney = await db.doctorMoney.findUnique({
+      where: { doctorId },
+    });
+
+    if (doctorMoney?.pending! < money) {
+      return { error: "المال ليس فى حساب الطبيب" };
+    }
+
+    await db.doctorMoney.update({
+      where: { doctorId },
+      data: { pending: { decrement: money } },
+    });
+    return { success: "نجح حذف المال من الطبيب" };
+  } catch (error) {
+    return { error: "حدث خطأ أثناء تحديث أموال الطبيب" };
+  }
+};
+
+export const changeMoneyToReady = async (doctorId: string, money: number) => {
+  try {
+    const doctorMoney = await db.doctorMoney.findUnique({
+      where: { doctorId },
+    });
+
+    if (doctorMoney?.pending! < money) {
+      return { error: "المال ليس فى حساب الطبيب" };
+    }
+
+    await db.doctorMoney.update({
+      where: { doctorId },
+      data: { ready: { increment: money }, pending: { decrement: money } },
+    });
+    return { success: "نجح تحويل المال للطبيب" };
+  } catch (error) {
+    return { error: "حدث خطأ أثناء تحديث أموال الطبيب" };
+  }
+};
+
 export const getDoctorMoney = async (email: string) => {
   try {
     const user = await db.user.findUnique({

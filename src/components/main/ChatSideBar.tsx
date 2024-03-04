@@ -4,10 +4,14 @@ import Link from "next/link";
 import React from "react";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import { FaUserFriends } from "react-icons/fa";
+import { auth } from "@/auth";
+import { redirect } from "next/navigation";
 
 type Props = { userId: string };
 
 export default async function ChatSideBar({ userId }: Props) {
+  const session = await auth();
+  if (!session) redirect("/");
   const conversations = await db.conversation.findMany({
     where: { users: { some: { id: userId } } },
     select: {
@@ -18,6 +22,26 @@ export default async function ChatSideBar({ userId }: Props) {
       id: true,
     },
   });
+  if (session.user.role === "USER") {
+    return (
+      <div className="flex gap-4 items-center">
+        {conversations.length > 0 ? (
+          conversations.map((conversation) => (
+            <Link
+              href={`/chats/${conversation.id}`}
+              key={conversation.id}
+              className="transition hover:text-main"
+            >
+              {conversation.users[0].name}
+            </Link>
+          ))
+        ) : (
+          <h3 className="p-4">لا يوجد لديك أطباء للتواصل معهم</h3>
+        )}
+      </div>
+    );
+  }
+
   return (
     <Sheet modal>
       <SheetTrigger

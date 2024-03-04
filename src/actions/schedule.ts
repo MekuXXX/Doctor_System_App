@@ -114,7 +114,6 @@ export const getScheduleSessionsByDay = async (
         hour: parseInt(session.sessionTime.substring(0, 2)), // Extract hour from time string
         minute: parseInt(session.sessionTime.substring(3, 5)), // Extract minute from time string
         second: 0,
-
         millisecond: 0,
       });
       doctorSessions.forEach((doctorSession) => {

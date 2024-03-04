@@ -82,6 +82,7 @@ export default async function CheckoutPage({ searchParams }: Props) {
       image: true,
       DoctorData: {
         select: {
+          id: true,
           doctorSessions: {
             select: { halfSessions: true, hourSessions: true },
           },
@@ -97,7 +98,7 @@ export default async function CheckoutPage({ searchParams }: Props) {
 
   const sessionTime = moment().add(15, "minutes");
 
-  const time = sessionTime.format("HH:ss A");
+  const time = sessionTime.format("hh:ss A");
   const firstPrice =
     type === "HALF_HOUR"
       ? sessionData.DoctorData?.doctorSessions?.halfSessions!
@@ -119,9 +120,9 @@ export default async function CheckoutPage({ searchParams }: Props) {
   const newSessionData: PaymentData = {
     type: "NORMAL",
     quantity: 1,
-    sessionPrice: resultPrice + TAX,
+    sessionPrice: resultPrice,
     sessionType: type,
-    doctorId: id,
+    doctorId: sessionData.DoctorData?.id!,
     date: sessionTime.toDate(),
     userId: user.user.id,
   };

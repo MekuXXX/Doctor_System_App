@@ -2,7 +2,8 @@
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  // uncomment next line if you use Prisma <5.10
+  directUrl = env("DATABASE_URL_UNPOOLED")
 }
 
 generator client {
@@ -44,6 +45,48 @@ model User {
   messages              Message[]
 }
 
+model DoctorData {
+  id             String          @id
+  breif          String
+  certificate    String
+  article        String
+  country        String
+  doctorRank     DoctorRank      @default(BRONSE)
+  doctorDiscount Int             @default(0)
+  masterId       String?
+  master         Master?         @relation(fields: [masterId], references: [id], onDelete: Cascade)
+  doctorId       String          @unique
+  doctor         User            @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  Rate           Rate[]
+  moneyRequests  MoneyRequest[]
+  coupons        Coupon[]
+  money          DoctorMoney?
+  doctorActive   DoctorActive?
+  doctorSessions DoctorSessions?
+  doctorSchedule Schedule[]
+  paymentLink    PaymentLink[]
+  // DoctorPakage   DoctorPackage[]
+  paidPackages   UserPackage[]
+  sessions       Session[]
+}
+
+model Session {
+  id              String        @id @default(uuid())
+  status          SessionStatus @default(WAITING_PAY)
+  type            SessionType
+  link            String
+  doctorPrice     Float
+  sessionPrice    Float
+  patientPrice    Float
+  date            DateTime
+  coupon          String?
+  paymentIntentId String        @unique
+  userId          String?
+  user            User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  doctorId        String
+  doctor          DoctorData    @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+}
+
 enum PaymentStatus {
   WAITING_PAY
   PAID
@@ -57,9 +100,12 @@ model UserPackage {
   doctor        DoctorData    @relation(fields: [doctorId], references: [id], onDelete: Cascade)
   status        PaymentStatus
   type          SessionType
-  price         Float
+  doctorPrice   Float
+  patientPrice  Float
+  sessionPrice  Float
   paymentIntent String        @unique
   remain        Int
+  validUntil    DateTime
 }
 
 // model DoctorPackage {
@@ -90,30 +136,6 @@ enum DoctorRank {
   SILVER
   GOLD
   PLATINIUM
-}
-
-model DoctorData {
-  id             String          @id
-  breif          String
-  certificate    String
-  article        String
-  country        String
-  doctorRank     DoctorRank      @default(BRONSE)
-  doctorDiscount Int             @default(0)
-  masterId       String?
-  master         Master?         @relation(fields: [masterId], references: [id], onDelete: Cascade)
-  doctorId       String          @unique
-  doctor         User            @relation(fields: [doctorId], references: [id], onDelete: Cascade)
-  Rate           Rate[]
-  moneyRequests  MoneyRequest[]
-  coupons        Coupon[]
-  money          DoctorMoney?
-  doctorActive   DoctorActive?
-  doctorSessions DoctorSessions?
-  doctorSchedule Schedule[]
-  paymentLink    PaymentLink[]
-  // DoctorPakage   DoctorPackage[]
-  paidPackages   UserPackage[]
 }
 
 model PaymentLink {
@@ -233,19 +255,6 @@ enum SessionStatus {
   CANCELLED
   RESERVED
   WAITING_PAY
-}
-
-model Session {
-  id              String        @id @default(uuid())
-  status          SessionStatus @default(WAITING_PAY)
-  type            SessionType
-  link            String
-  price           Float
-  date            DateTime
-  coupon          String?
-  userId          String
-  paymentIntentId String        @unique
-  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Account {

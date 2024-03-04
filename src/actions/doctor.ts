@@ -321,9 +321,7 @@ export const isDoctorBusy = async (doctorId: string) => {
           lte: sessionEnd.toDate(),
         },
         status: { not: "WAITING_PAY" },
-        user: {
-          id: doctorId,
-        },
+        doctor: { doctor: { id: doctorId } },
       },
     });
     return sessions.length > 0;
@@ -335,7 +333,11 @@ export const isDoctorBusy = async (doctorId: string) => {
 export const isSessionBought = async (doctorId: string, date: Date) => {
   try {
     const session = await db.session.findMany({
-      where: { userId: doctorId, date: date, status: { not: "WAITING_PAY" } },
+      where: {
+        doctor: { doctor: { id: doctorId } },
+        date: date,
+        status: { not: "WAITING_PAY" },
+      },
     });
     return session.length > 0;
   } catch (err) {
@@ -388,68 +390,58 @@ export const buySessionByPackages = async (session: PaymentData) => {
 
     const sessionLink = await createWherebyUrl();
     const generateIntent = uuidV4();
-    const [userData, doctorData] = await Promise.all([
-      db.user.update({
-        where: {
-          id: session.userId!,
-        },
+    const [sessionData] = await Promise.all([
+      db.session.create({
         data: {
-          newNotifications: { increment: 1 },
-          sessions: {
-            create: {
-              date: session.date!,
-              price: 0,
-              type: session.sessionType,
-              link: sessionLink.hostRoomUrl,
-              coupon: session.coupon,
-              status: "RESERVED",
-              paymentIntentId: `User ${generateIntent}`,
-            },
-          },
+          date: session.date!,
+          sessionPrice: session.sessionPrice,
+          doctorPrice: 0,
+          patientPrice: 0,
+          doctorId: session.doctorId,
+          type: session.sessionType,
+          link: sessionLink.hostRoomUrl,
+          coupon: session.coupon,
+          status: "RESERVED",
+          paymentIntentId: generateIntent,
         },
         select: {
-          name: true,
-          image: true,
-          id: true,
-          email: true,
+          user: {
+            select: {
+              name: true,
+              image: true,
+              id: true,
+              email: true,
+            },
+          },
+          doctor: {
+            select: {
+              doctor: {
+                select: {
+                  name: true,
+                  image: true,
+                  id: true,
+                  email: true,
+                },
+              },
+            },
+          },
         },
       }),
 
-      db.user.update({
-        where: {
-          id: session.doctorId,
-          role: "DOCTOR",
-        },
-        data: {
-          newNotifications: { increment: 1 },
-          sessions: {
-            create: {
-              date: session.date!,
-              price: 0,
-              type: session.sessionType,
-              link: sessionLink.hostRoomUrl,
-              coupon: session.coupon,
-              status: "RESERVED",
-              paymentIntentId: `Doctor ${generateIntent}`,
-            },
-          },
-        },
-        select: {
-          name: true,
-          image: true,
-          id: true,
-          email: true,
-        },
-      }),
       db.userPackage.update({
         where: { id: packageData.id },
         data: { remain: { decrement: 1 } },
       }),
     ]);
 
+    const [userData, doctorData] = [
+      sessionData.user,
+      sessionData.doctor.doctor,
+    ];
+
     const isConversationExist = await db.user.findFirst({
       where: {
-        id: userData.id,
+        id: userData?.id,
         conversations: {
           some: {
             users: { some: { id: doctorData!.id } },
@@ -464,9 +456,9 @@ export const buySessionByPackages = async (session: PaymentData) => {
           users: {
             connect: [
               {
-                id: userData.id,
-                name: userData.name,
-                email: userData.email,
+                id: userData!.id,
+                name: userData!.name,
+                email: userData!.email,
               },
               {
                 id: doctorData!.id,
@@ -482,7 +474,7 @@ export const buySessionByPackages = async (session: PaymentData) => {
     let userMessage = "لقد اشتريت من أحد الأطباء",
       doctorMessage = "لقد اشترى أحد العملاء منك";
 
-    doctorMessage = `لقد اشترى منك ${userData.name} جلسة ${
+    doctorMessage = `لقد اشترى منك ${userData!.name} جلسة ${
       session.sessionType === "HALF_HOUR" ? "نصف" : ""
     } ساعة`;
 
@@ -498,15 +490,16 @@ export const buySessionByPackages = async (session: PaymentData) => {
     };
 
     const doctor_notification = {
-      name: userData.name,
+      name: userData!.name,
       date: getNotificationDate(),
-      image: userData.image,
+      image: userData!.image,
       message: doctorMessage,
     };
+
     await Promise.all([
       db.notification.create({
         data: {
-          userId: userData.id,
+          userId: userData!.id,
           ...user_notification,
         },
       }),
@@ -527,7 +520,7 @@ export const buySessionByPackages = async (session: PaymentData) => {
 
     pusherServer.trigger(
       "notifications",
-      `new-notification:${userData.id}`,
+      `new-notification:${userData?.id}`,
       user_notification
     );
     return { success: "تم الشراء بنجاح" };

@@ -133,7 +133,7 @@ export default async function DoctorDataPage({ params: { id } }: Props) {
               />
             </>
           )}
-          <ChangeTimezone />
+          {/* <ChangeTimezone /> */}
           <SelectSessions doctorId={id} />
           <div className="space-y-2">
             <SessionPackage

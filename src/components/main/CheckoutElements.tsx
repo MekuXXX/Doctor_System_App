@@ -53,6 +53,7 @@ export default function CheckoutElements({ clientSecret }: Props) {
 
   const paymentElementOptions: StripePaymentElementOptions = {
     layout: "tabs",
+    paymentMethodOrder: ["Cards"],
   };
 
   // TODO: add loading spinner and error messages
