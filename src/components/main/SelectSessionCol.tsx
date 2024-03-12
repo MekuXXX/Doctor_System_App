@@ -29,9 +29,6 @@ export default function SelectSessionCol({
   initialDate,
 }: Props) {
   const [isOpen, setIsOpen] = useState(false);
-  const [filteredTimes, setFilteredTimes] = useState<DoctorScheduleSession[]>(
-    []
-  );
   const refetchInterval = process.env.NEXT_PUBLIC_REFETCH_INTERVAL || 5000;
   const {
     data: times,
@@ -45,7 +42,7 @@ export default function SelectSessionCol({
       return data.data;
     },
     initialData: initialDate,
-    refetchInterval: Number(refetchInterval),
+    // refetchInterval: Number(refetchInterval),
   });
 
   const first = [];

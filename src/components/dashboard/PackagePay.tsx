@@ -16,18 +16,16 @@ export function PackagePay({ session, isUsePackage }: Props) {
 
   const handleSubmit = async () => {
     const res = await buySessionByPackages(session);
+    console.log(res);
     if (res.error) router.replace(`/result?status=failed&message=${res.error}`);
     else router.push(`/result?status=success&message=${res.success}`);
   };
 
   return (
-    <Button
-      onClick={handleSubmit}
-      variant={"link"}
-      className=" text-main block ps-0"
-      type="submit"
-    >
-      شراء بالبكجات
-    </Button>
+    <form action={handleSubmit}>
+      <Button variant={"link"} className=" text-main block ps-0" type="submit">
+        شراء بالبكجات
+      </Button>
+    </form>
   );
 }

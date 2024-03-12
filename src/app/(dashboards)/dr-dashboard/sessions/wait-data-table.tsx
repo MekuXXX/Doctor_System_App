@@ -17,25 +17,16 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { IoStar } from "react-icons/io5";
 import { getDoctorSessionTimeByType } from "@/lib/doctor-session";
 import { StatusBadge } from "@/components/main/StatusBadge";
-import { toast } from "sonner";
-import { FaClipboard } from "react-icons/fa";
-import {
-  AlertDialog,
-  AlertDialogCancel,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import {
-  AlertDialogAction,
-  AlertDialogContent,
-} from "@radix-ui/react-alert-dialog";
-import Link from "next/link";
-import { MdDelete } from "react-icons/md";
 import { useTransition } from "react";
 import { changeMoneyToReady } from "@/actions/money";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { AiOutlineCheck } from "react-icons/ai";
+import { AiOutlineClose } from "react-icons/ai";
 import { changeSessionStatus } from "@/actions/sessions";
+import { SessionStatus } from "@prisma/client";
 
 export const columns: ColumnDef<any>[] = [
   {
@@ -71,7 +62,7 @@ export const columns: ColumnDef<any>[] = [
     header: () => <DataTableColumnHeader>الحالة</DataTableColumnHeader>,
     cell: () => (
       <DataTableItem>
-        <StatusBadge className="bg-blue-600 text-white">محجوز</StatusBadge>
+        <StatusBadge className="bg-yellow-600 text-white">انتظار</StatusBadge>
       </DataTableItem>
     ),
   },
@@ -139,23 +130,29 @@ export const columns: ColumnDef<any>[] = [
     ),
     cell: function Cell({ row }) {
       const [isPending, startTransition] = useTransition();
-      const sessionTime = getDoctorSessionTimeByType(row.original.sessionType);
-      const currentDate = moment().toDate();
-      const sessionDate = moment(row.original.date);
-      const refundDate = sessionDate.subtract(12, "hours").toDate();
-      const rateDate = sessionDate.add(sessionTime, "minutes").toDate();
-
-      const handleDelete = () => {
+      const router = useRouter();
+      console.log(row.original);
+      const changeStatus = async (status: SessionStatus) => {
+        await changeSessionStatus(row.original.id, status);
+        router.refresh();
+      };
+      const handleAcceptDoctor = () => {
         startTransition(async () => {
           const res = await changeMoneyToReady(
             row.original.doctorId,
             row.original.doctorPrice
           );
-          if (res.error) toast.error(res.error);
-          else {
-            await changeSessionStatus(row.original.id, "DONE");
+          if (res.error) {
+            toast.error(res.error);
+          } else {
+            await changeStatus("DONE");
             toast.success(res.success);
           }
+        });
+      };
+      const handleDenied = () => {
+        startTransition(async () => {
+          await changeStatus("CANCELLED");
         });
       };
 
@@ -168,51 +165,22 @@ export const columns: ColumnDef<any>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            {currentDate > rateDate && (
-              <a href={`/add-rate?sessionId=${row.original.id}`}>
-                <DropdownMenuItem
-                  className="flex gap-2 items-center"
-                  disabled={isPending}
-                >
-                  <IoStar />
-                  اضافة تقييم
-                </DropdownMenuItem>
-              </a>
-            )}
             <DropdownMenuItem
               className="flex gap-2 items-center"
-              onClick={() =>
-                navigator.clipboard.writeText(
-                  `${process.env.NEXT_PUBLIC_BASE_URL}/session?roomId=${row.original.link}`
-                )
-              }
+              onClick={handleAcceptDoctor}
               disabled={isPending}
             >
-              <FaClipboard className="h-[1.2rem] w-[1.2rem]" />
-              <span>نسخ الرابط</span>
+              <AiOutlineCheck className="w-[1.2rem] h-[1.2rem]" />
+              <span>تمت</span>
             </DropdownMenuItem>
-            {refundDate > currentDate ? (
-              <Link href={"/change-session"}>
-                <DropdownMenuItem
-                  className="flex gap-2 items-center"
-                  disabled={isPending}
-                >
-                  <MdDelete className="h-[1.2rem] w-[1.2rem]" />
-                  <span>تأجيل</span>
-                </DropdownMenuItem>
-              </Link>
-            ) : (
-              !(currentDate > rateDate) && (
-                <DropdownMenuItem
-                  className="flex gap-2 items-center"
-                  disabled={isPending}
-                  onClick={handleDelete}
-                >
-                  <MdDelete className="h-[1.2rem] w-[1.2rem]" />
-                  <span>الغاء</span>
-                </DropdownMenuItem>
-              )
-            )}
+            <DropdownMenuItem
+              className="flex gap-2 items-center"
+              onClick={handleDenied}
+              disabled={isPending}
+            >
+              <AiOutlineClose className="h-[1.2rem] w-[1.2rem]" />
+              <span>ملغية</span>
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       );

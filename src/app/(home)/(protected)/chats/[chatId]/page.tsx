@@ -24,7 +24,7 @@ const page = async ({ params }: PageProps) => {
   );
 
   return (
-    <div className="h-full px-2 flex justify-between flex-col">
+    <div className="h-full px-2 flex justify-between flex-col min-h-[75]">
       <div className="flex items-center gap-4 py-3 border-b-2 border-gray-200">
         <div className="relative w-12 h-12 rounded-full">
           <Image

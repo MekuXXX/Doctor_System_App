@@ -142,7 +142,7 @@ export default async function CheckoutPage({ searchParams }: Props) {
     {
       id: 2,
       text: "المبلغ الضريبى",
-      text_bold: <CurrencyConvert currency={Number(process.env.TAX!)} />,
+      text_bold: <CurrencyConvert currency={Number(TAX)} />,
       icon: <FaDollarSign className="h-[1.5rem] w-[1.5rem]" />,
     },
     {

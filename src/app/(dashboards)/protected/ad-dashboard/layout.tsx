@@ -55,6 +55,11 @@ const sidebarLinks: SideBarLinkType = {
     },
     {
       id: 9,
+      link: "packages",
+      text: "البكجات",
+    },
+    {
+      id: 10,
       link: "payment-links",
       text: "روابط الدفع",
     },

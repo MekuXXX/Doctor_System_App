@@ -19,13 +19,15 @@ import {
   doctorDetailsSchema,
 } from "@/schemas/doctorDetails";
 import { DEFAULT_IMG } from "@/lib/constants";
-import moment, { now } from "moment";
+import moment from "moment";
 import { SessionType } from "@prisma/client";
 import { PaymentData } from "@/components/main/CheckoutForm";
 import { createWherebyUrl } from "@/actions/whereby";
 import { v4 as uuidV4 } from "uuid";
 import { getNotificationDate } from "@/lib/moment";
 import { pusherServer } from "@/lib/pusher";
+import { sendSessionNotification } from "@/lib/notification";
+import { createConversation } from "@/lib/message";
 
 export const getDoctors = async () => {
   try {
@@ -352,13 +354,15 @@ export const isHavePackageToBuy = async (
 ) => {
   try {
     if (!doctorId || !userId || !type) return false;
+    const currentDate = moment();
     const packageData = await db.userPackage.findFirst({
       where: {
         status: "PAID",
-        doctor: { doctor: { id: doctorId } },
+        doctor: { id: doctorId },
         userId,
         type,
         remain: { gt: 0 },
+        validUntil: { gt: currentDate.toDate() },
       },
       select: { id: true, remain: true },
     });
@@ -376,7 +380,7 @@ export const buySessionByPackages = async (session: PaymentData) => {
     const packageData = await db.userPackage.findFirst({
       where: {
         status: "PAID",
-        doctor: { doctor: { id: session.doctorId } },
+        doctor: { id: session.doctorId },
         userId: session.userId,
         type: session.sessionType,
         remain: { gt: 0 },
@@ -399,6 +403,7 @@ export const buySessionByPackages = async (session: PaymentData) => {
           patientPrice: 0,
           doctorId: session.doctorId,
           type: session.sessionType,
+          userId: session.userId,
           link: sessionLink.hostRoomUrl,
           coupon: session.coupon,
           status: "RESERVED",
@@ -433,43 +438,12 @@ export const buySessionByPackages = async (session: PaymentData) => {
         data: { remain: { decrement: 1 } },
       }),
     ]);
-
     const [userData, doctorData] = [
       sessionData.user,
       sessionData.doctor.doctor,
     ];
 
-    const isConversationExist = await db.user.findFirst({
-      where: {
-        id: userData?.id,
-        conversations: {
-          some: {
-            users: { some: { id: doctorData!.id } },
-          },
-        },
-      },
-    });
-
-    if (!isConversationExist) {
-      await db.conversation.create({
-        data: {
-          users: {
-            connect: [
-              {
-                id: userData!.id,
-                name: userData!.name,
-                email: userData!.email,
-              },
-              {
-                id: doctorData!.id,
-                name: doctorData!.name,
-                email: doctorData!.email,
-              },
-            ],
-          },
-        },
-      });
-    }
+    await createConversation(doctorData.id, userData?.id!);
 
     let userMessage = "لقد اشتريت من أحد الأطباء",
       doctorMessage = "لقد اشترى أحد العملاء منك";
@@ -482,47 +456,11 @@ export const buySessionByPackages = async (session: PaymentData) => {
       session.sessionType === "HOUR" ? "" : "نصف"
     } ساعة`;
 
-    const user_notification = {
-      name: doctorData.name,
-      date: getNotificationDate(),
-      image: doctorData.image,
-      message: userMessage,
-    };
-
-    const doctor_notification = {
-      name: userData!.name,
-      date: getNotificationDate(),
-      image: userData!.image,
-      message: doctorMessage,
-    };
-
     await Promise.all([
-      db.notification.create({
-        data: {
-          userId: userData!.id,
-          ...user_notification,
-        },
-      }),
-
-      db.notification.create({
-        data: {
-          userId: doctorData.id,
-          ...doctor_notification,
-        },
-      }),
+      sendSessionNotification({ data: userData!, message: userMessage }),
+      sendSessionNotification({ data: doctorData, message: userMessage }),
     ]);
 
-    pusherServer.trigger(
-      "notifications",
-      `new-notification:${doctorData.id}`,
-      doctor_notification
-    );
-
-    pusherServer.trigger(
-      "notifications",
-      `new-notification:${userData?.id}`,
-      user_notification
-    );
     return { success: "تم الشراء بنجاح" };
   } catch (err) {
     console.log(err);

@@ -4,21 +4,11 @@ import Stripe from "stripe";
 import { stripe } from "@/lib/stripe";
 import { db } from "@/lib/db";
 import { pusherServer } from "@/lib/pusher";
-import { Notification, SessionType } from "@prisma/client";
 import { getNotificationDate } from "@/lib/moment";
 import { PaymentType } from "@/components/main/CheckoutForm";
-import { TAX } from "@/lib/constants";
+import { sendSessionNotification } from "@/lib/notification";
+import { createConversation } from "@/lib/message";
 //Securing a connection to firebase from backend
-
-type NotificationUserType = {
-  id: string;
-  paymentType: PaymentType;
-  name: string;
-  image: string;
-  email: string;
-  type: SessionType;
-  newNotificationsNum: number;
-};
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "POST") {
@@ -50,9 +40,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       session = event.data.object as Stripe.Charge;
       const type = session.metadata.type as PaymentType;
       let doctorMoney: number;
-      let doctorId: string;
-      let userData: NotificationUserType;
-      let doctorData: NotificationUserType;
+      let userData: any;
+      let doctorData: any;
       if (type === "NORMAL" || type === "LINK") {
         const data = await db.session.update({
           where: {
@@ -169,17 +158,19 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         doctorMoney = data.doctorPrice;
       }
 
-      if (doctorId! && doctorMoney!) {
-        await db.user.update({
-          where: { id: doctorId },
-          data: {
-            DoctorData: {
-              update: {
-                money: { update: { pending: doctorMoney } },
-              },
+      await db.user.update({
+        where: { id: doctorData!.id, role: "DOCTOR" },
+        data: {
+          DoctorData: {
+            update: {
+              money: { update: { pending: doctorMoney! } },
             },
           },
-        });
+        },
+      });
+
+      if (userData!) {
+        await createConversation(doctorData!.id, userData.id);
       }
 
       let userMessage = "لقد اشتريت من أحد الأطباء",
@@ -205,100 +196,26 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       }
 
       if (userData!) {
-        const isConversationExist = await db.user.findFirst({
-          where: {
-            id: userData.id,
-            conversations: {
-              some: {
-                users: { some: { id: doctorData!.id } },
-              },
-            },
-          },
-        });
-
-        if (!isConversationExist) {
-          await db.conversation.create({
-            data: {
-              users: {
-                connect: [
-                  {
-                    id: userData.id,
-                    name: userData.name,
-                    email: userData.email,
-                  },
-                  {
-                    id: doctorData!.id,
-                    name: doctorData!.name,
-                    email: doctorData!.email,
-                  },
-                ],
-              },
-            },
-          });
-        }
-        const user_notification = {
-          name: doctorData!.name,
-          date: getNotificationDate(),
-          image: doctorData!.image,
-          message: userMessage,
-        };
-
-        pusherServer.trigger(
-          "notifications",
-          `new-notification:${userData!.id}`,
-          user_notification
-        );
-
-        await db.user.update({
-          where: { id: userData.id },
+        await sendSessionNotification({
           data: {
-            newNotifications: { increment: 1 },
-            notifications: {
-              create: user_notification,
-            },
+            id: userData.id,
+            name: userData.name,
+            image: userData.image,
           },
+          message: userMessage,
         });
       }
 
-      const doctor_notification = {
-        name: userData!.name,
-        date: getNotificationDate(),
-        image: userData!.image,
-        message: doctorMessage,
-      };
-
-      pusherServer.trigger(
-        "notifications",
-        `new-notification:${doctorData!.id}`,
-        doctor_notification
-      );
-
-      await db.user.update({
-        where: { id: doctorData!.id, role: "DOCTOR" },
+      const responses = await sendSessionNotification({
         data: {
-          newNotifications: { increment: 1 },
-          notifications: {
-            create: doctor_notification,
-          },
+          id: doctorData.id,
+          name: doctorData.name,
+          image: doctorData.image,
         },
+        message: doctorMessage,
       });
 
       console.log("Orders Updated");
-    } else if (
-      event.type === "charge.expired" ||
-      event.type === "charge.failed"
-    ) {
-      session = event.data.object as { payment_intent: string };
-      await Promise.all([
-        await db.session.delete({
-          where: { paymentIntentId: `User ${session.payment_intent}` },
-        }),
-
-        await db.session.delete({
-          where: { paymentIntentId: `Doctor ${session.payment_intent}` },
-        }),
-      ]);
-      console.log("Orders deleted");
     } else {
       console.log("Unhandled event: " + event.type);
     }

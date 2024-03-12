@@ -79,6 +79,18 @@ export const getScheduleSessionsByDay = async (
 ) => {
   try {
     const currentTime = moment().add(30, "minutes");
+    let dayNum = moment().date();
+
+    switch (day.toLowerCase()) {
+      case currentTime.format("dddd"):
+        break;
+      case moment().add(1, "days").format("dddd").toLowerCase():
+        dayNum += 1;
+        break;
+      case moment().add(2, "days").format("dddd").toLowerCase():
+        dayNum += 2;
+    }
+
     const data = await db.doctorScheduleSession.findMany({
       where: {
         schedule: { dayOfWeek: day, doctor: { id: doctorId } },
@@ -89,8 +101,8 @@ export const getScheduleSessionsByDay = async (
 
     const doctorSessions = await db.session.findMany({
       where: {
-        user: { DoctorData: { id: doctorId }, role: "DOCTOR" },
-        status: { not: "WAITING_PAY" },
+        doctor: { id: doctorId, doctor: { role: "DOCTOR" } },
+        status: "RESERVED",
       },
     });
 
@@ -111,13 +123,18 @@ export const getScheduleSessionsByDay = async (
     newData.forEach((session) => {
       let isExist = false;
       let scheduleTime = moment().set({
+        date: dayNum,
         hour: parseInt(session.sessionTime.substring(0, 2)), // Extract hour from time string
         minute: parseInt(session.sessionTime.substring(3, 5)), // Extract minute from time string
         second: 0,
         millisecond: 0,
       });
+      // console.log(`Schedule time`, scheduleTime);
       doctorSessions.forEach((doctorSession) => {
-        if (moment(doctorSession.date).format() === scheduleTime.format()) {
+        const sessionTime = moment(doctorSession.date);
+        // console.log(sessionTime);
+        if (sessionTime.format() === scheduleTime.format()) {
+          console.log("Hitted");
           isExist = true;
         }
       });
@@ -125,7 +142,7 @@ export const getScheduleSessionsByDay = async (
       if (!isExist) filteredData.push(session);
     });
 
-    const newArray = filteredData.toSorted((a, b) => {
+    filteredData.sort((a, b) => {
       const firstSessionTime = moment().set({
         hour: parseInt(a.sessionTime.substring(0, 2)), // Extract hour from time string
         minute: parseInt(a.sessionTime.substring(3, 5)), // Extract minute from time string
@@ -145,7 +162,7 @@ export const getScheduleSessionsByDay = async (
       return firstSessionTime < secondSessionTime ? -1 : 1;
     });
 
-    return { success: "نجح الحصول على جلسات الطبيب", data: newArray };
+    return { success: "نجح الحصول على جلسات الطبيب", data: filteredData };
   } catch {
     return { error: "حدث خطأ أثناء الحصول على جلسات الطبيب" };
   }

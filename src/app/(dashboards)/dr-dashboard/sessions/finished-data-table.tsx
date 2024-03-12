@@ -17,25 +17,13 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { IoStar } from "react-icons/io5";
 import { getDoctorSessionTimeByType } from "@/lib/doctor-session";
+import { TAX } from "@/lib/constants";
 import { StatusBadge } from "@/components/main/StatusBadge";
-import { toast } from "sonner";
-import { FaClipboard } from "react-icons/fa";
-import {
-  AlertDialog,
-  AlertDialogCancel,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import {
-  AlertDialogAction,
-  AlertDialogContent,
-} from "@radix-ui/react-alert-dialog";
-import Link from "next/link";
 import { MdDelete } from "react-icons/md";
-import { useTransition } from "react";
-import { changeMoneyToReady } from "@/actions/money";
-import { changeSessionStatus } from "@/actions/sessions";
+import { deleteSessions } from "@/actions/sessions";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export const columns: ColumnDef<any>[] = [
   {
@@ -65,13 +53,12 @@ export const columns: ColumnDef<any>[] = [
       <DataTableItem>{row.original?.user?.name}</DataTableItem>
     ),
   },
-
   {
     accessorKey: "status",
     header: () => <DataTableColumnHeader>الحالة</DataTableColumnHeader>,
-    cell: () => (
+    cell: ({ row }) => (
       <DataTableItem>
-        <StatusBadge className="bg-blue-600 text-white">محجوز</StatusBadge>
+        <StatusBadge className="bg-green-600 text-white">تمت</StatusBadge>
       </DataTableItem>
     ),
   },
@@ -132,89 +119,26 @@ export const columns: ColumnDef<any>[] = [
   },
   {
     accessorKey: "actions",
-    header: () => (
-      <DataTableColumnHeader className="text-end">
-        تعديلات
-      </DataTableColumnHeader>
-    ),
+    header: () => <DataTableColumnHeader>تعديلات</DataTableColumnHeader>,
     cell: function Cell({ row }) {
-      const [isPending, startTransition] = useTransition();
-      const sessionTime = getDoctorSessionTimeByType(row.original.sessionType);
-      const currentDate = moment().toDate();
-      const sessionDate = moment(row.original.date);
-      const refundDate = sessionDate.subtract(12, "hours").toDate();
-      const rateDate = sessionDate.add(sessionTime, "minutes").toDate();
+      const router = useRouter();
 
-      const handleDelete = () => {
-        startTransition(async () => {
-          const res = await changeMoneyToReady(
-            row.original.doctorId,
-            row.original.doctorPrice
-          );
-          if (res.error) toast.error(res.error);
-          else {
-            await changeSessionStatus(row.original.id, "DONE");
-            toast.success(res.success);
-          }
-        });
+      const handleDelete = async () => {
+        const res = await deleteSessions([row.original.id]);
+        if (res.success) {
+          toast.success(res.success);
+          router.refresh();
+        } else {
+          toast.error(res.error);
+        }
       };
 
       return (
-        <DropdownMenu dir="rtl">
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost">
-              <BsThreeDots />
-              <span className="sr-only">Open menu</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            {currentDate > rateDate && (
-              <a href={`/add-rate?sessionId=${row.original.id}`}>
-                <DropdownMenuItem
-                  className="flex gap-2 items-center"
-                  disabled={isPending}
-                >
-                  <IoStar />
-                  اضافة تقييم
-                </DropdownMenuItem>
-              </a>
-            )}
-            <DropdownMenuItem
-              className="flex gap-2 items-center"
-              onClick={() =>
-                navigator.clipboard.writeText(
-                  `${process.env.NEXT_PUBLIC_BASE_URL}/session?roomId=${row.original.link}`
-                )
-              }
-              disabled={isPending}
-            >
-              <FaClipboard className="h-[1.2rem] w-[1.2rem]" />
-              <span>نسخ الرابط</span>
-            </DropdownMenuItem>
-            {refundDate > currentDate ? (
-              <Link href={"/change-session"}>
-                <DropdownMenuItem
-                  className="flex gap-2 items-center"
-                  disabled={isPending}
-                >
-                  <MdDelete className="h-[1.2rem] w-[1.2rem]" />
-                  <span>تأجيل</span>
-                </DropdownMenuItem>
-              </Link>
-            ) : (
-              !(currentDate > rateDate) && (
-                <DropdownMenuItem
-                  className="flex gap-2 items-center"
-                  disabled={isPending}
-                  onClick={handleDelete}
-                >
-                  <MdDelete className="h-[1.2rem] w-[1.2rem]" />
-                  <span>الغاء</span>
-                </DropdownMenuItem>
-              )
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <DataTableItem className="flex gap-2 justify-end">
+          <Button variant={"destructive"} onClick={handleDelete}>
+            <MdDelete className="h-[1.2rem] w-[1.2rem]" />
+          </Button>
+        </DataTableItem>
       );
     },
   },

@@ -14,7 +14,7 @@ import moment from "moment";
 import Image from "next/image";
 import { auth } from "@/auth";
 import { checkCoupon } from "@/actions/coupon";
-import { isSessionBought } from "@/actions/doctor";
+import { isHavePackageToBuy, isSessionBought } from "@/actions/doctor";
 import { TAX } from "@/lib/constants";
 
 type Props = {
@@ -145,10 +145,14 @@ export default async function CheckoutPage({ searchParams }: Props) {
     date: nextDayDate.toDate(),
     userId: user.user.id,
   };
-
   if (checkCouponData?.success)
     newSessionData.coupon = checkCouponData.data.coupon;
 
+  const isHavePackage = await isHavePackageToBuy(
+    newSessionData.doctorId,
+    newSessionData.userId!,
+    newSessionData.sessionType
+  );
   const OrderData = [
     {
       id: 1,
@@ -160,7 +164,7 @@ export default async function CheckoutPage({ searchParams }: Props) {
     {
       id: 2,
       text: "المبلغ الضريبى",
-      text_bold: <CurrencyConvert currency={Number(process.env.TAX!)} />,
+      text_bold: <CurrencyConvert currency={Number(TAX)} />,
       icon: <FaDollarSign className="h-[1.5rem] w-[1.5rem]" />,
     },
 
@@ -222,7 +226,10 @@ export default async function CheckoutPage({ searchParams }: Props) {
         <div className="py-8 px-4">
           {/*TODO: add loading spinner */}
           <Suspense fallback={<p>Loading...</p>}>
-            <CheckoutForm session={newSessionData} />
+            <CheckoutForm
+              session={newSessionData}
+              isUsePackage={isHavePackage}
+            />
           </Suspense>
         </div>
       </div>

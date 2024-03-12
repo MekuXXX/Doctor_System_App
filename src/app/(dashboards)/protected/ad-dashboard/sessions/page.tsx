@@ -11,6 +11,9 @@ import { db } from "@/lib/db";
 const getAllSessions = async () => {
   "use server";
   const data = await db.session.findMany({
+    where: {
+      status: { not: "WAITING_PAY" },
+    },
     include: {
       user: { select: { name: true } },
       doctor: { select: { doctor: { select: { name: true } } } },
@@ -46,7 +49,7 @@ const getWaitingSessions = async () => {
 const getCancelledSessions = async () => {
   "use server";
   const data = await db.session.findMany({
-    where: { status: "CANCELLED" },
+    where: { OR: [{ status: "CANCELLED" }, { status: "CANCELLED_DONE" }] },
     include: {
       user: { select: { name: true } },
       doctor: { select: { doctor: { select: { name: true } } } },

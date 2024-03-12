@@ -1,5 +1,5 @@
 import { isDoctorBusy } from "@/actions/doctor";
-import { sendSMS } from "@/actions/twilio";
+import { sendSMS, sendWhatsapp } from "@/actions/twilio";
 import DiscountBadge from "@/components/main/DiscountBadge";
 import DoctorsView from "@/components/main/DoctorsView";
 import FAQ from "@/components/main/FAQ";
@@ -57,19 +57,19 @@ export default async function page({}: Props) {
       activeDoctors.push(doctor);
     else inActiveDoctors.push(doctor);
   }
-  const handleSubmit = async (data: FormData) => {
-    "use server";
-    await sendSMS("سلام عليكم ورحمة الله وبركاته", "+20 10 61637259");
-    // console.log(data);
-    console.log("Hitted");
-  };
+  // const handleSubmit = async (data: FormData) => {
+  //   "use server";
+  //   await sendWhatsapp("سلام عليكم ورحمة الله وبركاته", "+201144200925");
+  //   // console.log(data);
+  //   console.log("Hitted");
+  // };
 
   return (
     <div className="content">
       <DiscountBadge />
-      <form action={handleSubmit}>
+      {/* <form action={handleSubmit}>
         <Button>ارسال</Button>
-      </form>
+      </form> */}
 
       {activeDoctors.length !== 0 && (
         <DoctorsView

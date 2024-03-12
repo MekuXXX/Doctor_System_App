@@ -49,7 +49,7 @@ export default async function ChatSideBar({ userId }: Props) {
         aria-label="قائمة الأصدقاء"
       >
         <FaUserFriends className="w-[1.5rem] h-[1.5rem]" />
-        <span className="font-bold text-md hidden md:block">الأطباء</span>
+        <span className="font-bold text-md hidden md:block">المرضى</span>
       </SheetTrigger>
       <SheetContent>
         <h2 className="text-xl font-extrabold mt-8 text-start">الأطباء</h2>

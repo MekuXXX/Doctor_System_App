@@ -19,6 +19,10 @@ const titles = [
     to: "الحجوزات والطلبات",
   },
   {
+    from: "packages",
+    to: "البكجات",
+  },
+  {
     from: "masters",
     to: "التخصصات",
   },
