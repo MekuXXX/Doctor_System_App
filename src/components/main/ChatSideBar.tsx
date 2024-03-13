@@ -72,7 +72,7 @@ export default async function ChatSideBar({ userId }: Props) {
               </Link>
             ))
           ) : (
-            <h3 className="p-4">لا يوجد لديك أطباء للتواصل معهم</h3>
+            <h3 className="p-4">لا يوجد لديك مرضى للتواصل معهم</h3>
           )}
         </ul>
       </SheetContent>

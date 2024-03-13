@@ -1,12 +1,4 @@
 "use client";
-import { Button } from "@/components/ui/button";
-import { BsThreeDots } from "react-icons/bs";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { ColumnDef } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "@/components/global/DataTableColumnHeader";
 import { DataTableItem } from "@/components/global/DataTableItem";
@@ -18,7 +10,6 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { getDoctorSessionTimeByType } from "@/lib/doctor-session";
-import { TAX } from "@/lib/constants";
 import { StatusBadge } from "@/components/main/StatusBadge";
 import { useTransition } from "react";
 import { changeMoneyToReady } from "@/actions/money";
@@ -40,13 +31,7 @@ export const columns: ColumnDef<any>[] = [
       </DataTableItem>
     ),
   },
-  {
-    accessorKey: "doctor",
-    header: () => <DataTableColumnHeader>المعالج</DataTableColumnHeader>,
-    cell: ({ row }) => {
-      return <DataTableItem>{row.original.doctor?.doctor?.name}</DataTableItem>;
-    },
-  },
+
   {
     accessorKey: "patient",
     header: () => <DataTableColumnHeader>المريض</DataTableColumnHeader>,
@@ -165,30 +150,7 @@ export const columns: ColumnDef<any>[] = [
       return (
         <>
           {row.original.status === "CANCELLED" ? (
-            <DropdownMenu dir="rtl">
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost">
-                  <BsThreeDots />
-                  <span className="sr-only">Open menu</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem
-                  className="flex gap-2 items-center"
-                  onClick={handleAcceptDoctor}
-                  disabled={isPending}
-                >
-                  <span>تحول المبلغ للطبيب</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  className="flex gap-2 items-center"
-                  onClick={handleDeleteDoctorMoney}
-                  disabled={isPending}
-                >
-                  <span>رد المبلغ</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <span>بانتظار المراجعة</span>
           ) : (
             <span>تم رد المبلغ للعميل</span>
           )}

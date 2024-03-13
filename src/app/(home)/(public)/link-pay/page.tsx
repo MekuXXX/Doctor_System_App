@@ -80,7 +80,6 @@ export default async function CheckoutPage({ searchParams }: Props) {
   if (sessionData.status === "PAID") redirect("/result?status=success");
   const { name, image, id } = sessionData.doctor.doctor;
 
-  const tax = 5;
   const nextDayDate = moment(sessionData.date).set({
     hour: parseInt(sessionData.time.substring(0, 2)), // Extract hour from time string
     minute: parseInt(sessionData.time.substring(3, 5)), // Extract minute from time string
@@ -88,9 +87,7 @@ export default async function CheckoutPage({ searchParams }: Props) {
     millisecond: 0,
   });
 
-  const price = Math.round(
-    sessionData.customPrice + sessionData.doctorPrice + tax
-  );
+  const price = sessionData.doctorPrice + sessionData.customPrice;
   let checkCouponData;
   if (coupon)
     checkCouponData = await checkCoupon(coupon, price, sessionData.doctorId);
@@ -109,6 +106,7 @@ export default async function CheckoutPage({ searchParams }: Props) {
     type: "LINK",
     quantity: 1,
     sessionPrice: resultPrice,
+    doctorPrice: sessionData.doctorPrice,
     sessionType: sessionData.sessionType as "HOUR",
     doctorId: id,
     date: nextDayDate.toDate(),

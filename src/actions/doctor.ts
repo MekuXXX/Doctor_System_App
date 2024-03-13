@@ -457,8 +457,22 @@ export const buySessionByPackages = async (session: PaymentData) => {
     } ساعة`;
 
     await Promise.all([
-      sendSessionNotification({ data: userData!, message: userMessage }),
-      sendSessionNotification({ data: doctorData, message: userMessage }),
+      sendSessionNotification({
+        data: {
+          id: userData!.id,
+          name: doctorData.name,
+          image: doctorData.image,
+        },
+        message: userMessage,
+      }),
+      sendSessionNotification({
+        data: {
+          id: doctorData!.id,
+          name: userData!.name,
+          image: userData!.image,
+        },
+        message: doctorMessage,
+      }),
     ]);
 
     return { success: "تم الشراء بنجاح" };

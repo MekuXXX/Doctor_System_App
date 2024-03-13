@@ -4,23 +4,32 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
-    const currentDate = moment({
-      hours: 0,
-      minutes: 0,
-      seconds: 0,
-      milliseconds: 0,
-    });
-    await db.session.updateMany({
-      where: {
-        status: "RESERVED",
-        date: {
-          lt: currentDate.toDate(),
+    await Promise.all([
+      db.session.updateMany({
+        where: {
+          status: "RESERVED",
+          type: "HALF_HOUR",
+          date: {
+            lt: moment().subtract(30, "minutes").toDate(),
+          },
         },
-      },
-      data: {
-        status: "WAITING",
-      },
-    });
+        data: {
+          status: "WAITING",
+        },
+      }),
+      db.session.updateMany({
+        where: {
+          status: "RESERVED",
+          type: "HOUR",
+          date: {
+            lt: moment().subtract(60, "minutes").toDate(),
+          },
+        },
+        data: {
+          status: "WAITING",
+        },
+      }),
+    ]);
     return NextResponse.json({ message: "OK" }, { status: 200 });
   } catch {
     return NextResponse.json({ message: "ERROR" }, { status: 500 });

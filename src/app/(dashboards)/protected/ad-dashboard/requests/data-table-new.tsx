@@ -74,6 +74,7 @@ export const columns: ColumnDef<any>[] = [
 
       const handleCancelled = async () => {
         const res = await updateMoneyRequest(id, "CANCELLED");
+
         if (res.success) {
           toast.success(res.success);
         } else {

@@ -1,12 +1,4 @@
 "use client";
-import { Button } from "@/components/ui/button";
-import { BsThreeDots } from "react-icons/bs";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { ColumnDef } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "@/components/global/DataTableColumnHeader";
 import { DataTableItem } from "@/components/global/DataTableItem";
@@ -18,14 +10,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { getDoctorSessionTimeByType } from "@/lib/doctor-session";
-import { TAX } from "@/lib/constants";
 import { StatusBadge } from "@/components/main/StatusBadge";
-import { useTransition } from "react";
-import { changeMoneyToReady } from "@/actions/money";
-import { toast } from "sonner";
-import { useRouter } from "next/navigation";
-import { changeSessionStatus, deleteSessions } from "@/actions/sessions";
-import { MdDelete } from "react-icons/md";
 import { SessionStatus } from "@prisma/client";
 
 export const columns: ColumnDef<any>[] = [
@@ -42,13 +27,7 @@ export const columns: ColumnDef<any>[] = [
       </DataTableItem>
     ),
   },
-  {
-    accessorKey: "doctor",
-    header: () => <DataTableColumnHeader>المعالج</DataTableColumnHeader>,
-    cell: ({ row }) => {
-      return <DataTableItem>{row.original.doctor?.doctor?.name}</DataTableItem>;
-    },
-  },
+
   {
     accessorKey: "patient",
     header: () => <DataTableColumnHeader>المريض</DataTableColumnHeader>,
@@ -134,31 +113,6 @@ export const columns: ColumnDef<any>[] = [
               </AccordionContent>
             </AccordionItem>
           </Accordion>
-        </DataTableItem>
-      );
-    },
-  },
-  {
-    accessorKey: "actions",
-    header: () => <DataTableColumnHeader>تعديلات</DataTableColumnHeader>,
-    cell: function Cell({ row }) {
-      const router = useRouter();
-
-      const handleDelete = async () => {
-        const res = await deleteSessions([row.original.id]);
-        if (res.success) {
-          toast.success(res.success);
-          router.refresh();
-        } else {
-          toast.error(res.error);
-        }
-      };
-
-      return (
-        <DataTableItem className="flex gap-2 justify-end">
-          <Button variant={"destructive"} onClick={handleDelete}>
-            <MdDelete className="h-[1.2rem] w-[1.2rem]" />
-          </Button>
         </DataTableItem>
       );
     },

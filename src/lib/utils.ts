@@ -18,8 +18,8 @@ export const sortDoctorByRank = (doctor_1: Doctor, doctor_2: Doctor) => {
     PLATINIUM: 4,
   };
 
-  const rank1 = rankMap[doctor_1?.DoctorData?.doctorRank as "BRONZE"];
-  const rank2 = rankMap[doctor_2?.DoctorData?.doctorRank as "BRONZE"];
+  const rank1 = rankMap[doctor_1?.DoctorData?.doctorRank as "BRONZE"] || 1;
+  const rank2 = rankMap[doctor_2?.DoctorData?.doctorRank as "BRONZE"] || 1;
 
   // Sort doctors in descending order (highest rank first)
   return rank2 - rank1;

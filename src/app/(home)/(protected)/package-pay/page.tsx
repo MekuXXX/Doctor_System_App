@@ -1,16 +1,12 @@
 import React, { Suspense } from "react";
 import CheckoutForm, { PaymentData } from "@/components/main/CheckoutForm";
 import { FaDollarSign } from "react-icons/fa6";
-import { CiClock2 } from "react-icons/ci";
-import { SlCalender } from "react-icons/sl";
 import { IoGitNetwork } from "react-icons/io5";
 import { CgNametag } from "react-icons/cg";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import CurrencyConvert from "@/components/global/CurrencyConvert";
-import { convertToAmAndPm, getNextDayOfWeek } from "@/lib/moment";
 import { getDoctorSessionTimeByType } from "@/lib/doctor-session";
-import moment from "moment";
 import Image from "next/image";
 import { auth } from "@/auth";
 import { checkCoupon } from "@/actions/coupon";

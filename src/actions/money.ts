@@ -44,6 +44,29 @@ export const changeMoneyToReady = async (doctorId: string, money: number) => {
   }
 };
 
+export const deleteMoneyFromPending = async (
+  doctorId: string,
+  money: number
+) => {
+  try {
+    const doctorMoney = await db.doctorMoney.findUnique({
+      where: { doctorId },
+    });
+
+    if (doctorMoney?.pending! < money) {
+      return { error: "المال ليس فى حساب الطبيب" };
+    }
+
+    await db.doctorMoney.update({
+      where: { doctorId },
+      data: { ready: { increment: money }, pending: { decrement: money } },
+    });
+    return { success: "نجح تحويل المال للطبيب" };
+  } catch (error) {
+    return { error: "حدث خطأ أثناء تحديث أموال الطبيب" };
+  }
+};
+
 export const getDoctorMoney = async (email: string) => {
   try {
     const user = await db.user.findUnique({
@@ -138,7 +161,16 @@ export const updateMoneyRequest = async (
   status: Money_Request_Status
 ) => {
   try {
-    await db.moneyRequest.update({ where: { id }, data: { status } });
+    const req = await db.moneyRequest.update({
+      where: { id },
+      data: { status },
+    });
+    if (status === "CANCELLED") {
+      await db.doctorMoney.update({
+        where: { doctorId: req.doctorId },
+        data: { pending: { increment: req.money } },
+      });
+    }
     return { success: "تم تحديث الطلب بنجاح" };
   } catch {
     return { error: "حدث خطأ أثناء تحديث الطلب" };

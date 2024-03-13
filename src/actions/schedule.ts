@@ -103,6 +103,9 @@ export const getScheduleSessionsByDay = async (
       where: {
         doctor: { id: doctorId, doctor: { role: "DOCTOR" } },
         status: "RESERVED",
+        date: {
+          gt: currentTime.add(dayNum, "days").toDate(),
+        },
       },
     });
 
@@ -134,7 +137,6 @@ export const getScheduleSessionsByDay = async (
         const sessionTime = moment(doctorSession.date);
         // console.log(sessionTime);
         if (sessionTime.format() === scheduleTime.format()) {
-          console.log("Hitted");
           isExist = true;
         }
       });

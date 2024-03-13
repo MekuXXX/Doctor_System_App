@@ -22,6 +22,7 @@ export type PaymentData = {
   coupon?: string;
   paymentLinkToken?: string;
   userId?: string;
+  doctorPrice?: number;
 };
 
 type Props = {

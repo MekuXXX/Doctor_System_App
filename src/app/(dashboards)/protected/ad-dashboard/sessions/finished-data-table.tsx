@@ -1,12 +1,5 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { BsThreeDots } from "react-icons/bs";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { ColumnDef } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "@/components/global/DataTableColumnHeader";
 import { DataTableItem } from "@/components/global/DataTableItem";
@@ -18,7 +11,6 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { getDoctorSessionTimeByType } from "@/lib/doctor-session";
-import { TAX } from "@/lib/constants";
 import { StatusBadge } from "@/components/main/StatusBadge";
 import { MdDelete } from "react-icons/md";
 import { deleteSessions } from "@/actions/sessions";

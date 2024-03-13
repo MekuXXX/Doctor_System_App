@@ -5,7 +5,7 @@ import { stripe } from "@/lib/stripe";
 import { db } from "@/lib/db";
 import { createWherebyUrl } from "@/actions/whereby";
 import { PaymentData } from "@/components/main/CheckoutForm";
-import { TAX } from "@/lib/constants";
+import { MAIN_DISCOUNT, TAX } from "@/lib/constants";
 import moment from "moment";
 
 export async function POST(req: NextRequest) {
@@ -22,12 +22,28 @@ export async function POST(req: NextRequest) {
   const metadata: any = {
     type: session.type,
   };
+  const doctorData = await db.doctorData.findUnique({
+    where: { id: session.doctorId },
+    select: { doctorDiscount: true },
+  });
 
   metadata.user = session.userId ? true : false;
   if (session.type === "LINK") metadata.token = session.paymentLinkToken;
 
-  const doctorPrice = session.sessionPrice;
-  const patientPrice = Math.round(session.sessionPrice + TAX);
+  let discountValue =
+    MAIN_DISCOUNT + doctorData?.doctorDiscount! > 100
+      ? 100
+      : MAIN_DISCOUNT + doctorData?.doctorDiscount! < 0
+      ? 0
+      : doctorData?.doctorDiscount! + MAIN_DISCOUNT;
+  discountValue = discountValue / 100;
+
+  const doctorPrice =
+    (session.doctorPrice ? session.doctorPrice : session.sessionPrice) *
+    discountValue;
+
+  const patientPrice = session.sessionPrice + TAX;
+
   const sessionLink = await createWherebyUrl();
   const validUntil = moment().add(45, "days");
 

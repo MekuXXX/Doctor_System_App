@@ -18,7 +18,6 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { getDoctorSessionTimeByType } from "@/lib/doctor-session";
-import { TAX } from "@/lib/constants";
 import { StatusBadge } from "@/components/main/StatusBadge";
 import { useTransition } from "react";
 import { changeMoneyToReady } from "@/actions/money";
@@ -151,9 +150,9 @@ export const columns: ColumnDef<any>[] = [
       };
       const handleDeleteDoctorMoney = () => {
         startTransition(async () => {
-          const res = await changeMoneyToReady(
-            row.original.doctorId,
-            row.original.doctorPrice
+          const res = await changeSessionStatus(
+            row.original.id,
+            "CANCELLED_DONE"
           );
           if (res.error) toast.error(res.error);
           else {

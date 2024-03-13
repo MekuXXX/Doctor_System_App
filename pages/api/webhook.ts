@@ -199,18 +199,18 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         await sendSessionNotification({
           data: {
             id: userData.id,
-            name: userData.name,
-            image: userData.image,
+            name: doctorData.name,
+            image: doctorData.image,
           },
           message: userMessage,
         });
       }
 
-      const responses = await sendSessionNotification({
+      await sendSessionNotification({
         data: {
           id: doctorData.id,
-          name: doctorData.name,
-          image: doctorData.image,
+          name: userData.name,
+          image: userData.image,
         },
         message: doctorMessage,
       });

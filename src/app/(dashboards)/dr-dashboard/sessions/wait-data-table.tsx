@@ -43,13 +43,6 @@ export const columns: ColumnDef<any>[] = [
     ),
   },
   {
-    accessorKey: "doctor",
-    header: () => <DataTableColumnHeader>المعالج</DataTableColumnHeader>,
-    cell: ({ row }) => {
-      return <DataTableItem>{row.original.doctor?.doctor?.name}</DataTableItem>;
-    },
-  },
-  {
     accessorKey: "patient",
     header: () => <DataTableColumnHeader>المريض</DataTableColumnHeader>,
     cell: ({ row }) => (
@@ -118,71 +111,6 @@ export const columns: ColumnDef<any>[] = [
             </AccordionItem>
           </Accordion>
         </DataTableItem>
-      );
-    },
-  },
-  {
-    accessorKey: "actions",
-    header: () => (
-      <DataTableColumnHeader className="text-end">
-        تعديلات
-      </DataTableColumnHeader>
-    ),
-    cell: function Cell({ row }) {
-      const [isPending, startTransition] = useTransition();
-      const router = useRouter();
-      console.log(row.original);
-      const changeStatus = async (status: SessionStatus) => {
-        await changeSessionStatus(row.original.id, status);
-        router.refresh();
-      };
-      const handleAcceptDoctor = () => {
-        startTransition(async () => {
-          const res = await changeMoneyToReady(
-            row.original.doctorId,
-            row.original.doctorPrice
-          );
-          if (res.error) {
-            toast.error(res.error);
-          } else {
-            await changeStatus("DONE");
-            toast.success(res.success);
-          }
-        });
-      };
-      const handleDenied = () => {
-        startTransition(async () => {
-          await changeStatus("CANCELLED");
-        });
-      };
-
-      return (
-        <DropdownMenu dir="rtl">
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost">
-              <BsThreeDots />
-              <span className="sr-only">Open menu</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuItem
-              className="flex gap-2 items-center"
-              onClick={handleAcceptDoctor}
-              disabled={isPending}
-            >
-              <AiOutlineCheck className="w-[1.2rem] h-[1.2rem]" />
-              <span>تمت</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              className="flex gap-2 items-center"
-              onClick={handleDenied}
-              disabled={isPending}
-            >
-              <AiOutlineClose className="h-[1.2rem] w-[1.2rem]" />
-              <span>ملغية</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
       );
     },
   },

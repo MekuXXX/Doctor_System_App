@@ -91,17 +91,20 @@ export function DataTable<TData, TValue>({
   if (isError) return <h1>Error</h1>;
   return (
     <div>
-      <div dir="rtl" className="flex items-center py-4">
-        <Input
+      <div dir="rtl" className="flex items-center justify-between py-4">
+        <div></div>
+        {/* <Input
           placeholder="ابحث فى..."
           // value={table.getColumn("email")?.getFilterValue() as string}
           onChange={(event) =>
             table.getColumn(searchIn || "")?.setFilterValue(event.target.value)
           }
           className="max-w-sm bg-white dark:bg-dark"
-        />
-        <DataTableViewOptions table={table} />
-        <div className=" mx-2">{childrenButtons}</div>
+        /> */}
+        <div className="flex gap-2 items-center">
+          <DataTableViewOptions table={table} />
+          <div>{childrenButtons}</div>
+        </div>
       </div>
       <div className="rounded-md border bg-white dark:bg-dark py-6 px-4">
         <Table dir="rtl" className="text-left">

@@ -34,7 +34,7 @@ import {
 import Link from "next/link";
 import { MdDelete } from "react-icons/md";
 import { useTransition } from "react";
-import { changeMoneyToReady } from "@/actions/money";
+import { changeMoneyToReady, deleteMoneyFromPending } from "@/actions/money";
 import { changeSessionStatus } from "@/actions/sessions";
 
 export const columns: ColumnDef<any>[] = [
@@ -50,13 +50,6 @@ export const columns: ColumnDef<any>[] = [
         {String(row.index + 1).padStart(2, "00")}
       </DataTableItem>
     ),
-  },
-  {
-    accessorKey: "doctor",
-    header: () => <DataTableColumnHeader>المعالج</DataTableColumnHeader>,
-    cell: ({ row }) => {
-      return <DataTableItem>{row.original.doctor?.doctor?.name}</DataTableItem>;
-    },
   },
   {
     accessorKey: "patient",
@@ -142,20 +135,13 @@ export const columns: ColumnDef<any>[] = [
       const sessionTime = getDoctorSessionTimeByType(row.original.sessionType);
       const currentDate = moment().toDate();
       const sessionDate = moment(row.original.date);
-      const refundDate = sessionDate.subtract(12, "hours").toDate();
       const rateDate = sessionDate.add(sessionTime, "minutes").toDate();
 
       const handleDelete = () => {
         startTransition(async () => {
-          const res = await changeMoneyToReady(
-            row.original.doctorId,
-            row.original.doctorPrice
-          );
-          if (res.error) toast.error(res.error);
-          else {
-            await changeSessionStatus(row.original.id, "DONE");
-            toast.success(res.success);
-          }
+          const res = await changeSessionStatus(row.original.id, "CANCELLED");
+          if (res.error) toast.error("حدث خطأ أثناء الغاء المقابلة");
+          else toast.success("تم الغاء المقابلة");
         });
       };
 
@@ -168,17 +154,6 @@ export const columns: ColumnDef<any>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            {currentDate > rateDate && (
-              <a href={`/add-rate?sessionId=${row.original.id}`}>
-                <DropdownMenuItem
-                  className="flex gap-2 items-center"
-                  disabled={isPending}
-                >
-                  <IoStar />
-                  اضافة تقييم
-                </DropdownMenuItem>
-              </a>
-            )}
             <DropdownMenuItem
               className="flex gap-2 items-center"
               onClick={() =>
@@ -191,27 +166,15 @@ export const columns: ColumnDef<any>[] = [
               <FaClipboard className="h-[1.2rem] w-[1.2rem]" />
               <span>نسخ الرابط</span>
             </DropdownMenuItem>
-            {refundDate > currentDate ? (
-              <Link href={"/change-session"}>
-                <DropdownMenuItem
-                  className="flex gap-2 items-center"
-                  disabled={isPending}
-                >
-                  <MdDelete className="h-[1.2rem] w-[1.2rem]" />
-                  <span>تأجيل</span>
-                </DropdownMenuItem>
-              </Link>
-            ) : (
-              !(currentDate > rateDate) && (
-                <DropdownMenuItem
-                  className="flex gap-2 items-center"
-                  disabled={isPending}
-                  onClick={handleDelete}
-                >
-                  <MdDelete className="h-[1.2rem] w-[1.2rem]" />
-                  <span>الغاء</span>
-                </DropdownMenuItem>
-              )
+            {currentDate < rateDate && (
+              <DropdownMenuItem
+                className="flex gap-2 items-center"
+                disabled={isPending}
+                onClick={handleDelete}
+              >
+                <MdDelete className="h-[1.2rem] w-[1.2rem]" />
+                <span>الغاء</span>
+              </DropdownMenuItem>
             )}
           </DropdownMenuContent>
         </DropdownMenu>

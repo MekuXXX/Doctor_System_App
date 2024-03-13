@@ -44,3 +44,34 @@ export const getNextDayOfWeek = (dayName: DayOfWeek) => {
 export const getNotificationDate = () => {
   return moment().format("hh:mm A, Do MMMM YYYY");
 };
+
+export const getArabicDay = (day: string) => {
+  let ar;
+  switch (day) {
+    case "Saturday":
+      ar = "السبت";
+      break;
+    case "Sunday":
+      ar = "الأحد";
+      break;
+    case "Monday":
+      ar = "الاثنين";
+      break;
+    case "Tuesday":
+      ar = "الثلاثاء";
+      break;
+    case "Wednesday":
+      ar = "الأربعاء";
+      break;
+    case "Thursday":
+      ar = "الخميس";
+      break;
+    case "Friday":
+      ar = "الجمعة";
+      break;
+    default:
+      ar = "التاريخ غير صحيح";
+  }
+
+  return ar;
+};

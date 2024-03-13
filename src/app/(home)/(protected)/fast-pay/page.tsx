@@ -8,7 +8,6 @@ import { CgNametag } from "react-icons/cg";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import CurrencyConvert from "@/components/global/CurrencyConvert";
-import { convertToAmAndPm, getNextDayOfWeek } from "@/lib/moment";
 import { getDoctorSessionTimeByType } from "@/lib/doctor-session";
 import moment from "moment";
 import Image from "next/image";

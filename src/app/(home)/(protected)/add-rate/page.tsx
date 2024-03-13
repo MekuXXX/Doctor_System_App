@@ -14,6 +14,8 @@ export default async function AddRate({ searchParams }: Props) {
   const session = await auth();
   if (!session) redirect("/");
 
+  // if (session.user.role !== "USER") redirect("/");
+
   const { sessionId } = searchParams;
   if (!sessionId) redirect("/");
 

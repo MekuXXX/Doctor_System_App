@@ -16,6 +16,8 @@ export type Notification = {
 export const sendSessionNotification = async (user: Notification) => {
   try {
     const { data, message } = user;
+    if (!data.id || !data.name || !data.image)
+      return { error: "لا يوجد مستخدم" };
 
     const user_notification = {
       name: data.name,

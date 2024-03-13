@@ -28,3 +28,18 @@ export const deleteSessions = async (sessionsId: string[]) => {
     return { error: "حدثت مشكلة أثناء حذف الجلسات" };
   }
 };
+
+export const changeSessionDate = async (
+  sessionId: string,
+  sessionDate: Date
+) => {
+  try {
+    await db.session.update({
+      where: { id: sessionId },
+      data: { date: sessionDate },
+    });
+    return { success: "تم تحديث الجلسة بنجاح" };
+  } catch {
+    return { error: "حدثت مشكلة أثناء تغير وقت الجلسة" };
+  }
+};
