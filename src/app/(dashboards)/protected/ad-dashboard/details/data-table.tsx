@@ -78,7 +78,11 @@ export const columns: ColumnDef<any>[] = [
     accessorKey: "all-price",
     header: () => <DataTableColumnHeader>السعر الكلى</DataTableColumnHeader>,
     cell: ({ row }) => {
-      return <DataTableItem>100$</DataTableItem>;
+      return (
+        <DataTableItem>
+          {row.original.moneyReady + row.original.moneyPending}$
+        </DataTableItem>
+      );
     },
   },
 
@@ -86,7 +90,7 @@ export const columns: ColumnDef<any>[] = [
     accessorKey: "can-use",
     header: () => <DataTableColumnHeader>القابل للسحب</DataTableColumnHeader>,
     cell: ({ row }) => {
-      return <DataTableItem>30$</DataTableItem>;
+      return <DataTableItem>{row.original.moneyReady}$</DataTableItem>;
     },
   },
 
@@ -94,7 +98,7 @@ export const columns: ColumnDef<any>[] = [
     accessorKey: "price",
     header: () => <DataTableColumnHeader>ثمن الجلسة</DataTableColumnHeader>,
     cell: ({ row }) => {
-      return <DataTableItem>15$</DataTableItem>;
+      return <DataTableItem>{row.original.minSession}$</DataTableItem>;
     },
   },
   {

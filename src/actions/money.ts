@@ -36,7 +36,7 @@ export const changeMoneyToReady = async (doctorId: string, money: number) => {
 
     await db.doctorMoney.update({
       where: { doctorId },
-      data: { ready: { increment: money }, pending: { decrement: money } },
+      data: { ready: { increment: money } },
     });
     return { success: "نجح تحويل المال للطبيب" };
   } catch (error) {
@@ -59,7 +59,7 @@ export const deleteMoneyFromPending = async (
 
     await db.doctorMoney.update({
       where: { doctorId },
-      data: { ready: { increment: money }, pending: { decrement: money } },
+      data: { pending: { decrement: money } },
     });
     return { success: "نجح تحويل المال للطبيب" };
   } catch (error) {

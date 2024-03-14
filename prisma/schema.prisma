@@ -105,6 +105,7 @@ model UserPackage {
   sessionPrice  Float
   paymentIntent String        @unique
   remain        Int
+  coupon        String?
   validUntil    DateTime
 }
 

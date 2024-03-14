@@ -122,6 +122,7 @@ export default async function CheckoutPage({ searchParams }: Props) {
     sessionType: type,
     doctorId: DoctorData?.id!,
     userId: user.user.id,
+    coupon: checkCouponData?.data?.coupon,
   };
 
   if (checkCouponData?.success)

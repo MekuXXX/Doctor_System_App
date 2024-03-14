@@ -8,7 +8,7 @@ export const addCoupon = async (data: AddCouponSchemaType) => {
   try {
     const parsedVal = addCouponSchema.safeParse(data);
     if (!parsedVal.success) return { error: "البيانات الذى أدخلتها غير صيححه" };
-    let coupon = uuidV4().slice(0, 20);
+    let coupon = uuidV4().slice(0, 8);
 
     const couponDb = await db.coupon.findUnique({ where: { coupon } });
     if (couponDb)
@@ -38,7 +38,7 @@ export const addDoctorCoupon = async (
   try {
     const parsedVal = addCouponSchema.safeParse(data);
     if (!parsedVal.success) return { error: "البيانات الذى أدخلتها غير صيححه" };
-    let coupon = uuidV4().slice(0, 20);
+    let coupon = uuidV4().slice(0, 8);
 
     const couponDb = await db.coupon.findUnique({ where: { coupon } });
     if (couponDb)

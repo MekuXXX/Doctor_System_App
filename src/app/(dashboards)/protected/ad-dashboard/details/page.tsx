@@ -24,11 +24,16 @@ export default async function DetailsPage({}: Props) {
             doctorDiscount: true,
             master: { select: { name: true } },
             Rate: { select: { rateValue: true } },
+            money: { select: { pending: true, ready: true } },
+            doctorSessions: {
+              select: { halfSessions: true, hourSessions: true },
+            },
           },
         },
       },
     });
     return data.map((doctor) => {
+      const { halfSessions, hourSessions } = doctor.DoctorData?.doctorSessions!;
       return {
         id: doctor.id,
         name: doctor.name,
@@ -39,6 +44,9 @@ export default async function DetailsPage({}: Props) {
         image: doctor.image,
         master: doctor.DoctorData?.master?.name,
         rate: calculateRate(doctor.DoctorData?.Rate!),
+        moneyPending: doctor.DoctorData?.money?.pending,
+        moneyReady: doctor.DoctorData?.money?.ready,
+        minSession: hourSessions < halfSessions ? hourSessions : halfSessions,
       };
     });
   };

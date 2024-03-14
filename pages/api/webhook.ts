@@ -163,7 +163,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         data: {
           DoctorData: {
             update: {
-              money: { update: { pending: doctorMoney! } },
+              money: { update: { pending: {increment: doctorMoney!} } },
             },
           },
         },

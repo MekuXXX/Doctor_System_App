@@ -93,6 +93,7 @@ export async function POST(req: NextRequest) {
             sessionPrice: session.sessionPrice,
             paymentIntent: paymentIntent.id,
             validUntil: validUntil.toDate(),
+            coupon: session.coupon,
           },
         });
       }
@@ -135,6 +136,7 @@ export async function POST(req: NextRequest) {
             userId: session.userId!,
             validUntil: validUntil.toDate(),
             paymentIntent: paymentIntent.id,
+            coupon: session.coupon,
           },
         });
       } else throw new Error(`Unknown payment type`);

@@ -36,7 +36,7 @@ export default async function DoctorDataPage({ params: { id } }: Props) {
       article: true,
       breif: true,
       country: true,
-      Rate: true,
+      Rate: { take: 10 },
       doctorRank: true,
       certificate: true,
       doctorActive: {

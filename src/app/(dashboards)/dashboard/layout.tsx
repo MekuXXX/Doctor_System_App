@@ -18,16 +18,20 @@ const sidebarLinks: SideBarLinkType = {
       link: "",
       text: "الصفحة الرئيسية",
     },
-
     {
       id: 2,
-      link: "account",
-      text: "حسابك",
+      link: "sessions",
+      text: "الطلبات والحجوزات",
     },
     {
       id: 3,
       link: "packages",
       text: "البكجات",
+    },
+    {
+      id: 4,
+      link: "account",
+      text: "حسابك",
     },
   ],
 };

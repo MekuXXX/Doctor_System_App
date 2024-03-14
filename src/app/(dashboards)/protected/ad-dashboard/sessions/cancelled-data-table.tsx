@@ -20,7 +20,7 @@ import {
 import { getDoctorSessionTimeByType } from "@/lib/doctor-session";
 import { StatusBadge } from "@/components/main/StatusBadge";
 import { useTransition } from "react";
-import { changeMoneyToReady } from "@/actions/money";
+import { changeMoneyToReady, deleteMoneyFromPending } from "@/actions/money";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { changeSessionStatus } from "@/actions/sessions";
@@ -129,34 +129,40 @@ export const columns: ColumnDef<any>[] = [
       const [isPending, startTransition] = useTransition();
       const router = useRouter();
 
-      const changeToDone = async () => {
-        await changeSessionStatus(row.original.id, "DONE");
-        router.refresh();
-      };
-
       const handleAcceptDoctor = () => {
         startTransition(async () => {
-          const res = await changeMoneyToReady(
-            row.original.doctorId,
-            row.original.doctorPrice
-          );
-          if (res.error) {
-            toast.error(res.error);
+          const [res_1, res_2, res_3] = await Promise.all([
+            deleteMoneyFromPending(
+              row.original.doctor.id,
+              row.original.doctorPrice
+            ),
+            changeMoneyToReady(row.original.doctorId, row.original.doctorPrice),
+
+            changeSessionStatus(row.original.id, "DONE"),
+          ]);
+          if (res_1.error || res_2.error || res_3.error) {
+            toast.error(`حدث خطأ أثناء تحديث المقابلة`);
           } else {
-            await changeToDone();
-            toast.success(res.success);
+            toast.success(`تم تحديث المقابلة بنجاح`);
+            router.refresh();
           }
         });
       };
       const handleDeleteDoctorMoney = () => {
         startTransition(async () => {
-          const res = await changeSessionStatus(
-            row.original.id,
-            "CANCELLED_DONE"
-          );
-          if (res.error) toast.error(res.error);
+          const [res_1, res_2] = await Promise.all([
+            deleteMoneyFromPending(
+              row.original.doctor.id,
+              row.original.doctorPrice
+            ),
+            changeSessionStatus(row.original.id, "CANCELLED_DONE"),
+          ]);
+          if (res_1.error || res_2.error)
+            toast.error(`حدث خطأ أثناء رد المبلغ للعميل`);
           else {
-            toast.success(res.success);
+            toast.success(`تم رد المبلغ بنجاح`);
+
+            router.refresh();
           }
         });
       };

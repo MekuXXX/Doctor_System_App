@@ -52,7 +52,7 @@ const getCancelledSessions = async () => {
     where: { OR: [{ status: "CANCELLED" }, { status: "CANCELLED_DONE" }] },
     include: {
       user: { select: { name: true } },
-      doctor: { select: { doctor: { select: { name: true } } } },
+      doctor: { select: { doctor: { select: { name: true } }, id: true } },
     },
   });
   return data;

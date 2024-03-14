@@ -21,19 +21,22 @@ import { addRateSchema, AddRateSchemaType } from "@/schemas/rate";
 import { Textarea } from "@/components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { addRate } from "@/actions/rate";
-import { USER_DASHBOARD } from "@/routes";
+import { ADMIN_DASHBOARD, USER_DASHBOARD } from "@/routes";
 import { changeSessionStatus } from "@/actions/sessions";
+import { UserRole } from "@prisma/client";
 
 type Props = {
   doctorId: string;
   patientName: string;
   sessionId: string;
+  role: UserRole;
 };
 
 export default function AddClientRate({
   doctorId,
   patientName,
   sessionId,
+  role,
 }: Props) {
   const [error, setError] = useState("");
   const [isPending, startTransition] = useTransition();
@@ -63,7 +66,9 @@ export default function AddClientRate({
             await changeSessionStatus(sessionId, "WAITING");
             toast.success(res.success);
             router.refresh();
-            router.push(`${USER_DASHBOARD}/sessions`);
+            router.push(
+              `${role === "USER" ? USER_DASHBOARD : ADMIN_DASHBOARD}/sessions`
+            );
           }
         }
       } catch {

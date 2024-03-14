@@ -19,11 +19,19 @@ export default async function ChangeSession({
   if (!sessionId) redirect("/");
   const user = await auth();
   if (!user) redirect("/");
+
+  if (user.user.role === "DOCTOR") redirect("/");
+
   const sessionData = await db.session.findUnique({
     where: { id: sessionId },
-    select: { doctorId: true, date: true },
+    select: { doctorId: true, date: true, userId: true },
   });
   if (!sessionData) redirect("/");
+
+  if (user.user.role === "USER") {
+    if (user.user.id !== sessionData.userId) redirect("/");
+  }
+
   const sessionDate = moment(sessionData.date).subtract(12, "hours").toDate();
   const firstDay = moment();
   if (sessionDate < moment().toDate()) redirect("/");

@@ -20,6 +20,7 @@ import Link from "next/link";
 import StarRate from "@/components/main/StarRate";
 import { ADMIN_DASHBOARD } from "@/routes";
 import moment from "moment";
+import { getDoctorSessionTimeByType } from "@/lib/doctor-session";
 
 export const columns: ColumnDef<any>[] = [
   {
@@ -51,6 +52,31 @@ export const columns: ColumnDef<any>[] = [
     accessorKey: "remain",
     header: () => <DataTableColumnHeader>المتبقى</DataTableColumnHeader>,
     cell: ({ row }) => <DataTableItem>{row.original.remain}</DataTableItem>,
+  },
+  {
+    accessorKey: "type",
+    header: () => <DataTableColumnHeader>النوع</DataTableColumnHeader>,
+    cell: ({ row }) => (
+      <DataTableItem>
+        {getDoctorSessionTimeByType(row.original.type)} دقيقة
+      </DataTableItem>
+    ),
+  },
+  {
+    accessorKey: "price",
+    header: () => <DataTableColumnHeader>السعر</DataTableColumnHeader>,
+    cell: ({ row }) => (
+      <DataTableItem>{row.original.patientPrice}$</DataTableItem>
+    ),
+  },
+  {
+    accessorKey: "coupon",
+    header: () => <DataTableColumnHeader>الكوبون</DataTableColumnHeader>,
+    cell: ({ row }) => (
+      <DataTableItem>
+        {!row.original.coupon ? "لا يوجد" : row.original.coupon}
+      </DataTableItem>
+    ),
   },
   {
     accessorKey: "valid_date",

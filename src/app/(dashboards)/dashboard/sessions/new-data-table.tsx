@@ -36,6 +36,7 @@ import { MdDelete } from "react-icons/md";
 import { useTransition } from "react";
 import { changeMoneyToReady } from "@/actions/money";
 import { changeSessionStatus } from "@/actions/sessions";
+import { useRouter } from "next/navigation";
 
 export const columns: ColumnDef<any>[] = [
   {
@@ -139,6 +140,7 @@ export const columns: ColumnDef<any>[] = [
     ),
     cell: function Cell({ row }) {
       const [isPending, startTransition] = useTransition();
+      const router = useRouter();
       const sessionTime = getDoctorSessionTimeByType(row.original.sessionType);
       const currentDate = moment().toDate();
       const sessionDate = moment(row.original.date);
@@ -147,14 +149,11 @@ export const columns: ColumnDef<any>[] = [
 
       const handleDelete = () => {
         startTransition(async () => {
-          const res = await changeMoneyToReady(
-            row.original.doctorId,
-            row.original.doctorPrice
-          );
+          const res = await changeSessionStatus(row.original.id, "CANCELLED");
           if (res.error) toast.error(res.error);
           else {
-            await changeSessionStatus(row.original.id, "DONE");
             toast.success(res.success);
+            router.refresh();
           }
         });
       };
@@ -179,18 +178,15 @@ export const columns: ColumnDef<any>[] = [
                 </DropdownMenuItem>
               </a>
             )}
-            <DropdownMenuItem
-              className="flex gap-2 items-center"
-              onClick={() =>
-                navigator.clipboard.writeText(
-                  `${process.env.NEXT_PUBLIC_BASE_URL}/session?roomId=${row.original.link}`
-                )
-              }
-              disabled={isPending}
-            >
-              <FaClipboard className="h-[1.2rem] w-[1.2rem]" />
-              <span>نسخ الرابط</span>
-            </DropdownMenuItem>
+            <Link href={`/session?roomId=${row.original.link}`}>
+              <DropdownMenuItem
+                className="flex gap-2 items-center"
+                disabled={isPending}
+              >
+                <FaClipboard className="h-[1.2rem] w-[1.2rem]" />
+                <span>الذهاب للجلسة</span>
+              </DropdownMenuItem>
+            </Link>
             {refundDate > currentDate ? (
               <Link href={`/change-session?sessionId=${row.original.id}`}>
                 <DropdownMenuItem

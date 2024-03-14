@@ -20,7 +20,7 @@ import {
 import { getDoctorSessionTimeByType } from "@/lib/doctor-session";
 import { StatusBadge } from "@/components/main/StatusBadge";
 import { useTransition } from "react";
-import { changeMoneyToReady } from "@/actions/money";
+import { changeMoneyToReady, deleteMoneyFromPending } from "@/actions/money";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { AiOutlineCheck } from "react-icons/ai";
@@ -132,27 +132,34 @@ export const columns: ColumnDef<any>[] = [
       const [isPending, startTransition] = useTransition();
       const router = useRouter();
       console.log(row.original);
-      const changeStatus = async (status: SessionStatus) => {
-        await changeSessionStatus(row.original.id, status);
-        router.refresh();
-      };
       const handleAcceptDoctor = () => {
         startTransition(async () => {
-          const res = await changeMoneyToReady(
-            row.original.doctorId,
-            row.original.doctorPrice
-          );
-          if (res.error) {
-            toast.error(res.error);
+          const [res_1, res_2, res_3] = await Promise.all([
+            deleteMoneyFromPending(
+              row.original.doctorId,
+              row.original.doctorPrice
+            ),
+            changeMoneyToReady(row.original.doctorId, row.original.doctorPrice),
+            changeSessionStatus(row.original.id, "DONE"),
+          ]);
+
+          if (res_1.error || res_2.error || res_3.error) {
+            toast.error(`حدث خطأ أثناء تحديث الجلسة`);
           } else {
-            await changeStatus("DONE");
-            toast.success(res.success);
+            toast.success(`تم تحديث الجلسة بنجاح`);
+            router.refresh();
           }
         });
       };
+
       const handleDenied = () => {
         startTransition(async () => {
-          await changeStatus("CANCELLED");
+          const res = await changeSessionStatus(row.original.id, "CANCELLED");
+          if (res.error) toast.error(res.error);
+          else {
+            toast.success(res.success);
+            router.refresh();
+          }
         });
       };
 

@@ -154,18 +154,15 @@ export const columns: ColumnDef<any>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuItem
-              className="flex gap-2 items-center"
-              onClick={() =>
-                navigator.clipboard.writeText(
-                  `${process.env.NEXT_PUBLIC_BASE_URL}/session?roomId=${row.original.link}`
-                )
-              }
-              disabled={isPending}
-            >
-              <FaClipboard className="h-[1.2rem] w-[1.2rem]" />
-              <span>نسخ الرابط</span>
-            </DropdownMenuItem>
+            <Link href={`/session?roomId=${row.original.link}`}>
+              <DropdownMenuItem
+                className="flex gap-2 items-center"
+                disabled={isPending}
+              >
+                <FaClipboard className="h-[1.2rem] w-[1.2rem]" />
+                <span>الذهاب للجلسة</span>
+              </DropdownMenuItem>
+            </Link>
             {currentDate < rateDate && (
               <DropdownMenuItem
                 className="flex gap-2 items-center"

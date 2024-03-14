@@ -14,16 +14,20 @@ export default async function AddRate({ searchParams }: Props) {
   const session = await auth();
   if (!session) redirect("/");
 
-  // if (session.user.role !== "USER") redirect("/");
+  if (session.user.role === "DOCTOR") redirect("/");
 
   const { sessionId } = searchParams;
   if (!sessionId) redirect("/");
 
   const sessionData = await db.session.findUnique({
     where: { id: sessionId, status: "RESERVED" },
-    select: { doctor: { select: { id: true } } },
+    select: { doctor: { select: { id: true } }, userId: true },
   });
   if (!sessionData) redirect("/");
+
+  if (session.user.role === "USER") {
+    if (session.user.id !== sessionData.userId) redirect("/");
+  }
 
   return (
     <div className="content max-w-fit mx-auto border-2 rounded-xl my-8  px-6 py-12">
@@ -32,6 +36,7 @@ export default async function AddRate({ searchParams }: Props) {
         patientName={session.user.name!}
         doctorId={sessionData.doctor.id}
         sessionId={sessionId}
+        role={session.user.role}
       />
     </div>
   );
