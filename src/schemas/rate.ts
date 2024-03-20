@@ -1,11 +1,8 @@
 import * as z from "zod";
 
 export const addRateSchema = z.object({
-  patientName: z
-    .string({
-      required_error: "يجب ادخال اسم المريض",
-    })
-    .min(1, { message: "يجب ادخال اسم المريض" }),
+  patientName: z.string().optional(),
+  userId: z.string().optional(),
   doctorId: z
     .string({
       required_error: "يجب ادخال اسم الطبيب",

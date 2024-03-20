@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/select";
 import { doctorDetailsSchema, doctorRanks } from "@/schemas/doctorDetails";
 import { editDoctorDetails } from "@/actions/doctor";
+import { calculateRate } from "@/lib/rate";
 
 export const columns: ColumnDef<any>[] = [
   {
@@ -56,10 +57,11 @@ export const columns: ColumnDef<any>[] = [
       </DataTableColumnHeader>
     ),
     cell: ({ row }) => {
+      const rate = calculateRate(row.original.DoctorData.Rate);
       return (
         <DataTableItem>
           <div className="flex justify-center">
-            <StarRate rate={Number(row.getValue("rate"))} />
+            <StarRate rate={Number(rate)} />
           </div>
         </DataTableItem>
       );
@@ -70,7 +72,9 @@ export const columns: ColumnDef<any>[] = [
     accessorKey: "master",
     header: () => <DataTableColumnHeader>التخصص</DataTableColumnHeader>,
     cell: ({ row }) => {
-      return <DataTableItem>{row.getValue("master")}</DataTableItem>;
+      return (
+        <DataTableItem>{row.original.DoctorData.master.name}</DataTableItem>
+      );
     },
   },
 
@@ -80,7 +84,9 @@ export const columns: ColumnDef<any>[] = [
     cell: ({ row }) => {
       return (
         <DataTableItem>
-          {row.original.moneyReady + row.original.moneyPending}$
+          {row.original.DoctorData.money.pending +
+            row.original.DoctorData.money.ready}
+          $
         </DataTableItem>
       );
     },
@@ -90,7 +96,9 @@ export const columns: ColumnDef<any>[] = [
     accessorKey: "can-use",
     header: () => <DataTableColumnHeader>القابل للسحب</DataTableColumnHeader>,
     cell: ({ row }) => {
-      return <DataTableItem>{row.original.moneyReady}$</DataTableItem>;
+      return (
+        <DataTableItem>{row.original.DoctorData.money.ready}$</DataTableItem>
+      );
     },
   },
 
@@ -98,7 +106,11 @@ export const columns: ColumnDef<any>[] = [
     accessorKey: "price",
     header: () => <DataTableColumnHeader>ثمن الجلسة</DataTableColumnHeader>,
     cell: ({ row }) => {
-      return <DataTableItem>{row.original.minSession}$</DataTableItem>;
+      const { halfSessions, hourSessions } =
+        row.original.DoctorData.doctorSessions;
+      let sessionPrice = halfSessions;
+      if (hourSessions < halfSessions) sessionPrice = hourSessions;
+      return <DataTableItem>{sessionPrice}$</DataTableItem>;
     },
   },
   {
@@ -162,7 +174,10 @@ export const columns: ColumnDef<any>[] = [
               <form action={handleEdit} className="space-y-4">
                 <div>
                   <label htmlFor="rank">الرتبة</label>
-                  <Select defaultValue={rowData["Doctor Rank"]} name="rank">
+                  <Select
+                    defaultValue={row.original.DoctorData.doctorRank}
+                    name="rank"
+                  >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
@@ -183,7 +198,7 @@ export const columns: ColumnDef<any>[] = [
                     min={0}
                     max={100}
                     type="number"
-                    defaultValue={rowData["Doctor Discount"]}
+                    defaultValue={row.original.DoctorData.doctorDiscount}
                     required
                   />
                 </div>

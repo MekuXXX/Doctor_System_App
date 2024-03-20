@@ -7,6 +7,8 @@ import { FaPlus } from "react-icons/fa6";
 import { UserRole } from "@prisma/client";
 import { getMembers } from "@/actions/member";
 import { ADMIN_DASHBOARD } from "@/routes";
+import { db } from "@/lib/db";
+import { readImage } from "@/actions/images";
 
 type Props = {
   searchParams: {
@@ -15,11 +17,21 @@ type Props = {
 };
 
 export default async function MembersPage({ searchParams }: Props) {
-  const { role } = searchParams;
+  let { role } = searchParams;
   const getData = async () => {
     "use server";
-    const data = await getMembers(role);
-    return data.data;
+    let newRole = role;
+    if (!Object.keys(UserRole).includes(role as string)) newRole = undefined;
+    const data = await db.user.findMany({
+      where: { role: { not: "ADMIN", equals: newRole } },
+    });
+    const newData: typeof data = [];
+    for (const user of data) {
+      const image = await readImage(user.image);
+      user.image = image;
+      newData.push(user);
+    }
+    return newData;
   };
   const data = await getData();
 

@@ -51,6 +51,7 @@ type Props = {
     DoctorData: DoctorData;
   };
   role: UserRole;
+  image: string;
 };
 
 export default function EditDoctor({
@@ -58,6 +59,7 @@ export default function EditDoctor({
   mastersProps,
   data: initialData,
   role,
+  image,
 }: Props) {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string>();
@@ -91,7 +93,7 @@ export default function EditDoctor({
     initialData: initialData,
     refetchInterval: Number(refetchInterval),
   });
-  const [imageUrl, setImageUrl] = useState(data?.image as string);
+  const [imageUrl, setImageUrl] = useState(image);
   const router = useRouter();
   const form = useForm<EditDoctorSchemaType>({
     resolver: zodResolver(editDoctorSchema),
@@ -185,7 +187,7 @@ export default function EditDoctor({
                     type="file"
                     onChange={({ target }) => {
                       if (!target.files) return;
-                      const file = target.files[0];
+                      let file = target.files[0];
 
                       field.onChange(file);
                       if (

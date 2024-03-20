@@ -3,6 +3,7 @@ import React from "react";
 import { columns } from "./data-table";
 import { db } from "@/lib/db";
 import { calculateRate } from "@/lib/rate";
+import { readImage } from "@/actions/images";
 
 type Props = {};
 export const revalidate = 1;
@@ -10,7 +11,7 @@ export const revalidate = 1;
 export default async function DetailsPage({}: Props) {
   const getData = async () => {
     "use server";
-    const data = await db.user.findMany({
+    const doctors = await db.user.findMany({
       where: { role: "DOCTOR" },
       select: {
         id: true,
@@ -32,23 +33,13 @@ export default async function DetailsPage({}: Props) {
         },
       },
     });
-    return data.map((doctor) => {
-      const { halfSessions, hourSessions } = doctor.DoctorData?.doctorSessions!;
-      return {
-        id: doctor.id,
-        name: doctor.name,
-        email: doctor.email,
-        country: doctor.DoctorData?.country,
-        "Doctor Rank": doctor.DoctorData?.doctorRank,
-        "Doctor Discount": doctor.DoctorData?.doctorDiscount,
-        image: doctor.image,
-        master: doctor.DoctorData?.master?.name,
-        rate: calculateRate(doctor.DoctorData?.Rate!),
-        moneyPending: doctor.DoctorData?.money?.pending,
-        moneyReady: doctor.DoctorData?.money?.ready,
-        minSession: hourSessions < halfSessions ? hourSessions : halfSessions,
-      };
-    });
+    const newData: typeof doctors = [];
+    for (const doctor of doctors) {
+      const image = await readImage(doctor.image);
+      doctor.image = image;
+      newData.push(doctor);
+    }
+    return newData;
   };
   const data = await getData();
   return (

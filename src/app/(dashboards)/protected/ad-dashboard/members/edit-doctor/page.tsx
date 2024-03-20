@@ -5,6 +5,7 @@ import React from "react";
 import { getMasters } from "@/actions/master";
 import { getDoctorById } from "@/actions/doctor";
 import { auth } from "@/auth";
+import { readImage } from "@/actions/images";
 
 type Props = {
   searchParams: {
@@ -23,6 +24,8 @@ export default async function AddDoctorPage({ searchParams }: Props) {
   if (data.error) return <h1>Error in loading doctor data</h1>;
 
   if (!data) redirect(`${ADMIN_DASHBOARD}/members`);
+
+  const image = await readImage(data.data?.image!);
   const masters = await getMasters();
 
   // TODO: add error in loading masters
@@ -39,6 +42,7 @@ export default async function AddDoctorPage({ searchParams }: Props) {
           email={data.data?.email!}
           mastersProps={masters.data!}
           role={user?.user.role!}
+          image={image}
         />
       </div>
     </div>

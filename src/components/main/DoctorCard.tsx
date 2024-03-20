@@ -12,15 +12,17 @@ import { RenderedDoctorData } from "@/components/main/DoctorsView";
 import { calculateRate } from "@/lib/rate";
 import Image from "next/image";
 import CurrencyConvert from "../global/CurrencyConvert";
+import { readImage } from "@/actions/images";
 
 type Props = {
   doctor: RenderedDoctorData;
   isActive?: boolean;
 };
 
-export default function DoctorCard({ doctor, isActive }: Props) {
+export default async function DoctorCard({ doctor, isActive }: Props) {
   const rate = calculateRate(doctor.DoctorData?.Rate);
   const discount = 20;
+  const image = await readImage(doctor.image);
   let lowestPrice = doctor.DoctorData?.doctorSessions?.halfSessions;
 
   if (doctor.DoctorData?.doctorSessions?.hourSessions < lowestPrice)
@@ -46,7 +48,7 @@ export default function DoctorCard({ doctor, isActive }: Props) {
       <CardContent className="flex flex-col items-center gap-2">
         <div className="relative w-24 h-24 overflow-clip rounded-full">
           <Image
-            src={doctor.image}
+            src={image}
             alt={"دكتور " + doctor.name}
             fill
             className=" object-cover w-full h-full"

@@ -44,7 +44,6 @@ export default function SelectSessionCol({
     initialData: initialDate,
     // refetchInterval: Number(refetchInterval),
   });
-
   const first = [];
   const collapsed = [];
 

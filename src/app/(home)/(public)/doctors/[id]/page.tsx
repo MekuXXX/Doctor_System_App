@@ -20,6 +20,8 @@ import { calculateRate } from "@/lib/rate";
 import { isDoctorBusy } from "@/actions/doctor";
 import { isUserOnline } from "@/lib/compare-times";
 import { FastSession } from "@/components/main/FastSession";
+import { readImage } from "@/actions/images";
+import { DEFAULT_IMG } from "@/lib/constants";
 
 type Props = {
   params: {
@@ -36,7 +38,10 @@ export default async function DoctorDataPage({ params: { id } }: Props) {
       article: true,
       breif: true,
       country: true,
-      Rate: { take: 10 },
+      Rate: {
+        take: 10,
+        include: { user: { select: { image: true, name: true } } },
+      },
       doctorRank: true,
       certificate: true,
       doctorActive: {
@@ -60,6 +65,7 @@ export default async function DoctorDataPage({ params: { id } }: Props) {
     doctor.doctorActive?.from!,
     doctor.doctorActive?.to!
   );
+  const image = await readImage(doctor.doctor.image);
 
   return (
     <div className="content">
@@ -74,7 +80,7 @@ export default async function DoctorDataPage({ params: { id } }: Props) {
             <CardContent className="flex gap-4 min-w-[25rem]">
               <div className="w-[200px] h-[200px] relative overflow-clip rounded-sm">
                 <Image
-                  src={doctor.doctor?.image}
+                  src={image}
                   alt={`Dr.${doctor.doctor?.name}`}
                   fill
                   className=" object-cover"
@@ -163,25 +169,33 @@ export default async function DoctorDataPage({ params: { id } }: Props) {
             </TabsList>
             <TabsContent value="rate" className="grid gap-2">
               {doctor.Rate.length > 0 ? (
-                doctor.Rate.map(({ id, message, patientName, rateValue }) => (
-                  <div
-                    key={id}
-                    className="border border-gray-200 rounded-lg p-4 dark:border-gray-800"
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="relative w-12 h-12 overflow-clip rounded-full">
-                        <Image
-                          src={"/images/default.jpg"}
-                          alt={"المقيم " + patientName}
-                          fill
-                        />
+                doctor.Rate.map(
+                  async ({ id, message, patientName, rateValue, user }) => {
+                    let image;
+                    if (user?.image) image = await readImage(user.image);
+                    else image = DEFAULT_IMG;
+
+                    return (
+                      <div
+                        key={id}
+                        className="border border-gray-200 rounded-lg p-4 dark:border-gray-800"
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className="relative w-12 h-12 overflow-clip rounded-full">
+                            <Image
+                              src={image}
+                              alt={"المقيم " + patientName}
+                              fill
+                            />
+                          </div>
+                          <p className="font-semibold h-fit">{patientName}</p>
+                        </div>
+                        <div className="mt-2 text-sm">{message}</div>
+                        <StarRate rate={rateValue} />
                       </div>
-                      <p className="font-semibold h-fit">{patientName}</p>
-                    </div>
-                    <div className="mt-2 text-sm">{message}</div>
-                    <StarRate rate={rateValue} />
-                  </div>
-                ))
+                    );
+                  }
+                )
               ) : (
                 <h3 className="text-center my-4 text-2xl font-bold">
                   لا توجد تقييمات

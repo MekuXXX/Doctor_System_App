@@ -40,8 +40,6 @@ export default function CheckoutForm({ session, isUsePackage }: Props) {
   const searchParams = useSearchParams();
   const couponMessage = searchParams?.get("couponMessage") || "";
   useEffect(() => {
-    console.log(window.localStorage.getItem("payment_intent_id"));
-    console.log(session);
     // Create PaymentIntent as soon as the page loads
     fetch("/api/create-payment-intent", {
       method: "POST",

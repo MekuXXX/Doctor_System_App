@@ -17,6 +17,7 @@ export const addRate = async (data: AddRateSchemaType) => {
             message: parsedData.data.message,
             patientName: parsedData.data.patientName,
             rateValue: Number(parsedData.data.rate),
+            userId: parsedData.data.userId,
           },
         },
       },

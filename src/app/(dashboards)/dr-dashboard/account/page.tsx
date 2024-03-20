@@ -1,4 +1,5 @@
 import { getDoctorByEmail } from "@/actions/doctor";
+import { readImage } from "@/actions/images";
 import { getMasters } from "@/actions/master";
 import { auth } from "@/auth";
 import EditDoctor from "@/components/dashboard/EditDoctor";
@@ -15,6 +16,7 @@ export default async function AccountPage({}: Props) {
   const data = await getDoctorByEmail(user.user.email!);
   // TODO: add error in loading doctor data
   if (data.error) return <h1>Error in loading doctor data</h1>;
+  const image = await readImage(data.data?.image!);
 
   const masters = await getMasters();
   // TODO: add error in loading masters
@@ -30,6 +32,7 @@ export default async function AccountPage({}: Props) {
           data={data.data as any}
           email={data.data?.email!}
           mastersProps={masters.data!}
+          image={image}
           role={user.user.role!}
         />
       </div>

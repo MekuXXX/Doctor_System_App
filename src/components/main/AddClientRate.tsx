@@ -27,14 +27,14 @@ import { UserRole } from "@prisma/client";
 
 type Props = {
   doctorId: string;
-  patientName: string;
+  userId: string;
   sessionId: string;
   role: UserRole;
 };
 
 export default function AddClientRate({
   doctorId,
-  patientName,
+  userId,
   sessionId,
   role,
 }: Props) {
@@ -46,9 +46,9 @@ export default function AddClientRate({
     resolver: zodResolver(addRateSchema),
     defaultValues: {
       doctorId: doctorId,
-      patientName: patientName,
       message: "",
       rate: "5",
+      userId,
     },
   });
   async function onSubmit(data: AddRateSchemaType) {
@@ -82,11 +82,11 @@ export default function AddClientRate({
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <FormField
           control={form.control}
-          name="patientName"
+          name="userId"
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input type="hidden" value={patientName} />
+                <Input type="hidden" value={userId} />
               </FormControl>
             </FormItem>
           )}

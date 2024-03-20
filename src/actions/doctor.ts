@@ -147,9 +147,8 @@ export const addDoctor = async (data: AddDoctorSchemaType) => {
       const file = parsedData.data.image;
       const bytes = await file.arrayBuffer();
       const buffer = Buffer.from(bytes);
-      image = join("/images/", `${Date.now()}-${file.name}`);
-      path = join(cwd(), "public", image);
-      await writeFile(path, buffer);
+      image = join(cwd(), "images", `${Date.now()}-${file.name}`);
+      await writeFile(image, buffer);
     }
     const hashedPassword = await bcrypt.hash(parsedData.data.password, 10);
     await db.user.create({
@@ -186,8 +185,8 @@ export const addDoctor = async (data: AddDoctorSchemaType) => {
     );
     return { success: "تم ارسال رسالة تأكيد للحساب" };
   } catch (err) {
-    if (image !== DEFAULT_IMG && path) {
-      await unlink(path);
+    if (image !== DEFAULT_IMG && image) {
+      await unlink(image);
     }
     return { error: "حدث خطأ أثناء انشاء حساب الطبيب" };
   }
@@ -207,15 +206,14 @@ export const editDoctor = async (
       image = parsedData.data.image;
     } else {
       if (DEFAULT_IMG !== lastImage) {
-        const prevImage = cwd() + "/public" + lastImage;
+        const prevImage = lastImage;
         await unlink(prevImage);
       }
       const file = parsedData.data.image;
       const bytes = await file.arrayBuffer();
       const buffer = Buffer.from(bytes);
-      image = join("/images/", `${Date.now()}-${file.name}`);
-      path = join(cwd(), "public", image);
-      await writeFile(path, buffer);
+      image = join(cwd(), "images", `${Date.now()}-${file.name}`);
+      await writeFile(image, buffer);
     }
     await db.user.update({
       where: { email },
@@ -237,9 +235,10 @@ export const editDoctor = async (
       },
     });
     return { success: "تم تعديل الحساب بنجاح" };
-  } catch {
-    if (image !== DEFAULT_IMG && path) {
-      await unlink(path);
+  } catch (err) {
+    console.log(err);
+    if (image !== DEFAULT_IMG && image) {
+      await unlink(image);
     }
     return { error: "حدث خطأ أثناء تعديل الحساب" };
   }
@@ -250,7 +249,7 @@ export const editUser = async (
   lastImage: string,
   data: EditUserSchemaType
 ) => {
-  let image, path;
+  let image;
   try {
     data.image = data.image.get("image") as unknown as File;
     const parsedData = editUserSchema.safeParse(data);
@@ -258,16 +257,15 @@ export const editUser = async (
     if (typeof parsedData.data.image === "string") {
       image = parsedData.data.image;
     } else {
-      if (DEFAULT_IMG !== lastImage) {
-        const prevImage = cwd() + "/public" + lastImage;
-        await unlink(prevImage);
-      }
+      // if (DEFAULT_IMG !== lastImage) {
+      //   // const prevImage = cwd() + "/public" + lastImage;
+      //   await unlink(lastImage);
+      // }
       const file = parsedData.data.image;
-      const bytes = await file.arrayBuffer();
+      const bytes = (await file.arrayBuffer()) as any;
       const buffer = Buffer.from(bytes);
-      image = join("/images/", `${Date.now()}-${file.name}`);
-      path = join(cwd(), "public", image);
-      await writeFile(path, buffer);
+      image = join(cwd(), "images", `${Date.now()}-${file.name}`);
+      await writeFile(image, buffer);
     }
     await db.user.update({
       where: { id },
@@ -280,10 +278,11 @@ export const editUser = async (
       },
     });
     return { success: "تم تعديل حساب المستخدم بنجاح" };
-  } catch {
-    if (image !== DEFAULT_IMG && path) {
-      await unlink(path);
-    }
+  } catch (err) {
+    console.log(err);
+    // if (image !== DEFAULT_IMG && image) {
+    //   await unlink(image);
+    // }
     return { error: "حدث خطأ أثناء تعديل حساب المستخدم" };
   }
 };

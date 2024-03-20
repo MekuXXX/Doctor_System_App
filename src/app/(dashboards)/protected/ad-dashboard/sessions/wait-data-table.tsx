@@ -131,7 +131,6 @@ export const columns: ColumnDef<any>[] = [
     cell: function Cell({ row }) {
       const [isPending, startTransition] = useTransition();
       const router = useRouter();
-      console.log(row.original);
       const handleAcceptDoctor = () => {
         startTransition(async () => {
           const [res_1, res_2, res_3] = await Promise.all([

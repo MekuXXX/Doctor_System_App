@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import React from "react";
 import EditUser from "@/components/dashboard/EditUser";
 import { auth } from "@/auth";
+import { readImage } from "@/actions/images";
 
 type Props = {
   searchParams: {
@@ -27,6 +28,7 @@ export default async function AddDoctorPage({ searchParams }: Props) {
     },
   });
   if (!data) redirect(`${ADMIN_DASHBOARD}/members`);
+  const image = await readImage(data.image);
 
   return (
     <div className="content place-content-center">
@@ -38,6 +40,7 @@ export default async function AddDoctorPage({ searchParams }: Props) {
           user={data as any}
           email={data.email!}
           role={user.user.role}
+          image={image}
         />
       </div>
     </div>

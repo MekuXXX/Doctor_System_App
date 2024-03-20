@@ -43,6 +43,7 @@ model User {
   userPackage           UserPackage[]
   conversations         Conversation[]
   messages              Message[]
+  rates                 Rate[]
 }
 
 model DoctorData {
@@ -351,7 +352,9 @@ model Rate {
   id          String     @id @default(cuid())
   message     String
   rateValue   Int
-  patientName String
   doctorId    String
   doctor      DoctorData @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  patientName String?
+  userId      String?
+  user        User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

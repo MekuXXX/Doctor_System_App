@@ -48,7 +48,6 @@ export async function sendChatMessage(
     });
 
     await pusherServer.trigger(`chat_${chatId}`, "incoming-message", message);
-    console.log("Hitted");
     return { success: "نجح ارسال الرسالة" };
   } catch (err) {
     console.log(err);

@@ -65,26 +65,31 @@ export function AddRate({ propsData }: Props) {
 
     startTransition(async () => {
       try {
-        let res;
-        if (propsData) {
-          propsData = {
-            id: propsData.id,
-            patientName: data.patientName,
-            doctorId: data.doctorId,
-            message: data.message,
-            rateValue: Number(data.rate),
-          };
+        const parsedData = addRateSchema.safeParse(data);
+        if (!parsedData.success) setError("خطأ فى البيانات المدخلة");
+        else {
+          let res;
+          if (propsData) {
+            const newData = {
+              id: propsData.id,
+              patientName: data.patientName || null,
+              doctorId: data.doctorId,
+              message: data.message,
+              rateValue: Number(data.rate),
+              userId: data.userId || null,
+            };
 
-          res = await editRate(propsData);
-        } else {
-          res = await addRate(data);
-        }
-        if (res.error) {
-          setError(res.error);
-        } else if (res.success) {
-          toast.success(res.success);
-          router.refresh();
-          router.push(`${ADMIN_DASHBOARD}/rates`);
+            res = await editRate(newData);
+          } else {
+            res = await addRate(data);
+          }
+          if (res.error) {
+            setError(res.error);
+          } else if (res.success) {
+            toast.success(res.success);
+            router.refresh();
+            router.push(`${ADMIN_DASHBOARD}/rates`);
+          }
         }
       } catch {
         setError("حدث خطأ أثناء انشاء النتخصص");

@@ -7,6 +7,7 @@ import { pusherClient } from "@/lib/pusher";
 import { Notification, UserRole } from "@prisma/client";
 import { removeNewNotificationsNumber } from "@/actions/notifications";
 import useSound from "use-sound";
+import { readImage } from "@/actions/images";
 
 type Props = {
   initialData: Notification[];
@@ -49,9 +50,14 @@ export function Notifications({
 
   const handleOnNotification = useCallback(
     (notification: Notification) => {
-      play();
-      setNewNotification(newNotification + 1);
-      setNotifications(() => [notification, ...notifications]);
+      const setNotification = async () => {
+        const image = await readImage(notification.image);
+        notification.image = image;
+        setNotifications(() => [notification, ...notifications]);
+        setNewNotification(newNotification + 1);
+        play();
+      };
+      setNotification();
     },
     [newNotification, notifications, play]
   );
@@ -112,41 +118,43 @@ export function Notifications({
         >
           <p className="p-2 border-b font-bold select-none">اشعارات</p>
           <ul
-            className="min-w-fit p-2 gap-4"
+            className="min-w-fit p-2 grid gap-4"
             dir="rtl"
             aria-labelledby="menu-button"
           >
             {notifications.length !== 0 ? (
-              notifications.map((notification) => (
-                <li
-                  key={`${notification.name}--${notification.date}--${notification.message}`}
-                  className="flex items-start gap-1 select-none"
-                >
-                  <Image
-                    src={notification.image}
-                    alt={notification.name}
-                    width={60}
-                    height={60}
-                    className="rounded-full"
-                  />
-                  <div dir="rtl">
-                    <h4 className="font-bold cursor-pointer w-fit">
-                      {notification.name}
-                    </h4>
-                    <p className="text-sm text-black/50 dark:text-white/50">
-                      {notification.message}
-                    </p>
-                    <small dir="ltr" className="text-[#6c757d] text-xs">
-                      {notification.date}
-                    </small>
-                  </div>
-                </li>
-              ))
+              notifications.map((notification) => {
+                return (
+                  <li
+                    key={`${notification.name}--${notification.date}--${notification.message}`}
+                    className="flex items-start gap-1 select-none"
+                  >
+                    <div className="w-14 h-14 relative">
+                      <Image
+                        src={notification.image}
+                        alt={notification.name}
+                        fill
+                        className="rounded-full object-cover"
+                      />
+                    </div>
+                    <div dir="rtl">
+                      <h4 className="font-bold cursor-pointer w-fit">
+                        {notification.name}
+                      </h4>
+                      <p className="text-sm text-black/50 dark:text-white/50">
+                        {notification.message}
+                      </p>
+                      <small dir="ltr" className="text-[#6c757d] text-xs">
+                        {notification.date}
+                      </small>
+                    </div>
+                  </li>
+                );
+              })
             ) : (
               <h1>لا توجد اشعارات</h1>
             )}
           </ul>
-          <p></p>
         </div>
       )}
     </div>

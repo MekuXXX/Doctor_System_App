@@ -11,19 +11,29 @@ import { redirect } from "next/navigation";
 import { getUserNotifications } from "@/actions/notifications";
 import { db } from "@/lib/db";
 import ChatButton from "@/components/global/ChatButton";
+import { readImage } from "@/actions/images";
 
 type Props = {};
 
 export default async function DashHeader({}: Props) {
   const user = await auth();
   if (!user) redirect("/");
-  const notifications = await getUserNotifications(user.user.id!);
+  const userDb = await db.user.findUnique({
+    where: { id: user.user.id },
+    select: { image: true },
+  });
+  if (!userDb) redirect("/");
+  const image = await readImage(userDb.image!);
   const newNotifications = await db.user.findUnique({
     where: { id: user.user.id },
-    select: { newNotifications: true },
+    select: { newNotifications: true, notifications: true },
   });
   // TODO: add notification error
-  if (notifications.error) return <h1>خطأ فى الاشعارات</h1>;
+  if (!newNotifications) return <h1>خطأ فى الاشعارات</h1>;
+  for (let i = 0; i < newNotifications.notifications.length; ++i) {
+    const image = await readImage(newNotifications.notifications[i].image);
+    newNotifications.notifications[i].image = image;
+  }
 
   return (
     <header className="fx-between grow items-center py-2">
@@ -42,7 +52,7 @@ export default async function DashHeader({}: Props) {
           </div>
           <div>
             <Notifications
-              initialData={notifications.data!}
+              initialData={newNotifications.notifications!}
               userId={user.user.id!}
               newNotifications={newNotifications?.newNotifications!}
               role={user.user.role!}
@@ -67,12 +77,7 @@ export default async function DashHeader({}: Props) {
               </p>
             </div>
             <div className=" w-8 h-8 rounded-sm relative overflow-clip select-none">
-              <Image
-                src={user?.user.image!}
-                alt={user?.user.name!}
-                fill
-                sizes="3rem"
-              />
+              <Image src={image} alt={user?.user.name!} fill sizes="3rem" />
             </div>
           </div>
         </div>

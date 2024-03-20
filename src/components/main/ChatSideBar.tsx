@@ -6,6 +6,7 @@ import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import { FaUserFriends } from "react-icons/fa";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
+import { readImage } from "@/actions/images";
 
 type Props = { userId: string };
 
@@ -22,6 +23,12 @@ export default async function ChatSideBar({ userId }: Props) {
       id: true,
     },
   });
+
+  for (let i = 0; i < conversations.length; ++i) {
+    const image = await readImage(conversations[i].users[0].image);
+    conversations[i].users[0].image = image;
+  }
+
   if (session.user.role === "USER") {
     return (
       <div className="flex gap-4 items-center">

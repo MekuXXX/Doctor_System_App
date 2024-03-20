@@ -78,11 +78,10 @@ export const getScheduleSessionsByDay = async (
   day: DayOfWeek
 ) => {
   try {
-    const currentTime = moment().add(30, "minutes");
     let dayNum = moment().date();
 
     switch (day.toLowerCase()) {
-      case currentTime.format("dddd"):
+      case moment().format("dddd"):
         break;
       case moment().add(1, "days").format("dddd").toLowerCase():
         dayNum += 1;
@@ -90,6 +89,7 @@ export const getScheduleSessionsByDay = async (
       case moment().add(2, "days").format("dddd").toLowerCase():
         dayNum += 2;
     }
+    const currentTime = moment().date(dayNum).add(30, "minutes");
 
     const data = await db.doctorScheduleSession.findMany({
       where: {
@@ -104,7 +104,14 @@ export const getScheduleSessionsByDay = async (
         doctor: { id: doctorId, doctor: { role: "DOCTOR" } },
         status: "RESERVED",
         date: {
-          gt: currentTime.add(dayNum, "days").toDate(),
+          gt: moment().add(30, "minutes").date(dayNum).toDate(),
+          lt: moment({
+            date: dayNum + 1,
+            hours: 0,
+            minutes: 0,
+            seconds: 0,
+            milliseconds: 0,
+          }).toDate(),
         },
       },
     });

@@ -61,8 +61,6 @@ export default async function page({}: Props) {
   // const handleSubmit = async (data: FormData) => {
   //   "use server";
   //   await sendWhatsapp("سلام عليكم ورحمة الله وبركاته", "+201144200925");
-  //   // console.log(data);
-  //   console.log("Hitted");
   // };
 
   return (

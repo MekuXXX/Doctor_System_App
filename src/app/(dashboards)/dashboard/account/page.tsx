@@ -4,6 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import React from "react";
 import EditUser from "@/components/dashboard/EditUser";
 import { auth } from "@/auth";
+import { readImage } from "@/actions/images";
 
 type Props = {
   searchParams: {
@@ -25,6 +26,7 @@ export default async function AddDoctorPage({ searchParams }: Props) {
       phone: true,
     },
   });
+  const image = await readImage(data?.image!);
   if (!data) redirect("/");
 
   return (
@@ -37,6 +39,7 @@ export default async function AddDoctorPage({ searchParams }: Props) {
           user={data as any}
           email={data.email!}
           role={user.user.role}
+          image={image}
         />
       </div>
     </div>

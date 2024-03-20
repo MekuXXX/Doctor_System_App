@@ -16,6 +16,7 @@ import { checkCoupon } from "@/actions/coupon";
 import { isDoctorBusy, isHavePackageToBuy } from "@/actions/doctor";
 import { SessionType } from "@prisma/client";
 import { TAX } from "@/lib/constants";
+import { readImage } from "@/actions/images";
 
 type Props = {
   searchParams: {
@@ -91,7 +92,7 @@ export default async function CheckoutPage({ searchParams }: Props) {
   });
   if (!sessionData) redirect("/");
   const { name, image, id } = sessionData;
-
+  const doctorImage = await readImage(image);
   const isBusy = await isDoctorBusy(id);
   if (isBusy) redirect("/");
 
@@ -183,7 +184,7 @@ export default async function CheckoutPage({ searchParams }: Props) {
           <div className="flex gap-2 items-center">
             <div className="w-12 h-12 rounded-full bg-red-900 relative overflow-clip">
               <Image
-                src={image!}
+                src={doctorImage!}
                 alt={`Dr.${name}`}
                 fill
                 sizes="6rem"

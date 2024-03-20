@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useTransition } from "react";
+import React, { useEffect, useState, useTransition } from "react";
 import {
   Form,
   FormControl,
@@ -38,14 +38,16 @@ import { FormSuccess } from "../auth/form-success";
 import { ADMIN_DASHBOARD } from "@/routes";
 import { DEFAULT_IMG } from "@/lib/constants";
 import { useQuery } from "@tanstack/react-query";
+import { readImage } from "@/actions/images";
 
 type Props = {
   user: User;
   email: string;
   role: UserRole;
+  image: string;
 };
 
-export default function EditUser({ user: initialData, email, role }: Props) {
+export default function EditUser({ user: initialData, role, image }: Props) {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string>();
   const [success, setSuccess] = useState<string>();
@@ -54,14 +56,15 @@ export default function EditUser({ user: initialData, email, role }: Props) {
   const { data: user } = useQuery({
     queryKey: ["user", initialData.email],
     queryFn: async () => {
-      const user = await getUserById(email);
+      const user = await getUserById(initialData.id);
       if (user.error) throw new Error(user.error);
       return user.data;
     },
     refetchInterval: Number(refetchInterval),
     initialData: initialData,
   });
-  const [imageUrl, setImageUrl] = useState(user?.image || DEFAULT_IMG);
+
+  const [imageUrl, setImageUrl] = useState(image);
   const form = useForm<EditUserSchemaType>({
     resolver: zodResolver(editUserSchema),
     defaultValues: {

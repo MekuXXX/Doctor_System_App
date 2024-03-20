@@ -1,3 +1,4 @@
+import { readImage } from "@/actions/images";
 import { getConversation } from "@/actions/message";
 import { auth } from "@/auth";
 import ChatInput from "@/components/main/ChatInput";
@@ -22,6 +23,10 @@ const page = async ({ params }: PageProps) => {
   const otherUser = conversation.data?.users.find(
     (convUser) => convUser.id !== user.id
   );
+  if (!otherUser) redirect("/");
+  const otherUserImage = await readImage(otherUser?.image!);
+  otherUser.image = otherUserImage;
+  const sessionImg = await readImage(session.user.image!);
 
   return (
     <div className="h-full px-2 flex justify-between flex-col min-h-[75]">
@@ -30,7 +35,7 @@ const page = async ({ params }: PageProps) => {
           <Image
             fill
             referrerPolicy="no-referrer"
-            src={otherUser?.image!}
+            src={otherUserImage}
             alt={`${otherUser?.name} profile picture`}
             className="rounded-full"
           />
@@ -41,7 +46,7 @@ const page = async ({ params }: PageProps) => {
       <Messages
         chatId={chatId}
         chatPartner={otherUser!}
-        sessionImg={session.user.image}
+        sessionImg={sessionImg}
         sessionId={session.user.id!}
         initialMessages={conversation.data?.messages!}
       />

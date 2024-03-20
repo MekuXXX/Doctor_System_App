@@ -33,7 +33,7 @@ export default async function AddRate({ searchParams }: Props) {
     <div className="content max-w-fit mx-auto border-2 rounded-xl my-8  px-6 py-12">
       <h1 className="text-2xl mb-8">إضافة تقييم جديد</h1>
       <AddClientRate
-        patientName={session.user.name!}
+        userId={session.user.id!}
         doctorId={sessionData.doctor.id}
         sessionId={sessionId}
         role={session.user.role}

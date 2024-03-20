@@ -15,6 +15,7 @@ import Image from "next/image";
 import { auth } from "@/auth";
 import { checkCoupon } from "@/actions/coupon";
 import { TAX } from "@/lib/constants";
+import { readImage } from "@/actions/images";
 
 type Props = {
   searchParams: {
@@ -79,6 +80,7 @@ export default async function CheckoutPage({ searchParams }: Props) {
   if (!sessionData) redirect("/");
   if (sessionData.status === "PAID") redirect("/result?status=success");
   const { name, image, id } = sessionData.doctor.doctor;
+  const doctorImage = await readImage(image);
 
   const nextDayDate = moment(sessionData.date).set({
     hour: parseInt(sessionData.time.substring(0, 2)), // Extract hour from time string
@@ -168,7 +170,7 @@ export default async function CheckoutPage({ searchParams }: Props) {
           <div className="flex gap-2 items-center">
             <div className="w-12 h-12 rounded-full bg-red-900 relative overflow-clip">
               <Image
-                src={image!}
+                src={doctorImage!}
                 alt={`Dr.${name}`}
                 fill
                 sizes="6rem"
