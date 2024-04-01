@@ -57,7 +57,7 @@ export const columns: ColumnDef<any>[] = [
       </DataTableColumnHeader>
     ),
     cell: ({ row }) => {
-      const rate = calculateRate(row.original.DoctorData.Rate);
+      const rate = calculateRate(row.original?.DoctorData?.Rate);
       return (
         <DataTableItem>
           <div className="flex justify-center">
@@ -73,7 +73,7 @@ export const columns: ColumnDef<any>[] = [
     header: () => <DataTableColumnHeader>التخصص</DataTableColumnHeader>,
     cell: ({ row }) => {
       return (
-        <DataTableItem>{row.original.DoctorData.master.name}</DataTableItem>
+        <DataTableItem>{row.original?.DoctorData?.master?.name}</DataTableItem>
       );
     },
   },
@@ -84,8 +84,8 @@ export const columns: ColumnDef<any>[] = [
     cell: ({ row }) => {
       return (
         <DataTableItem>
-          {row.original.DoctorData.money.pending +
-            row.original.DoctorData.money.ready}
+          {row.original?.DoctorData?.money?.pending +
+            row.original?.DoctorData?.money?.ready || 0}
           $
         </DataTableItem>
       );
@@ -97,7 +97,9 @@ export const columns: ColumnDef<any>[] = [
     header: () => <DataTableColumnHeader>القابل للسحب</DataTableColumnHeader>,
     cell: ({ row }) => {
       return (
-        <DataTableItem>{row.original.DoctorData.money.ready}$</DataTableItem>
+        <DataTableItem>
+          {row.original?.DoctorData?.money?.ready || 0}$
+        </DataTableItem>
       );
     },
   },
@@ -106,11 +108,13 @@ export const columns: ColumnDef<any>[] = [
     accessorKey: "price",
     header: () => <DataTableColumnHeader>ثمن الجلسة</DataTableColumnHeader>,
     cell: ({ row }) => {
-      const { halfSessions, hourSessions } =
-        row.original.DoctorData.doctorSessions;
+      const halfSessions =
+        row.original?.DoctorData?.doctorSessions.halfSessions || 0;
+      const hourSessions =
+        row.original?.DoctorData?.doctorSessions.hourSessions || 0;
       let sessionPrice = halfSessions;
       if (hourSessions < halfSessions) sessionPrice = hourSessions;
-      return <DataTableItem>{sessionPrice}$</DataTableItem>;
+      return <DataTableItem>{sessionPrice || 0}$</DataTableItem>;
     },
   },
   {
@@ -175,7 +179,7 @@ export const columns: ColumnDef<any>[] = [
                 <div>
                   <label htmlFor="rank">الرتبة</label>
                   <Select
-                    defaultValue={row.original.DoctorData.doctorRank}
+                    defaultValue={row.original?.DoctorData?.doctorRank}
                     name="rank"
                   >
                     <SelectTrigger>
@@ -198,7 +202,7 @@ export const columns: ColumnDef<any>[] = [
                     min={0}
                     max={100}
                     type="number"
-                    defaultValue={row.original.DoctorData.doctorDiscount}
+                    defaultValue={row.original?.DoctorData?.doctorDiscount}
                     required
                   />
                 </div>

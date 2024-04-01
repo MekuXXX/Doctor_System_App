@@ -11,25 +11,20 @@ type Props = {
 };
 
 const sidebarLinks: SideBarLinkType = {
-  base: USER_DASHBOARD,
+  base: "/dashboard",
   links: [
     {
       id: 1,
-      link: "",
-      text: "الصفحة الرئيسية",
-    },
-    {
-      id: 2,
       link: "sessions",
       text: "الطلبات والحجوزات",
     },
     {
-      id: 3,
+      id: 2,
       link: "packages",
       text: "البكجات",
     },
     {
-      id: 4,
+      id: 3,
       link: "account",
       text: "حسابك",
     },

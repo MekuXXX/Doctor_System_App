@@ -53,4 +53,4 @@ export const DOCTOR_DASHBOARD = "/dr-dashboard";
  * The base url for doctor url
  * @type {string}
  */
-export const USER_DASHBOARD = "/dashboard";
+export const USER_DASHBOARD = "/dashboard/sessions";
