@@ -12,10 +12,6 @@ import {
 } from "@/components/ui/accordion";
 import { getDoctorSessionTimeByType } from "@/lib/doctor-session";
 import { StatusBadge } from "@/components/main/StatusBadge";
-import { toast } from "sonner";
-import { useRouter } from "next/navigation";
-import { deleteSessions } from "@/actions/sessions";
-import { MdDelete } from "react-icons/md";
 import { SessionStatus } from "@prisma/client";
 
 export const columns: ColumnDef<any>[] = [
@@ -124,31 +120,6 @@ export const columns: ColumnDef<any>[] = [
               </AccordionContent>
             </AccordionItem>
           </Accordion>
-        </DataTableItem>
-      );
-    },
-  },
-  {
-    accessorKey: "actions",
-    header: () => <DataTableColumnHeader>تعديلات</DataTableColumnHeader>,
-    cell: function Cell({ row }) {
-      const router = useRouter();
-
-      const handleDelete = async () => {
-        const res = await deleteSessions([row.original.id]);
-        if (res.success) {
-          toast.success(res.success);
-          router.refresh();
-        } else {
-          toast.error(res.error);
-        }
-      };
-
-      return (
-        <DataTableItem className="flex gap-2 justify-end">
-          <Button variant={"destructive"} onClick={handleDelete}>
-            <MdDelete className="h-[1.2rem] w-[1.2rem]" />
-          </Button>
         </DataTableItem>
       );
     },

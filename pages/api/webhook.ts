@@ -157,13 +157,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         };
         doctorMoney = data.doctorPrice;
       }
-
       await db.user.update({
         where: { id: doctorData!.id, role: "DOCTOR" },
         data: {
           DoctorData: {
             update: {
-              money: { update: { pending: {increment: doctorMoney!} } },
+              money: { update: { pending: { increment: doctorMoney! } } },
             },
           },
         },

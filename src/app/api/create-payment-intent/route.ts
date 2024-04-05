@@ -1,5 +1,4 @@
 import { auth } from "@/auth";
-import { UserDataType } from "@/hooks/use-user-data";
 import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
 import { db } from "@/lib/db";
@@ -46,8 +45,8 @@ export async function POST(req: NextRequest) {
 
   const sessionLink = await createWherebyUrl();
   const validUntil = moment().add(45, "days");
-
   let paymentIntent;
+
   try {
     if (payment_intent_id) {
       paymentIntent = await stripe.paymentIntents.retrieve(payment_intent_id);

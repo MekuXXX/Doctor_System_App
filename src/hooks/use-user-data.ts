@@ -1,44 +1,18 @@
 "use client";
 
+import { getUserLocation } from "@/actions/user-data";
 import { useQuery } from "@tanstack/react-query";
-
-export interface UserDataType {
-  geoplugin_request: string;
-  geoplugin_status: number;
-  geoplugin_delay: string;
-  geoplugin_credit: string;
-  geoplugin_city: string;
-  geoplugin_region: string;
-  geoplugin_regionCode: string;
-  geoplugin_regionName: string;
-  geoplugin_areaCode: string;
-  geoplugin_dmaCode: string;
-  geoplugin_countryCode: string;
-  geoplugin_countryName: string;
-  geoplugin_inEU: number;
-  geoplugin_euVATrate: boolean;
-  geoplugin_continentCode: string;
-  geoplugin_continentName: string;
-  geoplugin_latitude: string;
-  geoplugin_longitude: string;
-  geoplugin_locationAccuracyRadius: string;
-  geoplugin_timezone: string;
-  geoplugin_currencyCode: string;
-  geoplugin_currencySymbol: string;
-  geoplugin_currencySymbol_UTF8: string;
-  geoplugin_currencyConverter: number;
-}
 
 export const useUserData = () => {
   const refetchInterval = process.env.NEXT_PUBLIC_REFETCH_INTERVAL || 5000;
   return useQuery({
     queryKey: ["user-data"],
     queryFn: async () => {
-      const res = await fetch(
-        "http://www.geoplugin.net/json.gp?ip=41.47.255.255&base_currency=EUR"
-      );
-      const data = await res.json();
-      return data as UserDataType;
+      const ipRes = await fetch(process.env.NEXT_PUBLIC_IPIFY_URL || "");
+      const ip = await ipRes.text();
+      const data = await getUserLocation(ip);
+      console.log(data);
+      return data;
     },
     // refetchInterval: Number(refetchInterval),
   });

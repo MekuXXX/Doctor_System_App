@@ -22,16 +22,6 @@ type Props = {
   };
 };
 
-const order = {
-  id: "UTJzWVNhbTJPajFWdlNQejVGWmE4UT09",
-  doctorName: "أحمد السيد",
-  price: 25,
-  price_2: 15,
-  data: new Date(),
-  time: new Date().getTime(),
-  duration: 30,
-};
-
 const instructions = [
   {
     id: 1,
